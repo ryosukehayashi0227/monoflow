@@ -92,8 +92,14 @@ function initMetrics() {
     const total = tasks.length;
     document.getElementById('total-tasks').textContent = total;
     document.getElementById('completion-rate').textContent = `${total ? Math.round((statusCounts.done/total)*100) : 0}%`;
-    document.getElementById('avg-days').textContent = doneInPeriod ? (leadTimeTotal/doneInPeriod/(86400000)).toFixed(1) : "0.0";
-    let avgCycleStr = "0.0"; if (cycleCount) { const d = cycleTimeTotal/cycleCount/86400000; avgCycleStr = d < 0.1 ? `${(d*24).toFixed(1)}h` : d.toFixed(1); }
+    const leadVal = doneInPeriod ? (leadTimeTotal/doneInPeriod/(86400000)).toFixed(1) : "0.0";
+    document.getElementById('avg-days').textContent = `${leadVal} ${Common.t('unit_days')}`;
+    
+    let avgCycleStr = `0.0 ${Common.t('unit_days')}`; 
+    if (cycleCount) { 
+        const d = cycleTimeTotal/cycleCount/86400000; 
+        avgCycleStr = d < 0.1 ? `${(d*24).toFixed(1)} ${Common.t('unit_hours')}` : `${d.toFixed(1)} ${Common.t('unit_days')}`; 
+    }
     document.getElementById('cycle-time').textContent = avgCycleStr;
     const pace = doneInPeriod / Math.max(1, Math.round((endTs-startTs)/86400000));
     const remaining = statusCounts.todo + statusCounts.progress;
