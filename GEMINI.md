@@ -1,32 +1,37 @@
 # Monoflow Project Context
 
 ## Overview
-**Monoflow** is a lightweight, browser-based personal Kanban board application.
+**Monoflow** is a lightweight, professional, browser-based personal Kanban board application.
 It is designed to be fully self-contained in a single HTML file (`index.html`) without requiring a build process or a backend server.
 
 ## Architecture
 - **Single File Component:** All logic (HTML, CSS, JS) resides in `index.html`.
-- **Styling:** Tailwind CSS (via CDN).
-- **Icons:** Lucide React (via CDN, though used as vanilla JS).
-- **Drag & Drop:** SortableJS (via CDN).
-- **Data Persistence:** `localStorage` is used to persist tasks and columns.
-- **No Build Step:** The project runs directly in the browser.
+- **Styling:** Tailwind CSS (via Play CDN for zero-config portability).
+- **Icons:** Lucide Icons (via CDN).
+- **Drag & Drop:** SortableJS (via CDN) with **nested list** support.
+- **Data Persistence:** `localStorage` is used to persist tasks, columns, and custom labels.
+- **No Build Step:** The project runs directly by opening the file in a browser.
 
 ## Key Features
-- **Kanban Board:** Drag-and-drop tasks between columns (ToDo, In Progress, Done).
+- **Nested Kanban Board:** Support for parent-child relationships (1-level deep).
+- **Drag & Drop Subtasks:** Drag a task into another task to create a subtask.
 - **Task Management:** Create, edit, and delete tasks.
-- **Task Details:** Modal for editing title, description, and due date.
-- **Modern UI:** Clean aesthetic using Inter font and Tailwind CSS.
+- **Task Details:** Modal for editing title, description, due date, priority, and labels.
+- **Visual Status:**
+    - **Done State:** Tasks in the "Done" column are grayed out with a strike-through.
+    - **Completed Time:** Records and displays the exact date and time a task was moved to Done.
+- **Priorities:** High, Medium, and Low priorities with visual indicators.
+- **Custom Labels:** Create, delete, and filter tasks by color-coded labels.
+- **Data Portability:** Export and import the entire board data as JSON.
+
+## Data Schema (LocalStorage)
+- `tasks`: Object map of task objects.
+- `columns`: Object map of column objects containing `taskIds` (flat array of all IDs in order).
+- `columnOrder`: Array of column IDs.
+- `labels`: Array of custom label definitions.
 
 ## Development Guidelines
-1.  **Keep it Simple:** Avoid introducing build tools (Webpack, Vite) unless explicitly requested. The goal is "zero-config" usage.
-2.  **CDN Usage:** Use CDN links for libraries to maintain the single-file portability.
-3.  **Data Structure:**
-    - `tasks`: Object map of task details.
-    - `columns`: Object map of column details (including `taskIds` array).
-    - `columnOrder`: Array defining the visual order of columns.
-
-## Future Roadmap (Potential)
-- Dark mode toggle.
-- Export/Import JSON data.
-- customizable columns.
+1.  **Portability First:** Maintain the single-file structure. Avoid external local assets.
+2.  **CDN Reliance:** Continue using CDNs for libraries.
+3.  **DOM-to-Data Sync:** When updating task order or nesting, ensure the DOM structure is reliably mapped back to the `localStorage` state.
+4.  **Safety:** Keep the orphan-recovery logic in `renderBoard` to prevent data loss during schema/logic changes.
