@@ -107,7 +107,8 @@ const State = {
     data: null,
     filter: 'all',
     language: 'ja',
-    tempLabels: []
+    tempLabels: [],
+    lastAddedId: null // Track new task for animation
 };
 
 // --- 3. Data Service ---
@@ -303,7 +304,9 @@ const UI = {
     createTaskCard: (task, columnId, visibleTasksContext) => {
         const isDone = columnId === CONSTANTS.DONE_COLUMN_ID; const el = document.createElement('div');
         const hasParent = !!task.parentId && !!State.data.tasks[task.parentId]; const indentClass = hasParent ? 'child-task scale-95 origin-left' : '';
-        el.className = `task-card bg-white border border-slate-200 rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass} ${isDone ? 'is-done' : ''}`;
+        const isNewClass = task.id === State.lastAddedId ? 'is-new' : '';
+        
+        el.className = `task-card bg-white border border-slate-200 rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass} ${isDone ? 'is-done' : ''} ${isNewClass}`;
         el.dataset.taskId = task.id;
         const pConfig = CONSTANTS.PRIORITIES.find(p => p.value === task.priority);
         const priorityHtml = (pConfig && pConfig.value !== 'none') ? `<div class="flex items-center justify-center w-6 h-6 rounded-md border ${pConfig.style.replace('text-sm font-bold', '')}"><i data-lucide="${pConfig.icon}" class="w-4 h-4"></i></div>` : '';
@@ -350,7 +353,13 @@ const App = {
         if (content) {
             const id = `task-${Date.now()}`; const now = new Date().toISOString();
             State.data.tasks[id] = { id, content, description: '', dueDate: '', parentId: null, labels: [], priority: 'none', createdAt: now, updatedAt: now };
-            State.data.columns['c1'].taskIds.unshift(id); DataService.save(); App.render(); input.value = '';
+            State.data.columns['c1'].taskIds.unshift(id);
+            
+            // Highlight effect
+            State.lastAddedId = id;
+            setTimeout(() => { State.lastAddedId = null; }, 3000);
+
+            DataService.save(); App.render(); input.value = '';
         }
     },
     render: () => {
