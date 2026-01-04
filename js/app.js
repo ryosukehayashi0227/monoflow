@@ -77,7 +77,15 @@ const Modal = {
     },
     init: () => {
         const cContainer = document.getElementById('label-color-picker');
-        cContainer.innerHTML = ['red', 'blue', 'green', 'yellow', 'purple'].map((c, i) => `<input type="radio" name="label-color" value="${c}" id="c-${c}" class="hidden color-radio" ${i===0?'checked':''}><label for="c-${c}" class="w-5 h-5 rounded-full bg-${c}-500 cursor-pointer block color-label hover:scale-110"></label>`).join('');
+        const colors = {
+            red: 'bg-red-500', blue: 'bg-blue-500', green: 'bg-green-500', yellow: 'bg-yellow-500', purple: 'bg-purple-500'
+        };
+        cContainer.innerHTML = Object.keys(colors).map((c, i) => 
+            `<div class="relative">
+                <input type="radio" name="label-color" value="${c}" id="c-${c}" class="peer sr-only" ${i===0?'checked':''}>
+                <label for="c-${c}" class="w-5 h-5 rounded-full ${colors[c]} cursor-pointer block hover:scale-110 border border-black/10 transition-all peer-checked:ring-2 peer-checked:ring-offset-1 peer-checked:ring-slate-400"></label>
+            </div>`
+        ).join('');
     },
     renderStaticUI: () => {
         document.querySelector('#task-modal h3').textContent = Common.t('modal_title');
@@ -90,16 +98,15 @@ const Modal = {
         archBtn.innerHTML = `<i data-lucide="archive" class="w-4 h-4"></i> ${Common.t('modal_btn_archive')}`;
         archBtn.onclick = () => BoardData.archiveTask(Modal.elements.id.value);
         const pContainer = document.getElementById('priority-options-container');
-        pContainer.innerHTML = CONSTANTS.PRIORITIES.map(p => `<label class="cursor-pointer"><input type="radio" name="priority" value="${p.value}" class="peer sr-only"><div class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 peer-checked:${p.style} text-sm font-bold flex items-center gap-1 transition-all hover:bg-slate-50">${p.icon ? `<i data-lucide="${p.icon}" class="w-4 h-4"></i>` : ''} ${p.label[State.language]}</div></label>`).join('');
+        pContainer.innerHTML = CONSTANTS.PRIORITIES.map(p => `<label class="cursor-pointer flex-1"><input type="radio" name="priority" value="${p.value}" class="peer sr-only"><div class="w-full text-center px-2 py-2 rounded-lg border border-slate-200 text-slate-500 peer-checked:${p.style} text-xs font-bold flex items-center justify-center gap-1 transition-all hover:bg-slate-50 h-full">${p.icon ? `<i data-lucide="${p.icon}" class="w-3 h-3"></i>` : ''} <span class="hidden sm:inline">${p.label[State.language]}</span><span class="sm:hidden">${p.label[State.language].substring(0,1)}</span></div></label>`).join('');
         
-        const labels = document.querySelectorAll('#task-modal label');
-        if (labels.length > 0) labels[0].textContent = Common.t('modal_label_title');
-        if (labels.length > 1) labels[1].textContent = Common.t('modal_label_priority');
-        if (labels.length > 2) labels[2].textContent = Common.t('modal_label_tags');
-        if (labels.length > 3) labels[3].textContent = Common.t('modal_label_parent');
-        if (labels.length > 4) labels[4].textContent = Common.t('modal_label_blocker');
-        if (labels.length > 5) labels[5].textContent = Common.t('modal_label_desc');
-        if (labels.length > 6) labels[6].textContent = Common.t('modal_label_date');
+        Common.setT('modal-label-title', 'modal_label_title');
+        Common.setT('modal-label-priority', 'modal_label_priority');
+        Common.setT('modal-label-tags', 'modal_label_tags');
+        Common.setT('modal-label-parent', 'modal_label_parent');
+        Common.setT('modal-label-blocker', 'modal_label_blocker');
+        Common.setT('modal-label-desc', 'modal_label_desc');
+        Common.setT('modal-label-date', 'modal_label_date');
         
         if (Modal.elements.addBlockerBtn) Modal.elements.addBlockerBtn.textContent = Common.t('modal_btn_add_blocker');
         lucide.createIcons();
@@ -324,6 +331,7 @@ const App = {
     },
     init: () => {
         BoardData.init();
+        Modal.init(); // Initialize color picker
         Modal.renderStaticUI();
         App.translateUI();
         document.getElementById('add-task-form').addEventListener('submit', App.handleAddTask);
@@ -349,6 +357,7 @@ const App = {
         t('footer-text', 'help_footer');
         a('search-input', 'placeholder', 'search_placeholder');
         a('new-task-input', 'placeholder', 'add_placeholder');
+        a('new-label-name', 'placeholder', 'modal_label_new_tag');
         a('help-btn', 'title', 'menu_help');
         a('lang-btn', 'title', 'switch_lang');
         a('theme-btn', 'title', 'toggle_theme');

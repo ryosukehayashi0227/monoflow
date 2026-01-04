@@ -15,8 +15,10 @@ Unlike cloud-based tools, MonoFlow lives entirely in your browser. It requires n
 
 - **Advanced Task Engine:**
   - **Smart 2-Level Hierarchy:** Powerful parent-child task management with automatic progress tracking and subtask previews.
-  - **Context Ghosts (Virtual Tickets):** Maintain project visibility across lanes with placeholders and "Jump & Flash" navigation.
-  - **Notification Center:** Centralized alerts for overdue and due-today tasks, ensuring you never miss a deadline.
+  - **Dependency Management (Blockers):** Define tasks that must be completed first. Visualize dependencies with **dynamic flowing connectors** by hovering over the link icon.
+  - **Stale Task Detection:** Automatically highlights tasks in the "To Do" lane that haven't been touched for over a week with a "Dust" icon.
+  - **Context Ghosts:** Maintain project visibility across lanes with placeholders and "Jump & Flash" navigation.
+  - **Notification Center:** Centralized alerts for overdue and due-today tasks.
 - **Deep Analytics:**
   - **Metrics Dashboard:** High-precision tracking of Throughput, Lead Time, and Cycle Time (down to the hour).
   - **Burndown Dynamics:** Pro-grade progress visualization with ideal trend lines and scope change tracking.
@@ -24,11 +26,12 @@ Unlike cloud-based tools, MonoFlow lives entirely in your browser. It requires n
 - **Professional Workflow:**
   - **Masterful Keyboard Navigation:** Navigate instantly with global shortcuts (e.g., `Alt/Option + M/B/L/A`) and `?` for help.
   - **Full-text Real-time Search:** Instant filtering across titles and detailed notes as you type.
+  - **Compact Done Lane:** Completed tasks are automatically compacted to reduce visual clutter and keep focus on active work.
   - **Touch-Optimized:** Seamless drag-and-drop experience on iPad, iPhone, and Android devices.
 - **Highly Customizable:**
-  - **Unified Dark Mode:** A sleek, high-contrast dark theme designed to reduce eye strain during late-night sessions.
+  - **Unified Dark Mode:** A sleek, high-contrast dark theme designed to reduce eye strain.
   - **Bilingual Support:** Full, native localization for both Japanese and English.
-  - **Comprehensive Backups:** Export/Import entire system states (tasks, labels, settings) via JSON files.
+  - **Comprehensive Backups:** Export/Import entire system states via JSON.
 
 ## 🚀 Getting Started
 
@@ -42,7 +45,7 @@ Unlike cloud-based tools, MonoFlow lives entirely in your browser. It requires n
 
 MonoFlow is built with a focus on simplicity, speed, and standard web technologies:
 
-- **Logic:** Vanilla JavaScript (ES6+) with a modular, refactored Data Service architecture.
+- **Logic:** Vanilla JavaScript (ES6+) with a modular `DataService` and `Modal` architecture.
 - **Styling:** Tailwind CSS (Modern, utility-first design).
 - **Charts:** Chart.js v4 (High-performance data visualization).
 - **Icons:** Lucide Icons (Clean, consistent vector iconography).
