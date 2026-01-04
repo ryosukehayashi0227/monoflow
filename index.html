@@ -185,7 +185,7 @@
                                 <div class="flex gap-3 items-center bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-sm" id="label-color-picker">
                                     <!-- Injected by JS -->
                                 </div>
-                                <button type="button" onclick="LabelManager.create()" class="bg-slate-800 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-slate-900 shadow-sm shrink-0">追加</button>
+                                <button id="modal-add-tag-btn" type="button" onclick="LabelManager.create()" class="bg-slate-800 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-slate-900 shadow-sm shrink-0">追加</button>
                             </div>
                         </div>
                         <div id="edit-task-labels" class="flex flex-wrap gap-2"></div>
@@ -210,8 +210,8 @@
                 </form>
             </div>
             <div class="p-6 border-t border-slate-100 bg-slate-50 flex justify-end gap-3 rounded-b-2xl">
-                <button onclick="Modal.close()" class="px-5 py-2.5 text-slate-600 font-medium hover:bg-slate-200 rounded-xl transition-colors">キャンセル</button>
-                <button onclick="Modal.save()" class="bg-blue-600 text-white font-semibold rounded-xl px-6 py-2.5 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all">保存</button>
+                <button id="modal-cancel-btn" onclick="Modal.close()" class="px-5 py-2.5 text-slate-600 font-medium hover:bg-slate-200 rounded-xl transition-colors">キャンセル</button>
+                <button id="modal-save-btn" onclick="Modal.save()" class="bg-blue-600 text-white font-semibold rounded-xl px-6 py-2.5 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all">保存</button>
             </div>
         </div>
     </div>

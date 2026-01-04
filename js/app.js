@@ -150,9 +150,17 @@ const Modal = {
         if (notesLabel) notesLabel.textContent = Common.t('modal_label_desc');
         const dateLabel = document.querySelector('input#edit-task-date').previousElementSibling;
         if (dateLabel) dateLabel.textContent = Common.t('modal_label_date');
-        const btns = Modal.elements.overlay.querySelectorAll('.p-6.border-t button');
-        if (btns.length >= 2) { btns[1].textContent = Common.t('modal_btn_cancel'); btns[2].textContent = Common.t('modal_btn_save'); }
+
+        const addTagBtn = document.getElementById('modal-add-tag-btn');
+        if (addTagBtn) addTagBtn.textContent = Common.t('modal_btn_add_tag');
+
+        const cancelBtn = document.getElementById('modal-cancel-btn');
+        if (cancelBtn) cancelBtn.textContent = Common.t('modal_btn_cancel');
+
+        const saveBtn = document.getElementById('modal-save-btn');
+        if (saveBtn) saveBtn.textContent = Common.t('modal_btn_save');
         
+        // Archive button
         let archiveBtn = document.getElementById('modal-archive-btn');
         if (!archiveBtn) {
             archiveBtn = document.createElement('button'); archiveBtn.id = 'modal-archive-btn';
