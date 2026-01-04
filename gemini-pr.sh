@@ -11,22 +11,27 @@ if git diff --cached --quiet; then
 fi
 
 # 3. Geminiにコミットメッセージを生成させる
-echo "🤖 Geminiが変更内容を分析してメッセージを生成中..."
-COMMIT_MSG=$(git diff --cached | gemini "以下のdiffに基づき、Conventional Commits形式で1行のコミットメッセージを作成してください。余計な解説は不要です。")
+echo "🤖 Geminiがコミットメッセージを生成中..."
+# パイプで渡す際に、余計なツールを使わせないよう指示を強化します
+COMMIT_MSG=$(git diff --cached | gemini "あなたはコミットメッセージ作成者です。以下のdiffに基づき、Conventional Commits形式で1行のメッセージのみを出力してください。ツール実行や解説は一切不要です。")
 
-# 4. コミット実行
-echo "📝 コミット中: $COMMIT_MSG"
+# ※もし gemini コマンドが --raw などのオプションを持っている場合は追加してください
+# 例: gemini --raw "..."
+
+if [ -z "$COMMIT_MSG" ]; then
+  echo "❌ メッセージの生成に失敗しました。"
+  exit 1
+fi
+
+echo "📝 生成されたメッセージ: $COMMIT_MSG"
+
+# --- 以下、前回のスクリプトと同じ ---
 git commit -m "$COMMIT_MSG"
-
-# 5. 現在のブランチ名を取得してプッシュ
 BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
-echo "🚀 $BRANCH_NAME をプッシュ中..."
 git push origin "$BRANCH_NAME"
 
-# 6. PRの作成
-echo "📄 GitHubでプルリクエストを作成中..."
-PR_BODY=$(git diff main...HEAD | gemini "この差分に基づき、GitHubのプルリクエスト用の説明文を日本語のMarkdown形式で作成してください。")
+echo "📄 PR本文を生成中..."
+PR_BODY=$(git diff main...HEAD | gemini "この差分を要約し、GitHubのPR用説明文を日本語のMarkdownで作成してください。ツールは使用せずテキストのみ返してください。")
 
 gh pr create --title "$COMMIT_MSG" --body "$PR_BODY"
-
-echo "✅ すべての工程が完了しました！"
+echo "✅ 完了！"

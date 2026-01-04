@@ -123,6 +123,36 @@
                         <input type="text" id="edit-task-content" class="w-full border border-slate-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
                     </div>
 
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">優先度</label>
+                        <div class="flex gap-2">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="priority" value="high" class="peer sr-only">
+                                <div class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 peer-checked:bg-red-50 peer-checked:text-red-600 peer-checked:border-red-200 text-sm font-bold flex items-center gap-1 transition-all hover:bg-slate-50">
+                                    <i data-lucide="chevrons-up" class="w-4 h-4"></i> 高
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="priority" value="medium" class="peer sr-only">
+                                <div class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 peer-checked:bg-orange-50 peer-checked:text-orange-600 peer-checked:border-orange-200 text-sm font-bold flex items-center gap-1 transition-all hover:bg-slate-50">
+                                    <i data-lucide="minus" class="w-4 h-4"></i> 中
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="priority" value="low" class="peer sr-only">
+                                <div class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 peer-checked:bg-blue-50 peer-checked:text-blue-600 peer-checked:border-blue-200 text-sm font-bold flex items-center gap-1 transition-all hover:bg-slate-50">
+                                    <i data-lucide="chevrons-down" class="w-4 h-4"></i> 低
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="priority" value="none" class="peer sr-only">
+                                <div class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-400 peer-checked:bg-slate-100 peer-checked:text-slate-600 peer-checked:border-slate-300 text-sm font-medium transition-all hover:bg-slate-50">
+                                    指定なし
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
                     <!-- Label Section -->
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
                         <label class="block text-sm font-semibold text-slate-700 mb-3">ラベル</label>
@@ -368,14 +398,34 @@
                 }
             }
 
+            // Priority Indicator
+            let priorityHtml = '';
+            if (task.priority && task.priority !== 'none') {
+                const p = task.priority;
+                let colorClass = 'text-slate-400';
+                let icon = 'minus';
+                if (p === 'high') { colorClass = 'text-red-600 bg-red-50 border-red-100'; icon = 'chevrons-up'; }
+                else if (p === 'medium') { colorClass = 'text-orange-500 bg-orange-50 border-orange-100'; icon = 'minus'; }
+                else if (p === 'low') { colorClass = 'text-blue-500 bg-blue-50 border-blue-100'; icon = 'chevrons-down'; }
+                
+                priorityHtml = `
+                    <div class="flex items-center justify-center w-6 h-6 rounded-md border ${colorClass}" title="優先度">
+                        <i data-lucide="${icon}" class="w-4 h-4"></i>
+                    </div>
+                `;
+            }
+
             taskCard.innerHTML = `
                 ${parentIndicator}
                 ${labelsHtml}
                 <div class="flex justify-between items-start gap-2">
-                    <span class="text-[15px] font-medium text-slate-700 leading-relaxed">${task.content}</span>
-                    <button onclick="event.stopPropagation(); deleteTask('${task.id}', '${columnId}')" class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-1 -mr-2 -mt-2">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
+                    <span class="text-[15px] font-medium text-slate-700 leading-relaxed flex-grow">${task.content}</span>
+                    <div class="flex flex-col gap-1 items-end">
+                        ${priorityHtml}
+                        <button onclick="event.stopPropagation(); deleteTask('${task.id}', '${columnId}')" class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-1">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </div>
                 ${indicatorsHtml}
             `;
@@ -568,6 +618,11 @@
             tempTaskLabels = task.labels ? [...task.labels] : [];
             renderModalLabels();
 
+            // Set Priority
+            const priorityVal = task.priority || 'none';
+            const radio = document.querySelector(`input[name="priority"][value="${priorityVal}"]`);
+            if(radio) radio.checked = true;
+
             modal.classList.remove('hidden');
             void modal.offsetWidth; 
             modal.classList.remove('opacity-0');
@@ -593,6 +648,9 @@
                 task.dueDate = editTaskDateInput.value;
                 task.parentId = editTaskParentInput.value || null;
                 task.labels = tempTaskLabels;
+
+                const priorityRadio = document.querySelector('input[name="priority"]:checked');
+                task.priority = priorityRadio ? priorityRadio.value : 'none';
 
                 if (task.parentId) { 
                     Object.values(boardData.tasks).forEach(t => { if(t.parentId === taskId) t.parentId = null; });
