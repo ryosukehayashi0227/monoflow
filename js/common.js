@@ -30,13 +30,14 @@ const CONSTANTS = {
             add_placeholder: '新しいタスクを入力...', 
             add_btn: '追加',
             search_placeholder: '検索...',
+            menu_board: 'ボード',
             menu_export: 'エクスポート (JSON)',
             menu_import: 'インポート',
             menu_metrics: 'Metrics',
             menu_burndown: 'Burndown',
             menu_archive: 'アーカイブ',
+            menu_about: 'About',
             menu_help: 'User Guide',
-            menu_about: 'MonoFlowについて',
             menu_reset: 'ボードのリセット',
             modal_title: 'タスク詳細',
             modal_label_title: 'タイトル',
@@ -144,7 +145,6 @@ const CONSTANTS = {
             help_shortcuts_metrics: 'Metrics ページへ移動',
             help_shortcuts_burndown: 'Burndown ページへ移動',
             help_footer: 'MonoFlow Productivity System - Built for High-Performance Personal Kanban',
-            // About Page
             about_title: 'MonoFlow',
             about_link: 'What is MonoFlow?',
             about_subtitle: 'ミニマルで強力な個人用カンバン',
@@ -167,13 +167,14 @@ const CONSTANTS = {
             add_placeholder: 'Add a new task...', 
             add_btn: 'Add',
             search_placeholder: 'Search...', 
+            menu_board: 'Board',
             menu_export: 'Export (JSON)',
             menu_import: 'Import',
             menu_metrics: 'Metrics',
             menu_burndown: 'Burndown',
             menu_archive: 'Archive',
+            menu_about: 'About',
             menu_help: 'User Guide',
-            menu_about: 'About MonoFlow',
             menu_reset: 'Reset Board',
             modal_title: 'Task Details',
             modal_label_title: 'Title',
@@ -316,6 +317,12 @@ const Common = {
         State.language = localStorage.getItem(CONSTANTS.LANG_KEY) || (navigator.language.startsWith('ja') ? 'ja' : 'en');
         State.theme = localStorage.getItem(CONSTANTS.THEME_KEY) || 'light';
         Common.applyTheme();
+        
+        // Global Click to close menu
+        document.addEventListener('click', () => {
+            const menu = document.getElementById('settings-menu');
+            if (menu) menu.classList.add('hidden');
+        });
     },
 
     applyTheme: () => {
@@ -331,6 +338,12 @@ const Common = {
         State.theme = State.theme === 'light' ? 'dark' : 'light';
         localStorage.setItem(CONSTANTS.THEME_KEY, State.theme);
         Common.applyTheme();
+    },
+
+    toggleMenu: (e) => {
+        e.stopPropagation();
+        const menu = document.getElementById('settings-menu');
+        if (menu) menu.classList.toggle('hidden');
     },
 
     setLanguage: (lang) => {

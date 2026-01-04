@@ -52,19 +52,15 @@
             <div class="flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
                 <div class="flex items-center gap-3 bg-white dark:bg-slate-900 p-2 pl-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex-grow">
                     <div id="metrics-period-label" class="text-[10px] font-black text-slate-400 uppercase tracking-wider">期間</div>
-                    <div class="flex items-center gap-2">
-                        <input type="date" id="start-date" class="text-sm font-bold text-slate-600 dark:text-slate-300 focus:outline-none bg-transparent">
-                        <span class="text-slate-300">→</span>
-                        <input type="date" id="end-date" class="text-sm font-bold text-slate-600 dark:text-slate-300 focus:outline-none bg-transparent">
-                    </div>
+                    <div class="flex items-center gap-2"><input type="date" id="start-date" class="text-sm font-bold text-slate-600 dark:text-slate-300 focus:outline-none bg-transparent"><span class="text-slate-300">→</span><input type="date" id="end-date" class="text-sm font-bold text-slate-600 dark:text-slate-300 focus:outline-none bg-transparent"></div>
                 </div>
                 <div class="relative group">
-                    <button onclick="toggleLabelMenu(event)" class="flex items-center gap-3 bg-white dark:bg-slate-900 p-2 pl-5 pr-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-blue-300 transition-all min-w-[180px]">
-                        <div id="metrics-label-label" class="text-[10px] font-black text-slate-400 uppercase tracking-wider shrink-0">ラベル</div>
-                        <div id="selected-label-count" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg ml-auto">すべて</div>
-                        <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
-                    </button>
-                    <div id="metrics-label-menu" class="absolute left-0 top-full mt-2 w-64 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-[1.5rem] shadow-2xl border border-slate-100 dark:border-slate-800 hidden z-30 p-4 max-h-80 overflow-y-auto">
+                    <button onclick="Common.toggleMenu(event)" class="flex items-center gap-3 bg-white dark:bg-slate-900 p-2 pl-5 pr-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-blue-300 transition-all min-w-[180px]"><div id="metrics-label-label" class="text-[10px] font-black text-slate-400 uppercase tracking-wider shrink-0">ラベル</div><div id="selected-label-count" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg ml-auto">すべて</div><i data-lucide="more-horizontal" class="w-4 h-4 text-slate-400 ml-1"></i></button>
+                    <div id="settings-menu" class="absolute left-0 top-full mt-2 w-64 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-[1.5rem] shadow-2xl border border-slate-100 dark:border-slate-800 hidden z-30 p-4 max-h-80 overflow-y-auto">
+                        <a href="index.html" class="md:hidden w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 transition-colors border-b border-slate-100 dark:border-slate-800"><i data-lucide="layout" class="w-4 h-4 text-slate-400"></i> <span id="menu-board-text">Board</span></a>
+                        <a href="metrics.html" class="md:hidden w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 transition-colors border-b border-slate-100 dark:border-slate-800"><i data-lucide="bar-chart-2" class="w-4 h-4 text-slate-400"></i> <span id="menu-metrics-text">Metrics</span></a>
+                        <a href="burndown.html" class="md:hidden w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 transition-colors border-b border-slate-100 dark:border-slate-800"><i data-lucide="trending-down" class="w-4 h-4 text-slate-400"></i> <span id="menu-burndown-text">Burndown</span></a>
+                        <a href="about.html" class="md:hidden w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-blue-600 flex items-center gap-2 transition-colors border-b border-slate-100 dark:border-slate-800"><i data-lucide="info" class="w-4 h-4 text-blue-400"></i> <span id="menu-about-text">About</span></a>
                         <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-50 dark:border-slate-800"><span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">ラベルを選択</span><button onclick="clearLabels()" class="text-[10px] font-bold text-blue-500 hover:text-blue-700">クリア</button></div>
                         <div id="metrics-label-chips" class="flex flex-col gap-1"></div>
                     </div>
