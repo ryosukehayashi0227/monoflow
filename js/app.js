@@ -202,19 +202,22 @@ const UI = {
                     const isBDone = State.data.columns[CONSTANTS.DONE_COLUMN_ID].taskIds.includes(bid) || (b.archived && b.completedDate);
                     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                     
-                    // Smoother Curve
-                    const dist = Math.abs(tx - sx);
-                    const cpOffset = Math.min(dist / 2, 100); // Limit curvature
-                    const cp1x = sx + (tx > sx ? cpOffset : -cpOffset);
-                    const cp2x = tx + (tx > sx ? -cpOffset : cpOffset);
+                                // Smoother Curve
+                                const dist = Math.abs(tx - sx);
+                                const cpOffset = Math.min(dist / 2, 100); 
+                                // Control points logic needs to be swapped because we are drawing FROM Target (Blocker) TO Source (Self)
+                                // But wait, let's just swap M and coords in d attribute.
+                                
+                                // Draw from Blocker (tx, ty) to Self (sx, sy) to make the "flow" come from dependency.
+                                const cp1x_rev = tx + (sx > tx ? cpOffset : -cpOffset);
+                                const cp2x_rev = sx + (sx > tx ? -cpOffset : cpOffset);
                     
-                    path.setAttribute('d', `M ${sx} ${sy} C ${cp1x} ${sy}, ${cp2x} ${ty}, ${tx} ${ty}`);
-                    path.setAttribute('class', `connector-path ${isBDone ? 'is-done' : ''}`);
-                    canvas.appendChild(path);
-                });
-            },
-        
-        clearConnectors: () => {
+                                path.setAttribute('d', `M ${tx} ${ty} C ${cp1x_rev} ${ty}, ${cp2x_rev} ${sy}, ${sx} ${sy}`);
+                                path.setAttribute('class', `connector-path ${isBDone ? 'is-done' : ''}`);
+                                canvas.appendChild(path);
+                            });
+                        },
+                            clearConnectors: () => {
             const canvas = document.getElementById('connector-canvas');
             if (canvas) canvas.innerHTML = '';
         },

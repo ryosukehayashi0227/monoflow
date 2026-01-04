@@ -220,22 +220,25 @@ body.modal-open { overflow: hidden; }
 .connector-path {
     fill: none;
     stroke: #3b82f6;
-    stroke-width: 2; /* Thinner */
-    opacity: 0.6;    /* Semi-transparent */
+    stroke-width: 2.5;
+    opacity: 0.8;
     stroke-linecap: round;
-    filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.3));
-    stroke-dasharray: 1000;
-    stroke-dashoffset: 1000;
-    animation: draw-connector 0.4s ease-out forwards; /* Faster */
+    filter: drop-shadow(0 0 3px rgba(59, 130, 246, 0.4));
+    
+    /* Flowing Dash Animation */
+    stroke-dasharray: 8 6; /* Dash length 8, Gap 6 */
+    animation: flow-connector 1s linear infinite;
     pointer-events: none;
 }
 
 .connector-path.is-done {
     stroke: #22c55e;
-    opacity: 0.5;
-    filter: drop-shadow(0 0 2px rgba(34, 197, 94, 0.3));
+    opacity: 0.6;
+    filter: drop-shadow(0 0 3px rgba(34, 197, 94, 0.4));
+    animation: flow-connector 2s linear infinite; /* Slower flow for done */
 }
 
-@keyframes draw-connector {
+@keyframes flow-connector {
+    from { stroke-dashoffset: 14; } /* Matches dasharray total (8+6) */
     to { stroke-dashoffset: 0; }
 }
