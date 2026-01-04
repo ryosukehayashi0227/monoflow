@@ -21,6 +21,9 @@ function translateUI() {
     const trendTitle = document.querySelector('h2');
     if (trendTitle) trendTitle.innerHTML = `<i data-lucide="line-chart" class="w-4 h-4"></i> ${Common.t('burndown_trend')}`;
     
+    const aboutLink = document.getElementById('about-link');
+    if (aboutLink) aboutLink.textContent = Common.t('about_link');
+    
     const backLink = document.querySelector('a[href="index.html"] span');
     if (backLink) backLink.textContent = Common.t('back_to_app');
 }

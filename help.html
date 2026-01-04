@@ -5,253 +5,175 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MonoFlow - User Guide</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232563eb'/%3E%3Cpath d='M30 30 L 30 70 L 50 50 L 70 70 L 70 30' fill='none' stroke='white' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" type="image/svg+xml">
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
     </script>
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        body { background-color: #f8fafc; color: #1e293b; }
-        .feature-card { @apply bg-white p-10 rounded-[3rem] border border-slate-200 shadow-sm mb-12; }
+        .feature-card { @apply bg-white dark:bg-slate-900 p-10 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-sm mb-12; }
         .step-num { @apply flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white font-black text-sm shrink-0 shadow-lg shadow-blue-500/30; }
-        h2 { @apply text-3xl font-black text-slate-900 mb-12 flex items-center gap-4 border-l-8 border-l-blue-600 pl-6 tracking-tighter; }
-        h3 { @apply text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3; }
-        h4 { @apply text-lg font-bold text-slate-700 mb-3 mt-8 flex items-center gap-2; }
-        p { @apply text-slate-500 leading-relaxed mb-4 text-sm; }
+        h2 { @apply text-3xl font-black text-slate-900 dark:text-white mb-12 flex items-center gap-4 border-l-8 border-l-blue-600 pl-6 tracking-tighter; }
+        h3 { @apply text-2xl font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-3; }
+        h4 { @apply text-lg font-bold text-slate-700 dark:text-slate-300 mb-3 mt-8 flex items-center gap-2; }
+        p { @apply text-slate-500 dark:text-slate-400 leading-relaxed mb-4 text-sm; }
         ul { @apply space-y-2 mb-6; }
-        li { @apply text-slate-500 text-sm flex gap-2; }
+        li { @apply text-slate-500 dark:text-slate-400 text-sm flex gap-2; }
         li::before { content: "•"; @apply text-blue-500 font-bold; }
-        .screenshot { @apply w-full rounded-2xl border border-slate-100 shadow-inner my-8 bg-slate-50; }
-        .kbd { @apply px-2 py-1 bg-slate-100 border border-slate-200 rounded text-xs font-mono text-slate-600 shadow-sm; }
-        .badge-demo { @apply inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border; }
+        .screenshot { @apply w-full rounded-2xl border border-slate-100 dark:border-slate-800 shadow-inner my-8 bg-slate-50 dark:bg-slate-800/50; }
+        .kbd { @apply px-2 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-mono text-slate-600 dark:text-slate-400 shadow-sm; }
     </style>
 </head>
-<body class="antialiased">
-
-    <div class="max-w-[1200px] mx-auto px-6 py-20">
-        <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-24 border-b border-slate-200 pb-12 gap-8">
-            <div class="flex items-center gap-6">
-                <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-800 rounded-[1.5rem] flex items-center justify-center shadow-2xl shadow-blue-500/30">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="6" y2="18"></line><line x1="12" y1="6" x2="12" y2="14"></line><line x1="18" y1="6" x2="18" y2="10"></line></svg>
-                </div>
-                <div>
-                    <h1 id="help-page-title" class="text-5xl font-black text-slate-900 tracking-tighter leading-none">User Guide</h1>
-                    <p id="help-page-subtitle" class="text-slate-400 mt-2 font-bold uppercase tracking-widest text-xs">MonoFlow Comprehensive Manual</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-3 ml-auto">
-                <button onclick="Common.setLanguage(State.language === 'ja' ? 'en' : 'ja')" class="p-3 rounded-2xl bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center" title="Switch Language">
-                    <i data-lucide="languages" class="w-5 h-5"></i>
-                </button>
-                <button onclick="Common.toggleTheme()" class="p-3 rounded-2xl bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center">
-                    <i data-lucide="sun" id="theme-icon-light" class="w-5 h-5 hidden"></i>
-                    <i data-lucide="moon" id="theme-icon-dark" class="w-5 h-5"></i>
-                </button>
-                <a href="index.html" class="flex items-center gap-3 px-8 py-3.5 bg-white border border-slate-200 rounded-2xl text-slate-700 hover:bg-slate-50 transition-all font-black shadow-sm active:scale-95 ml-2">
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                    <span id="back-to-app-text">アプリに戻る</span>
+<body class="antialiased bg-[#f8fafc] dark:bg-[#0f172a]">
+    <div class="max-w-[1600px] mx-auto px-4 md:px-8 py-4">
+        <!-- Header Section (Unified) -->
+        <header class="flex flex-col gap-4 mb-6">
+            <div class="flex items-center gap-4 pb-4 border-b border-slate-200 dark:border-slate-800 relative">
+                <a href="index.html" class="flex items-center gap-4 group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-xl flex items-center justify-center shadow-lg shrink-0 transform transition-all group-hover:rotate-3 group-hover:scale-110 duration-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white transform group-hover:scale-110 transition-transform duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="6" y2="18"></line><line x1="12" y1="6" x2="12" y2="14"></line><line x1="18" y1="6" x2="18" y2="10"></line></svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-black tracking-tighter text-slate-900 dark:text-white leading-tight">MonoFlow</h1>
+                        <p class="text-slate-400 font-bold uppercase tracking-widest text-[8px] mt-0 opacity-80">Simple Personal Kanban</p>
+                    </div>
                 </a>
+                <nav class="flex items-center gap-3 ml-8 hidden md:flex">
+                    <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+                        <a href="index.html" class="tab-item px-4 py-1.5 rounded-lg text-xs font-bold transition-all">Board</a>
+                        <a href="metrics.html" class="tab-item px-4 py-1.5 rounded-lg text-xs font-bold transition-all">Metrics</a>
+                        <a href="burndown.html" class="tab-item px-4 py-1.5 rounded-lg text-xs font-bold transition-all">Burndown</a>
+                    </div>
+                    <a href="about.html" id="about-link" class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all border border-blue-100 dark:border-blue-800/50 shadow-sm">What is MonoFlow?</a>
+                </nav>
+                <div class="flex items-center gap-2 ml-auto">
+                    <a href="help.html" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center" title="User Guide"><i data-lucide="help-circle" class="w-4 h-4"></i></a>
+                    <button onclick="Common.setLanguage(State.language === 'ja' ? 'en' : 'ja')" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center" title="Switch Language"><i data-lucide="languages" class="w-4 h-4"></i></button>
+                    <button onclick="Common.toggleTheme()" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center"><i data-lucide="sun" id="theme-icon-light" class="w-4 h-4 hidden"></i><i data-lucide="moon" id="theme-icon-dark" class="w-4 h-4"></i></button>
+                </div>
             </div>
         </header>
 
-        <!-- Quick Start Section -->
-        <section class="mb-32">
-            <h2 id="help-quick-header">Quick Start</h2>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden group">
-                    <div class="step-num mb-6">01</div>
-                    <h3 id="help-q1-title">タスクの作成</h3>
-                    <p id="help-q1-desc">上部の大きな入力欄に内容を書き込み Enter を押すだけ。瞬時にチケットが発行されます。</p>
-                    <div class="absolute -bottom-4 -right-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                        <i data-lucide="plus-circle" class="w-32 h-32 text-blue-600"></i>
+        <main class="mt-12 max-w-[1200px] mx-auto">
+            <section class="mb-32">
+                <h2 id="help-quick-header">Quick Start</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+                        <div class="step-num mb-6">01</div>
+                        <h3 id="help-q1-title">タスクの作成</h3>
+                        <p id="help-q1-desc">上部の大きな入力欄に内容を書き込み Enter を押すだけ。瞬時にチケットが発行されます。</p>
+                        <div class="absolute -bottom-4 -right-4 opacity-5 group-hover:opacity-10 transition-opacity"><i data-lucide="plus-circle" class="w-32 h-32 text-blue-600"></i></div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+                        <div class="step-num mb-6">02</div>
+                        <h3 id="help-q2-title">進捗の管理</h3>
+                        <p id="help-q2-desc">カードをドラッグしてレーン間を移動。Doneへ移動させると「完了スタンプ」が自動で押されます。</p>
+                        <div class="absolute -bottom-4 -right-4 opacity-5 group-hover:opacity-10 transition-opacity"><i data-lucide="move" class="w-32 h-32 text-blue-600"></i></div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+                        <div class="step-num mb-6">03</div>
+                        <h3 id="help-q3-title">情報の詳細化</h3>
+                        <p id="help-q3-desc">カードをクリックして詳細パネルへ。優先度の設定、メモの追記、ラベルでの分類が行えます。</p>
+                        <div class="absolute -bottom-4 -right-4 opacity-5 group-hover:opacity-10 transition-opacity"><i data-lucide="edit-3" class="w-32 h-32 text-blue-600"></i></div>
                     </div>
                 </div>
-                <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden group">
-                    <div class="step-num mb-6">02</div>
-                    <h3 id="help-q2-title">進捗の管理</h3>
-                    <p id="help-q2-desc">カードをドラッグしてレーン間を移動。Doneへ移動させると「完了スタンプ」が自動で押されます。</p>
-                    <div class="absolute -bottom-4 -right-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                        <i data-lucide="move" class="w-32 h-32 text-blue-600"></i>
-                    </div>
-                </div>
-                <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden group">
-                    <div class="step-num mb-6">03</div>
-                    <h3 id="help-q3-title">情報の詳細化</h3>
-                    <p id="help-q3-desc">カードをクリックして詳細パネルへ。優先度の設定、メモの追記、ラベルでの分類が行えます。</p>
-                    <div class="absolute -bottom-4 -right-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                        <i data-lucide="edit-3" class="w-32 h-32 text-blue-600"></i>
-                    </div>
-                </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Detailed Manual Section -->
-        <section>
-            <h2 id="help-manual-header">Detailed Manual</h2>
-
-            <!-- 1. Task Visualization -->
-            <div class="feature-card">
-                <h3 id="help-m1-title">1. タスクカードの構造</h3>
-                <p id="help-m1-desc">MonoFlowのタスクカードは、限られたスペースに多くの情報を凝縮して表示するように設計されています。</p>
-                <div class="grid lg:grid-cols-2 gap-12 mt-10">
-                    <div class="space-y-2">
-                        <h4 id="help-m1-h1">視覚的インジケータ</h4>
-                        <ul id="help-m1-list1">
-                            <li><span id="help-m1-l1">優先度アクセント: カード左端の太いラインで重要度を表現。</span></li>
-                            <li><span id="help-m1-l2">タイムスタンプ: 右下に作成日時と最終更新日時を自動表示。</span></li>
-                            <li><span id="help-m1-l3">メモプレビュー: タイトルの下に詳細メモの冒頭2行を自動でプレビュー。</span></li>
-                            <li><span id="help-m1-l4">状態バッジ: 期限切れは赤色、完了済みは緑色のバッジで強調。</span></li>
-                        </ul>
-                    </div>
-                    <div class="space-y-2">
-                        <h4 id="help-m1-h2">完了時の挙動</h4>
-                        <ul id="help-m1-list2">
-                            <li><span id="help-m1-l5">グレーアウト: Doneレーンにあるタスクは透明度を下げ、集中を妨げないようにします。</span></li>
-                            <li><span id="help-m1-l6">打ち消し線: タイトルに線を引き、完了したことを明示。</span></li>
-                            <li><span id="help-m1-l7">完了時刻: 完了した瞬間の「時・分」を正確に記録し表示します。</span></li>
-                        </ul>
-                    </div>
-                </div>
-                <img src="img/screenshot-add.svg" alt="Screenshot" class="screenshot">
-            </div>
-
-            <!-- 2. Hierarchy & Virtual Tasks -->
-            <div class="feature-card">
-                <h3 id="help-m2-title">2. 高度な親子関係と「仮想チケット」</h3>
-                <p id="help-m2-desc">複雑なタスクをサブタスクに分割して管理できます。MonoFlow独自の「仮想チケット」システムが情報の断絶を防ぎます。</p>
-                
-                <div class="grid lg:grid-cols-2 gap-12 mt-10">
-                    <div class="space-y-6">
-                        <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                            <h4 id="help-m2-h1" class="mt-0 text-blue-600">仮想親チケット (Virtual Parent)</h4>
-                            <p id="help-m2-l1" class="mb-0">子タスクが親と別のレーンにあるとき、子の上に親の「残像」が表示されます。</p>
-                        </div>
-                        <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                            <h4 id="help-m2-h2" class="mt-0 text-indigo-600">仮想子チケット (Virtual Child)</h4>
-                            <p id="help-m2-l2" class="mb-0">親タスクの下には、他レーンに散らばった子タスクの状況が一覧表示されます。</p>
-                        </div>
-                        <div class="p-6 bg-blue-600 text-white rounded-2xl shadow-lg">
-                            <h4 id="help-m2-h3" class="mt-0 text-white"><i data-lucide="mouse-pointer-click" class="inline w-5 h-5 mr-1"></i> ジャンプ機能</h4>
-                            <p id="help-m2-l3" class="text-blue-100 mb-0">仮想チケットをクリックすると、実体のある場所まで自動スクロールし、フラッシュして知らせます。</p>
-                        </div>
-                    </div>
-                    <div>
-                        <img src="img/screenshot-nest.svg" alt="Screenshot" class="screenshot !mt-0 shadow-xl">
-                        <h4 id="help-m2-extra-title">進捗カウンター</h4>
-                        <p id="help-m2-extra-desc">親タスクにはサブタスクの消化状況が表示されます。完了数に応じてプログレスバーも伸びていきます。</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. Advanced Filtering & Search -->
-            <div class="feature-card">
-                <h3 id="help-m3-title">3. 検索とフィルタリング</h3>
-                <p id="help-m3-desc">数千のタスクがあっても、目的の情報を数秒で見つけ出すことができます。</p>
-                <div class="grid md:grid-cols-2 gap-10 mt-8">
-                    <div class="p-8 border border-slate-100 rounded-3xl">
-                        <h4 id="help-m3-h1" class="mt-0 flex items-center gap-2 text-slate-800"><i data-lucide="search" class="w-5 h-5"></i> 全文検索</h4>
-                        <p id="help-m3-l1">ツールバーの検索窓にキーワードを入力すると、リアルタイムで絞り込みます。</p>
-                    </div>
-                    <div class="p-8 border border-slate-100 rounded-3xl">
-                        <h4 id="help-m3-h2" class="mt-0 flex items-center gap-2 text-slate-800"><i data-lucide="filter" class="w-5 h-5"></i> マルチフィルタ</h4>
-                        <p id="help-m3-l2">ラベルと優先度の2つのフィルターを組み合わせて詳細な絞り込みが可能です。</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. Analytics & Data -->
-            <div class="feature-card">
-                <h3 id="help-m4-title">4. 分析とデータ管理</h3>
-                <p id="help-m4-desc">MonoFlowは単なるToDoリストではなく、あなたの生産性を分析するパートナーです。</p>
-                <div class="grid md:grid-cols-2 gap-10 mt-10">
-                    <div class="space-y-6">
-                        <div>
-                            <h4 id="help-m4-h1">進捗の可視化</h4>
-                            <ul>
-                                <li id="help-m4-l1">MetricsやBurndownで、ステータス分布や進捗ペースをグラフで確認できます。</li>
+            <section>
+                <h2 id="help-manual-header">Detailed Manual</h2>
+                <div class="feature-card">
+                    <h3 id="help-m1-title">1. タスクカードの構造</h3>
+                    <p id="help-m1-desc">MonoFlowのタスクカードは、限られたスペースに多くの情報を凝縮して表示するように設計されています。</p>
+                    <div class="grid lg:grid-cols-2 gap-12 mt-10">
+                        <div class="space-y-2">
+                            <h4 id="help-m1-h1">視覚的インジケータ</h4>
+                            <ul id="help-m1-list1">
+                                <li><span id="help-m1-l1">優先度アクセント: カード左端の太いラインで重要度を表現。</span></li>
+                                <li><span id="help-m1-l2">タイムスタンプ: 右下に作成日時と最終更新日時を自動表示。</span></li>
+                                <li><span id="help-m1-l3">メモプレビュー: タイトルの下に詳細メモの冒頭2行を自動でプレビュー。</span></li>
+                                <li><span id="help-m1-l4">状態バッジ: 期限切れは赤色、完了済みは緑色のバッジで強調。</span></li>
                             </ul>
                         </div>
-                        <div>
-                            <h4 id="help-m4-h2">アーカイブと整理</h4>
-                            <p id="help-m4-l2">完了したタスクをアーカイブへ移動させることで、ボードを常にクリーンに保てます。</p>
+                        <div class="space-y-2">
+                            <h4 id="help-m1-h2">完了時の挙動</h4>
+                            <ul id="help-m1-list2">
+                                <li><span id="help-m1-l5">グレーアウト: Doneレーンにあるタスクは透明度を下げ、集中を妨げないようにします。</span></li>
+                                <li><span id="help-m1-l6">打ち消し線: タイトルに線を引き、完了したことを明示。</span></li>
+                                <li><span id="help-m1-l7">完了時刻: 完了した瞬間の「時・分」を正確に記録し表示します。</span></li>
+                            </ul>
                         </div>
                     </div>
-                    <div class="space-y-6">
-                        <div>
-                            <h4 id="help-m4-h3">バックアップ</h4>
-                            <p id="help-m4-l3">JSON形式でのエクスポート・インポートに対応。データ移行も簡単です。</p>
+                    <img src="img/screenshot-add.svg" alt="Screenshot" class="screenshot">
+                </div>
+
+                <div class="feature-card">
+                    <h3 id="help-m2-title">2. 高度な親子関係と「仮想チケット」</h3>
+                    <p id="help-m2-desc">複雑なタスクをサブタスクに分割して管理できます。MonoFlow独自の「仮想チケット」システムが情報の断絶を防ぎます。</p>
+                    <div class="grid lg:grid-cols-2 gap-12 mt-10">
+                        <div class="space-y-6">
+                            <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800"><h4 id="help-m2-h1" class="mt-0 text-blue-600">仮想親チケット (Virtual Parent)</h4><p id="help-m2-l1" class="mb-0">子タスクが親と別のレーンにあるとき、子の上に親の「残像」が表示されます。</p></div>
+                            <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800"><h4 id="help-m2-h2" class="mt-0 text-indigo-600">仮想子チケット (Virtual Child)</h4><p id="help-m2-l2" class="mb-0">親タスクの下には、他レーンに散らばった子タスクの状況が一覧表示されます。</p></div>
+                            <div class="p-6 bg-blue-600 text-white rounded-2xl shadow-lg"><h4 id="help-m2-h3" class="mt-0 text-white"><i data-lucide="mouse-pointer-click" class="inline w-5 h-5 mr-1"></i> ジャンプ機能</h4><p id="help-m2-l3" class="text-blue-100 mb-0">仮想チケットをクリックすると、実体のある場所まで自動スクロールし、フラッシュして知らせます。</p></div>
                         </div>
-                        <div class="p-6 bg-slate-900 dark:bg-slate-800 rounded-3xl shadow-xl">
-                            <h4 id="help-m4-privacy-title" class="mt-0 text-white text-sm">Data Privacy</h4>
-                            <p id="help-m4-privacy-desc" class="text-slate-400 text-xs leading-relaxed mb-0">すべてのデータはあなたのブラウザ（LocalStorage）にのみ保存されます。外部サーバーへの送信は一切行われないため、機密情報も安全に管理できます。</p>
+                        <div><img src="img/screenshot-nest.svg" alt="Screenshot" class="screenshot !mt-0 shadow-xl"><h4 id="help-m2-extra-title">進捗カウンター</h4><p id="help-m2-extra-desc">親タスクにはサブタスクの消化状況が表示されます。完了数に応じてプログレスバーも伸びていきます。</p></div>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <h3 id="help-m3-title">3. 検索とフィルタリング</h3>
+                    <p id="help-m3-desc">数千のタスクがあっても、目的の情報を数秒で見つけ出すことができます。</p>
+                    <div class="grid md:grid-cols-2 gap-10 mt-8">
+                        <div class="p-8 border border-slate-100 dark:border-slate-800 rounded-3xl"><h4 id="help-m3-h1" class="mt-0 flex items-center gap-2 text-slate-800 dark:text-white"><i data-lucide="search" class="w-5 h-5"></i> 全文検索</h4><p id="help-m3-l1">ツールバーの検索窓にキーワードを入力すると、リアルタイムで絞り込みます。</p></div>
+                        <div class="p-8 border border-slate-100 dark:border-slate-800 rounded-3xl"><h4 id="help-m3-h2" class="mt-0 flex items-center gap-2 text-slate-800 dark:text-white"><i data-lucide="filter" class="w-5 h-5"></i> マルチフィルタ</h4><p id="help-m3-l2">ラベルと優先度の2つのフィルターを組み合わせて詳細な絞り込みが可能です。</p></div>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <h3 id="help-m4-title">4. 分析とデータ管理</h3>
+                    <p id="help-m4-desc">MonoFlowは単なるToDoリストではなく、あなたの生産性を分析するパートナーです。</p>
+                    <div class="grid md:grid-cols-2 gap-10 mt-10">
+                        <div class="space-y-6">
+                            <div><h4 id="help-m4-h1" class="dark:text-white">進捗の可視化</h4><ul><li id="help-m4-l1">MetricsやBurndownで、ステータス分布や進捗ペースをグラフで確認できます。</li></ul></div>
+                            <div><h4 id="help-m4-h2" class="dark:text-white">アーカイブと整理</h4><p id="help-m4-l2">完了したタスクをアーカイブへ移動させることで、ボードを常にクリーンに保てます。</p></div>
+                        </div>
+                        <div class="space-y-6">
+                            <div><h4 id="help-m4-h3" class="dark:text-white">バックアップ</h4><p id="help-m4-l3">JSON形式でのエクスポート・インポートに対応。データ移行も簡単です。</p></div>
+                            <div class="p-6 bg-slate-900 dark:bg-slate-800 rounded-3xl shadow-xl"><h4 id="help-m4-privacy-title" class="mt-0 text-white text-sm">Data Privacy</h4><p id="help-m4-privacy-desc" class="text-slate-400 text-xs leading-relaxed mb-0">すべてのデータはあなたのブラウザ（LocalStorage）にのみ保存されます。外部サーバーへの送信は一切行われないため、機密情報も安全に管理できます。</p></div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 5. System Settings -->
-            <div class="feature-card bg-slate-50 border-0">
-                <h3 id="help-m5-title">5. カスタマイズと設定</h3>
-                <div class="grid md:grid-cols-2 gap-12">
-                    <div>
-                        <h4 id="help-m5-h1">ダークモード</h4>
-                        <p id="help-m5-l1">月アイコンをクリックして切り替え。深夜の作業でも目に優しく集中できます。</p>
-                    </div>
-                    <div>
-                        <h4 id="help-m5-h2">マルチ言語対応</h4>
-                        <p id="help-m5-l2">メニューから日本語と英語を切り替えられます。</p>
+                <div class="feature-card bg-slate-50 dark:bg-slate-800/20 border-0">
+                    <h3 id="help-m5-title">5. カスタマイズと設定</h3>
+                    <div class="grid md:grid-cols-2 gap-12">
+                        <div><h4 id="help-m5-h1" class="dark:text-white">ダークモード</h4><p id="help-m5-l1">月アイコンをクリックして切り替え。深夜の作業でも目に優しく集中できます。</p></div>
+                        <div><h4 id="help-m5-h2" class="dark:text-white">マルチ言語対応</h4><p id="help-m5-l2">メニューから日本語と英語を切り替えられます。</p></div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 6. Keyboard Shortcuts -->
-            <div class="feature-card border-blue-100 bg-blue-50/20">
-                <h3 id="help-shortcuts-title"><i data-lucide="keyboard" class="w-6 h-6 text-blue-600"></i> Keyboard Shortcuts</h3>
-                <div class="grid md:grid-cols-2 gap-x-12 gap-y-4 mt-6">
-                    <div class="flex justify-between items-center py-2 border-b border-blue-100/50">
-                        <span id="help-shortcuts-n" class="text-sm text-slate-600">Focus New Task Input</span>
-                        <kbd class="kbd">N</kbd>
-                    </div>
-                    <div class="flex justify-between items-center py-2 border-b border-blue-100/50">
-                        <span id="help-shortcuts-search" class="text-sm text-slate-600">Focus Search Bar</span>
-                        <kbd class="kbd">/</kbd>
-                    </div>
-                    <div class="flex justify-between items-center py-2 border-b border-blue-100/50">
-                        <span id="help-shortcuts-esc" class="text-sm text-slate-600">Close / Blur Input</span>
-                        <kbd class="kbd">Esc</kbd>
-                    </div>
-                    <div class="flex justify-between items-center py-2 border-b border-blue-100/50">
-                        <span id="help-shortcuts-help" class="text-sm text-slate-600">Show Help Page</span>
-                        <kbd class="kbd">?</kbd>
-                    </div>
-                    <div class="flex justify-between items-center py-2 border-b border-blue-100/50">
-                        <span id="help-shortcuts-metrics" class="text-sm text-slate-600">Go to Metrics Page</span>
-                        <div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">M</kbd></div>
-                    </div>
-                    <div class="flex justify-between items-center py-2 border-b border-blue-100/50">
-                        <span id="help-shortcuts-burndown" class="text-sm text-slate-600">Go to Burndown Page</span>
-                        <div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">B</kbd></div>
+                <div class="feature-card border-blue-100 dark:border-blue-900/30 bg-blue-50/20 dark:bg-blue-900/10">
+                    <h3 id="help-shortcuts-title" class="dark:text-white"><i data-lucide="keyboard" class="w-6 h-6 text-blue-600"></i> Keyboard Shortcuts</h3>
+                    <div class="grid md:grid-cols-2 gap-x-12 gap-y-4 mt-6">
+                        <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-n" class="text-sm text-slate-600 dark:text-slate-400">Focus New Task Input</span><kbd class="kbd">N</kbd></div>
+                        <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-search" class="text-sm text-slate-600 dark:text-slate-400">Focus Search Bar</span><kbd class="kbd">/</kbd></div>
+                        <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-esc" class="text-sm text-slate-600 dark:text-slate-400">Close / Blur Input</span><kbd class="kbd">Esc</kbd></div>
+                        <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-help" class="text-sm text-slate-600 dark:text-slate-400">Show Help Page</span><kbd class="kbd">?</kbd></div>
+                        <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-metrics" class="text-sm text-slate-600 dark:text-slate-400">Go to Metrics Page</span><div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">M</kbd></div></div>
+                        <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-burndown" class="text-sm text-slate-600 dark:text-slate-400">Go to Burndown Page</span><div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">B</kbd></div></div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </main>
 
-        <footer class="mt-32 pt-16 border-t border-slate-200 text-center">
-            <div class="flex justify-center gap-4 mb-8">
-                <div class="w-3 h-3 rounded-full bg-blue-600 animate-bounce"></div>
-                <div class="w-3 h-3 rounded-full bg-blue-600 animate-bounce [animation-delay:0.2s]"></div>
-                <div class="w-3 h-3 rounded-full bg-blue-600 animate-bounce [animation-delay:0.4s]"></div>
-            </div>
+        <footer class="mt-32 pt-16 border-t border-slate-200 dark:border-slate-800 text-center">
             <p id="help-footer-text" class="text-slate-400 text-xs font-black uppercase tracking-[0.4em] mb-2">MonoFlow Productivity System</p>
-            <p class="text-slate-300 text-[10px] font-medium">Built for High-Performance Personal Kanban &copy; 2026</p>
+            <p class="text-slate-300 dark:text-slate-600 text-[10px] font-medium">Built for High-Performance Personal Kanban &copy; 2026</p>
         </footer>
     </div>
-
     <script src="js/common.js"></script>
     <script src="js/help.js"></script>
 </body>

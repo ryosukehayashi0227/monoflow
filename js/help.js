@@ -12,6 +12,7 @@ function translateUI() {
     // 1. Header & Basics
     setT('help-page-title', 'help_title');
     setT('help-page-subtitle', 'help_subtitle');
+    setT('about-link', 'about_link');
     setT('back-to-app-text', 'back_to_app');
     
     const h2s = document.querySelectorAll('h2');

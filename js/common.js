@@ -146,6 +146,7 @@ const CONSTANTS = {
             help_footer: 'MonoFlow Productivity System - Built for High-Performance Personal Kanban',
             // About Page
             about_title: 'MonoFlow',
+            about_link: 'What is MonoFlow?',
             about_subtitle: 'ミニマルで強力な個人用カンバン',
             about_concept_t: 'コンセプト',
             about_concept_d: 'MonoFlowは、個人の生産性を最大化するために設計された、ブラウザ完結型のカンバンツールです。複雑な設定やサーバーは不要。開いた瞬間から、あなたの思考をフロー状態へと導きます。',
@@ -282,6 +283,7 @@ const CONSTANTS = {
             help_footer: 'MonoFlow Productivity System - Built for High-Performance Personal Kanban',
             // About Page
             about_title: 'About MonoFlow',
+            about_link: 'What is MonoFlow?',
             about_subtitle: 'Minimal yet Powerful Personal Kanban',
             about_concept_t: 'Concept',
             about_concept_d: 'MonoFlow is a browser-based Kanban tool designed to maximize individual productivity. No complex setup or servers required. From the moment you open it, it guides your thoughts into a flow state.',

@@ -363,9 +363,14 @@ const App = {
     render: () => {
         const board = document.getElementById('board'); board.innerHTML = '';
         const appDesc = document.querySelector('header p.text-slate-400'); if (appDesc) appDesc.textContent = Common.t('app_desc');
-        const taskInput = document.getElementById('new-task-input'); if (taskInput) taskInput.placeholder = Common.t('add_placeholder');
-        const searchInput = document.getElementById('search-input'); if (searchInput) searchInput.placeholder = Common.t('search_placeholder');
-        const addBtnSpan = document.querySelector('#add-task-form span'); if (addBtnSpan) addBtnSpan.textContent = Common.t('add_btn');
+        const taskInput = document.getElementById('new-task-input');
+        if (taskInput) taskInput.placeholder = Common.t('add_placeholder');
+        
+        const aboutLink = document.getElementById('about-link');
+        if (aboutLink) aboutLink.textContent = Common.t('about_link');
+        
+        const addBtnSpan = document.querySelector('#add-task-form span');
+        if (addBtnSpan) addBtnSpan.textContent = Common.t('add_btn');
         const helpLink = document.querySelector('a[href="help.html"]'); if(helpLink) helpLink.title = Common.t('menu_help');
         App.updateFilterDropdown(); App.updatePriorityFilterDropdown();
         

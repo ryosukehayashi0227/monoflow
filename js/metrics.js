@@ -80,6 +80,9 @@ function translateUI() {
     const labelLabel = document.getElementById('metrics-label-label');
     if (labelLabel) labelLabel.textContent = Common.t('filter_label');
 
+    const aboutLink = document.getElementById('about-link');
+    if (aboutLink) aboutLink.textContent = Common.t('about_link');
+
     const menuTitle = document.querySelector('#metrics-label-menu span');
     if (menuTitle) menuTitle.textContent = Common.t('metrics_label_select');
 

@@ -10,6 +10,7 @@ function translateUI() {
 
     setT('about-page-title', 'about_title');
     setT('about-page-subtitle', 'about_subtitle');
+    setT('about-link', 'about_link');
     setT('back-to-app-text', 'back_to_app');
 
     setT('about-concept-title', 'about_concept_t');
