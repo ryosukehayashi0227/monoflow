@@ -51,6 +51,7 @@ function translateUI() {
     setT('help-m2-l3', 'help_m2_l3');
     setT('help-m2-extra-title', 'metrics_rate'); 
     setT('help-m2-extra-desc', 'help_m2_extra');
+    setT('help-m2-l4', 'help_m2_l4');
 
     // 5. Detailed Manual - Search
     setT('help-m3-title', 'help_m3_t');
@@ -89,11 +90,22 @@ function translateUI() {
     setT('help-shortcuts-help', 'help_shortcuts_help');
     setT('help-shortcuts-metrics', 'help_shortcuts_metrics');
     setT('help-shortcuts-burndown', 'help_shortcuts_burndown');
+    setT('help-shortcuts-board', 'help_shortcuts_board');
+
+    // 9. Mac OS Modifier Key Support
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    if (isMac) {
+        document.querySelectorAll('.kbd').forEach(kbd => {
+            if (kbd.textContent === 'Alt') {
+                kbd.textContent = '⌥ Option';
+            }
+        });
+    }
 
     // Footer
     setT('help-footer-text', 'help_footer');
 
-    // 9. Image Switcher
+    // 10. Image Switcher
     const suffix = State.language === 'en' ? '-en' : '';
     document.querySelectorAll('img.screenshot').forEach(img => {
         const src = img.getAttribute('src');

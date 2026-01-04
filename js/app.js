@@ -325,22 +325,16 @@ const App = {
         document.getElementById('search-input').addEventListener('input', (e) => { State.searchQuery = e.target.value.toLowerCase().trim(); App.render(); });
         document.getElementById('task-modal').addEventListener('click', (e) => { if (e.target.id === 'task-modal') Modal.close(); });
         
-        // Keyboard Shortcuts
+        // Board-Specific Keyboard Shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
                 if (e.key === 'Escape') { e.target.blur(); Modal.close(); Archive.close(); }
                 return;
             }
-            switch (e.key) {
-                case 'n': e.preventDefault(); document.getElementById('new-task-input').focus(); break;
-                case '/': e.preventDefault(); document.getElementById('search-input').focus(); break;
+            switch (e.code) {
+                case 'KeyN': e.preventDefault(); document.getElementById('new-task-input').focus(); break;
+                case 'Slash': e.preventDefault(); document.getElementById('search-input').focus(); break;
                 case 'Escape': Modal.close(); Archive.close(); break;
-                case '?': window.location.href = 'help.html'; break;
-            }
-            if (e.altKey) {
-                if (e.key === 'm') window.location.href = 'metrics.html';
-                if (e.key === 'b') window.location.href = 'burndown.html';
-                if (e.key === 'a') window.location.href = 'about.html';
             }
         });
 

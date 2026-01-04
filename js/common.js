@@ -117,6 +117,7 @@ const CONSTANTS = {
             help_m2_h3: 'ジャンプ機能',
             help_m2_l3: '仮想チケットをクリックすると、実体のある場所まで自動スクロールし、フラッシュして知らせます。',
             help_m2_extra: '親タスクにはサブタスクの消化状況が表示されます。完了数に応じてプログレスバーも伸びていきます。',
+            help_m2_l4: '階層の制限: 複雑さを避けるため、タスクは最大2階層（親タスクと子タスク）までに制限されています。',
             help_m3_t: '3. 検索とフィルタリング',
             help_m3_d: '数千のタスクがあっても、目的の情報を数秒で見つけ出すことができます。',
             help_m3_h1: '全文検索',
@@ -143,8 +144,9 @@ const CONSTANTS = {
             help_shortcuts_search: '検索窓にフォーカス',
             help_shortcuts_esc: '閉じる / フォーカスを外す',
             help_shortcuts_help: 'ヘルプページを表示',
-            help_shortcuts_metrics: 'Metrics ページへ移動',
-            help_shortcuts_burndown: 'Burndown ページへ移動',
+            help_shortcuts_metrics: 'Metrics ページへ移動 (Alt / ⌥)',
+            help_shortcuts_burndown: 'Burndown ページへ移動 (Alt / ⌥)',
+            help_shortcuts_board: 'ボード画面へ移動 (Alt / ⌥)',
             help_footer: 'MonoFlow Productivity System - Built for High-Performance Personal Kanban',
             about_title: 'MonoFlow',
             about_link: 'What is MonoFlow?',
@@ -255,6 +257,7 @@ const CONSTANTS = {
             help_m2_h3: 'Jump Feature',
             help_m2_l3: 'Click any virtual ticket to instantly scroll and flash the real card.',
             help_m2_extra: 'Parents show a progress counter and bar reflecting the completion status of subtasks.',
+            help_m2_l4: 'Hierarchy Limit: To maintain simplicity, tasks are limited to a maximum of two levels (Parent and Child).',
             help_m3_t: '3. Search & Filtering',
             help_m3_d: 'Find the information you need in seconds, even with thousands of tasks.',
             help_m3_h1: 'Full-text Search',
@@ -281,8 +284,9 @@ const CONSTANTS = {
             help_shortcuts_search: 'Focus Search Bar',
             help_shortcuts_esc: 'Close / Blur Input',
             help_shortcuts_help: 'Show Help Page',
-            help_shortcuts_metrics: 'Go to Metrics Page',
-            help_shortcuts_burndown: 'Go to Burndown Page',
+            help_shortcuts_metrics: 'Go to Metrics Page (Alt / ⌥)',
+            help_shortcuts_burndown: 'Go to Burndown Page (Alt / ⌥)',
+            help_shortcuts_board: 'Go to Board (Alt / ⌥)',
             help_footer: 'MonoFlow Productivity System - Built for High-Performance Personal Kanban',
             // About Page
             about_title: 'About MonoFlow',
@@ -362,6 +366,29 @@ const Common = {
         location.reload(); 
     }
 };
+
+// Global Keyboard Shortcuts (Navigation)
+document.addEventListener('keydown', (e) => {
+    // Avoid shortcuts when typing in inputs
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        if (e.key === 'Escape') e.target.blur();
+        return;
+    }
+
+    // Navigation with Alt (Windows) or Option (Mac)
+    // Using e.code to bypass character mapping issues on Mac (e.g., Option+M = µ)
+    if (e.altKey) {
+        if (e.code === 'KeyM') { e.preventDefault(); window.location.href = 'metrics.html'; }
+        if (e.code === 'KeyB') { e.preventDefault(); window.location.href = 'burndown.html'; }
+        if (e.code === 'KeyA') { e.preventDefault(); window.location.href = 'about.html'; }
+        if (e.code === 'KeyL') { e.preventDefault(); window.location.href = 'index.html'; }
+    }
+
+    // Global Help
+    if (e.key === '?') {
+        window.location.href = 'help.html';
+    }
+});
 
 // Auto-init common logic
 Common.init();
