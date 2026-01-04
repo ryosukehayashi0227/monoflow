@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MonoFlow - Burndown Chart</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232563eb'/%3E%3Cpath d='M30 30 L 30 70 L 50 50 L 70 70 L 70 30' fill='none' stroke='white' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" type="image/svg+xml">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
+    </script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="antialiased">
+
+    <div class="max-w-[1600px] mx-auto px-6 md:px-12 py-16">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 border-b border-slate-200 pb-12 gap-8">
+            <div class="flex items-center gap-6">
+                <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-700 rounded-[1.5rem] flex items-center justify-center shadow-2xl shadow-orange-500/40">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m19 20-4-4-3 3-4-4-3 3"></path><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-4xl font-black text-slate-900 tracking-tighter leading-none">Burndown Chart</h1>
+                    <p class="text-slate-400 mt-2 font-bold uppercase tracking-widest text-xs">Work Remaining Over Time</p>
+                </div>
+            </div>
+
+            <!-- Date Range Filter -->
+            <div class="flex items-center gap-3 bg-white p-2 pl-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider">表示期間</div>
+                <div class="flex items-center gap-2">
+                    <input type="date" id="start-date" class="text-sm font-bold text-slate-600 focus:outline-none bg-transparent">
+                    <span class="text-slate-300">→</span>
+                    <input type="date" id="end-date" class="text-sm font-bold text-slate-600 focus:outline-none bg-transparent">
+                </div>
+                <button onclick="initBurndown()" class="bg-slate-900 text-white p-2 rounded-xl hover:bg-slate-800 transition-all ml-2">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <a href="index.html" class="flex items-center gap-3 px-8 py-4 bg-white border border-slate-200 rounded-2xl text-slate-700 hover:bg-slate-50 transition-all font-black shadow-sm active:scale-95">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                アプリに戻る
+            </a>
+        </header>
+
+        <!-- Main Chart Content -->
+        <div class="bg-white p-10 rounded-[3rem] border border-slate-200 shadow-sm relative overflow-hidden">
+            <div class="flex justify-between items-center mb-10">
+                <h2 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                    <i data-lucide="line-chart" class="w-4 h-4"></i> 残タスク数の推移
+                </h2>
+                <div id="active-task-count" class="text-sm font-black text-blue-600 bg-blue-50 px-4 py-1.5 rounded-full">
+                    現在: -- タスク
+                </div>
+            </div>
+            
+            <div class="h-[500px] w-full">
+                <canvas id="burndownChart"></canvas>
+            </div>
+
+            <!-- Subtle background accent -->
+            <div class="absolute top-0 right-0 w-64 h-64 bg-orange-100/20 blur-[100px] pointer-events-none rounded-full"></div>
+        </div>
+
+        <footer class="mt-32 pt-16 border-t border-slate-200 text-center text-slate-400 text-xs font-black uppercase tracking-[0.3em]">
+            &copy; 2026 MonoFlow Productivity
+        </footer>
+    </div>
+
+    <!-- Application Logic -->
+    <script src="js/burndown.js"></script>
+</body>
+</html>
