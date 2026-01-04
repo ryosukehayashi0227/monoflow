@@ -175,11 +175,21 @@ const DataService = {
 
     archiveTask: (taskId) => {
         const t = State.data.tasks[taskId];
-        t.archived = true;
-        // Remove from columns
+        
+        // Remember which column it was in
+        let currentCid = 'c1';
         for(const cid in State.data.columns) {
-            State.data.columns[cid].taskIds = State.data.columns[cid].taskIds.filter(id => id !== taskId);
+            if (State.data.columns[cid].taskIds.includes(taskId)) {
+                currentCid = cid;
+                // Remove from columns
+                State.data.columns[cid].taskIds = State.data.columns[cid].taskIds.filter(id => id !== taskId);
+                break;
+            }
         }
+        
+        t.archived = true;
+        t.lastColumnId = currentCid; // Store for restoration
+        
         DataService.save();
         App.render();
         Modal.close();
@@ -188,7 +198,11 @@ const DataService = {
     restoreTask: (taskId) => {
         const t = State.data.tasks[taskId];
         t.archived = false;
-        State.data.columns['c1'].taskIds.unshift(taskId);
+        
+        // Restore to last known column or default to c1
+        const targetCid = t.lastColumnId && State.data.columns[t.lastColumnId] ? t.lastColumnId : 'c1';
+        State.data.columns[targetCid].taskIds.unshift(taskId);
+        
         DataService.save();
         App.render();
         Archive.render();
@@ -493,13 +507,30 @@ const App = {
         document.getElementById('theme-icon-dark').classList.toggle('hidden', dark);
     },
 
-    jumpToTask: (id) => {
-        const jump = () => { const t = document.querySelector(`.task-card[data-task-id="${id}"]`); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'center' }); t.classList.add('is-flash'); setTimeout(() => t.classList.remove('is-flash'), 3000); } };
-        if (!document.querySelector(`.task-card[data-task-id="${id}"]`)) { 
-            State.filter = 'all'; State.priorityFilter = 'all'; State.searchQuery = '';
-            document.getElementById('search-input').value = '';
-            App.render(); requestAnimationFrame(() => setTimeout(jump, 100)); 
-        } else jump();
+    jumpToTask: (taskId) => {
+        const doJump = () => {
+            const el = document.querySelector(`.task-card[data-task-id="${taskId}"]`);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.classList.add('is-flash');
+                setTimeout(() => el.classList.remove('is-flash'), 3000);
+            }
+        };
+
+        if (!document.querySelector(`.task-card[data-task-id="${taskId}"]`)) {
+            // Task is hidden (filtered)
+            State.filter = 'all';
+            State.priorityFilter = 'all';
+            State.searchQuery = '';
+            const searchBox = document.getElementById('search-input');
+            if (searchBox) searchBox.value = '';
+            
+            App.render();
+            // Wait for re-render
+            setTimeout(doJump, 200);
+        } else {
+            doJump();
+        }
     },
 
     init: () => {
@@ -539,18 +570,37 @@ const App = {
         const addBtnSpan = document.querySelector('#add-task-form span'); if (addBtnSpan) addBtnSpan.textContent = App.t('add_btn');
         App.updateFilterDropdown(); App.updatePriorityFilterDropdown();
         
-        const m = document.getElementById('settings-menu');
-        m.children[0].innerHTML = `<i data-lucide="download" class="w-4 h-4 text-slate-400"></i> ${App.t('menu_export')}`;
-        m.children[1].innerHTML = `<i data-lucide="upload" class="w-4 h-4 text-slate-400"></i> ${App.t('menu_import')}`;
-        m.children[2].innerHTML = `<i data-lucide="archive" class="w-4 h-4 text-slate-400"></i> ${App.t('menu_archive')}`;
-        m.children[3].innerHTML = `<i data-lucide="bar-chart-2" class="w-4 h-4 text-slate-400"></i> ${App.t('menu_metrics')}`;
-        m.children[4].innerHTML = `<i data-lucide="trending-down" class="w-4 h-4 text-slate-400"></i> ${App.t('menu_burndown')}`;
-        m.children[5].innerHTML = `<i data-lucide="help-circle" class="w-4 h-4 text-slate-400"></i> ${App.t('menu_help')}`;
+        // Update Menu Items by ID
+        const items = {
+            'menu-export': App.t('menu_export'),
+            'menu-import': App.t('menu_import'),
+            'menu-archive': App.t('menu_archive'),
+            'menu-metrics': App.t('menu_metrics'),
+            'menu-burndown': App.t('menu_burndown'),
+            'menu-reset': App.t('menu_reset')
+        };
+
+        for (const id in items) {
+            const el = document.getElementById(id);
+            if (el) {
+                const icon = el.querySelector('i');
+                const iconHtml = icon ? icon.outerHTML : '';
+                el.innerHTML = `${iconHtml} ${items[id]}`;
+            }
+        }
+
+        // Language Switcher
+        const menu = document.getElementById('settings-menu');
         let lBtn = document.getElementById('lang-switch-btn');
-        if (!lBtn) { lBtn = document.createElement('button'); lBtn.id = 'lang-switch-btn'; lBtn.className = 'w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-blue-600 flex items-center gap-2 border-t border-slate-100 dark:border-slate-800 transition-colors'; m.insertBefore(lBtn, m.querySelector('.text-red-600')); }
+        if (!lBtn) { 
+            lBtn = document.createElement('button'); 
+            lBtn.id = 'lang-switch-btn'; 
+            lBtn.className = 'w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-blue-600 flex items-center gap-2 border-t border-slate-100 dark:border-slate-800 transition-colors'; 
+            const resetBtn = document.getElementById('menu-reset');
+            menu.insertBefore(lBtn, resetBtn); 
+        }
         lBtn.innerHTML = `<i data-lucide="languages" class="w-4 h-4"></i> ${State.language === 'ja' ? 'English' : '日本語'}`;
         lBtn.onclick = () => DataService.setLanguage(State.language === 'ja' ? 'en' : 'ja');
-        const rBtn = m.querySelector('.text-red-600'); if(rBtn) rBtn.innerHTML = `<i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i> ${App.t('menu_reset')}`;
 
         State.data.columnOrder.forEach(colId => {
             const col = State.data.columns[colId]; const colTitle = colId === 'c1' ? App.t('col_todo') : (colId === 'c2' ? App.t('col_progress') : App.t('col_done'));

@@ -42,10 +42,15 @@
                     <p class="text-slate-400 font-bold uppercase tracking-widest text-[8px] mt-0 opacity-80">Simple Personal Kanban</p>
                 </div>
                 <!-- Theme Toggle -->
-                <button onclick="App.toggleTheme()" class="ml-auto p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm">
-                    <i data-lucide="sun" id="theme-icon-light" class="w-4 h-4 hidden"></i>
-                    <i data-lucide="moon" id="theme-icon-dark" class="w-4 h-4"></i>
-                </button>
+                <div class="flex items-center gap-2 ml-auto">
+                    <a href="help.html" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center" title="User Guide">
+                        <i data-lucide="help-circle" class="w-4 h-4"></i>
+                    </a>
+                    <button onclick="App.toggleTheme()" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center">
+                        <i data-lucide="sun" id="theme-icon-light" class="w-4 h-4 hidden"></i>
+                        <i data-lucide="moon" id="theme-icon-dark" class="w-4 h-4"></i>
+                    </button>
+                </div>
             </div>
 
             <!-- Toolbar -->
@@ -90,26 +95,27 @@
                         <button onclick="toggleMenu(event)" class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 hover:border-slate-300 shadow-sm transition-all flex items-center justify-center active:scale-90">
                             <i data-lucide="more-horizontal" class="w-4 h-4"></i>
                         </button>
-                        <div id="settings-menu" class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 hidden z-20 overflow-hidden">
-                                                    <button onclick="DataService.export()" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 transition-colors">
-                                                        <i data-lucide="download" class="w-4 h-4 text-slate-400"></i> エクスポート (JSON)
-                                                    </button>
-                                                                            <button onclick="document.getElementById('import-file').click()" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 border-t border-slate-100 transition-colors">
-                                                                                <i data-lucide="upload" class="w-4 h-4 text-slate-400"></i> インポート
-                                                                            </button>
-                        <a href="metrics.html" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 border-t border-slate-100 transition-colors">
-                            <i data-lucide="bar-chart-2" class="w-4 h-4 text-slate-400"></i> Metrics
-                        </a>
-                        <a href="burndown.html" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 border-t border-slate-100 transition-colors">
-                            <i data-lucide="trending-down" class="w-4 h-4 text-slate-400"></i> Burndown
-                        </a>
-                                                <a href="help.html" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 border-t border-slate-100 transition-colors">
-                                                    <i data-lucide="help-circle" class="w-4 h-4 text-slate-400"></i> User Guide
-                                                </a>
-                                                <button onclick="DataService.resetAll()" class="w-full text-left px-4 py-3 hover:bg-red-50 text-sm font-bold text-red-600 flex items-center gap-2 border-t border-red-100 transition-colors">
-                                                    <i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i> ボードのリセット
-                                                </button>
-                                                <input type="file" id="import-file" class="hidden" accept=".json" onchange="DataService.import(this)">                        </div>
+                        <div id="settings-menu" class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 hidden z-20 overflow-hidden text-left">
+                            <button id="menu-export" onclick="DataService.export()" class="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2 transition-colors">
+                                <i data-lucide="download" class="w-4 h-4 text-slate-400"></i> Export
+                            </button>
+                            <button id="menu-import" onclick="document.getElementById('import-file').click()" class="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2 border-t border-slate-100 dark:border-slate-800 transition-colors">
+                                <i data-lucide="upload" class="w-4 h-4 text-slate-400"></i> Import
+                            </button>
+                            <button id="menu-archive" onclick="Archive.open()" class="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2 border-t border-slate-100 dark:border-slate-800 transition-colors">
+                                <i data-lucide="archive" class="w-4 h-4 text-slate-400"></i> Archive
+                            </button>
+                            <a id="menu-metrics" href="metrics.html" class="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2 border-t border-slate-100 dark:border-slate-800 transition-colors">
+                                <i data-lucide="bar-chart-2" class="w-4 h-4 text-slate-400"></i> Metrics
+                            </a>
+                            <a id="menu-burndown" href="burndown.html" class="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2 border-t border-slate-100 dark:border-slate-800 transition-colors">
+                                <i data-lucide="trending-down" class="w-4 h-4 text-slate-400"></i> Burndown
+                            </a>
+                            <button id="menu-reset" onclick="DataService.resetAll()" class="w-full text-left px-4 py-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-sm font-bold text-red-600 flex items-center gap-2 border-t border-red-100 dark:border-red-900/20 transition-colors">
+                                <i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i> Reset
+                            </button>
+                            <input type="file" id="import-file" class="hidden" accept=".json" onchange="DataService.import(this)">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -117,6 +123,23 @@
 
         <!-- Kanban Board -->
         <main id="board" class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start"></main>
+    </div>
+
+    <!-- Archive Modal -->
+    <div id="archive-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm hidden opacity-0 modal">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[2.5rem] shadow-2xl transform transition-all scale-95 opacity-0 modal-content m-4 flex flex-col max-h-[80vh]">
+            <div class="flex justify-between items-center p-8 border-b border-slate-100 dark:border-slate-800">
+                <h3 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <i data-lucide="archive" class="w-6 h-6 text-slate-400"></i> Archived Tasks
+                </h3>
+                <button onclick="Archive.close()" class="text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div id="archive-list" class="p-8 overflow-y-auto space-y-4 flex-grow">
+                <!-- Archived tasks injected here -->
+            </div>
+        </div>
     </div>
 
     <!-- Task Detail Modal -->
