@@ -28,6 +28,11 @@ body.modal-open { overflow: hidden; }
     color: #f1f5f9;
 }
 
+/* Ensure priority borders are not overridden in dark mode */
+.dark .task-card.border-l-red-500 { border-left-color: #ef4444 !important; }
+.dark .task-card.border-l-orange-400 { border-left-color: #fb923c !important; }
+.dark .task-card.border-l-blue-400 { border-left-color: #60a5fa !important; }
+
 .task-card:hover {
     transform: translateY(-1px) scale(1.002);
     box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.08);

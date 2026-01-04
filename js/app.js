@@ -232,11 +232,13 @@ const UI = {
         const isDone = columnId === CONSTANTS.DONE_COLUMN_ID; const el = document.createElement('div');
         const hasParent = !!task.parentId && !!State.data.tasks[task.parentId]; const indentClass = hasParent ? 'child-task scale-95 origin-left' : '';
         const isNewClass = task.id === State.lastAddedId ? 'is-new' : '';
+        // Priority Based Accents
         let pBorder = 'border-slate-200 dark:border-slate-700';
         if (task.priority === 'high') pBorder = 'border-l-4 border-l-red-500 border-slate-200 dark:border-slate-700';
         else if (task.priority === 'medium') pBorder = 'border-l-4 border-l-orange-400 border-slate-200 dark:border-slate-700';
         else if (task.priority === 'low') pBorder = 'border-l-4 border-l-blue-400 border-slate-200 dark:border-slate-700';
-        el.className = `task-card bg-white dark:bg-slate-900 border rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass} ${isDone ? 'is-done' : ''} ${isNewClass} ${pBorder}`;
+
+        el.className = `task-card bg-white border rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass} ${isDone ? 'is-done' : ''} ${isNewClass} ${pBorder}`;
         el.dataset.taskId = task.id;
         const pConfig = CONSTANTS.PRIORITIES.find(p => p.value === task.priority);
         const pIcon = (pConfig && pConfig.value !== 'none') ? `<div class="flex items-center justify-center w-6 h-6 rounded-md border ${pConfig.style.replace('text-sm font-bold', '')}"><i data-lucide="${pConfig.icon}" class="w-4 h-4"></i></div>` : '';
@@ -332,9 +334,8 @@ const App = {
         document.getElementById('menu-export').innerHTML = `<i data-lucide="download" class="w-4 h-4 text-slate-400"></i> ${Common.t('menu_export')}`;
         document.getElementById('menu-import').innerHTML = `<i data-lucide="upload" class="w-4 h-4 text-slate-400"></i> ${Common.t('menu_import')}`;
         document.getElementById('menu-archive').innerHTML = `<i data-lucide="archive" class="w-4 h-4 text-slate-400"></i> ${Common.t('menu_archive')}`;
-        document.getElementById('menu-metrics').innerHTML = `<i data-lucide="bar-chart-2" class="w-4 h-4 text-slate-400"></i> ${Common.t('menu_metrics')}`;
-        document.getElementById('menu-burndown').innerHTML = `<i data-lucide="trending-down" class="w-4 h-4 text-slate-400"></i> ${Common.t('menu_burndown')}`;
         document.getElementById('menu-reset').innerHTML = `<i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i> ${Common.t('menu_reset')}`;
+        let lBtn = document.getElementById('lang-switch-btn');
 
         State.data.columnOrder.forEach(colId => {
             const col = State.data.columns[colId]; const colTitle = colId === 'c1' ? Common.t('col_todo') : (colId === 'c2' ? Common.t('col_progress') : Common.t('col_done'));
