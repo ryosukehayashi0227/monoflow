@@ -408,13 +408,15 @@ const App = {
         State.data.columnOrder.forEach(colId => {
             const column = State.data.columns[colId];
             const colEl = document.createElement('div');
-            colEl.className = 'bg-slate-100/50 rounded-2xl p-5 flex flex-col border border-slate-200/60 h-full';
+            colEl.className = 'bg-slate-200/40 backdrop-blur-md rounded-[2rem] p-6 flex flex-col border border-white/20 shadow-inner h-full min-h-[500px]';
             colEl.innerHTML = `
-                <div class="flex justify-between items-center mb-5 px-1">
-                    <h2 class="font-bold text-slate-700 tracking-tight flex items-center gap-2">
+                <div class="flex justify-between items-center mb-6 px-2">
+                    <h2 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
                         ${column.title}
-                        <span class="bg-slate-200 text-slate-500 text-[11px] px-2 py-0.5 rounded-full">${column.taskIds.length}</span>
                     </h2>
+                    <span class="bg-white/80 text-slate-500 text-[10px] font-black px-3 py-1 rounded-full shadow-sm border border-slate-100">
+                        ${column.taskIds.length}
+                    </span>
                 </div>
             `;
 
