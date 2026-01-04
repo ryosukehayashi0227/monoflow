@@ -85,77 +85,80 @@
 
             <section>
                 <h2 id="help-manual-header">Detailed Manual</h2>
+                
+                <!-- 1. Structure -->
                 <div class="feature-card">
                     <h3 id="help-m1-title">1. タスクカードの構造</h3>
-                    <p id="help-m1-desc">MonoFlowのタスクカードは、限られたスペースに多くの情報を凝縮して表示するように設計されています。</p>
+                    <p id="help-m1-desc">MonoFlowのタスクカードは、情報の優先順位を整理し、一目で状況を把握できるように設計されています。</p>
                     <div class="grid lg:grid-cols-2 gap-12 mt-10">
                         <div class="space-y-2">
-                            <h4 id="help-m1-h1">視覚的インジケータ</h4>
+                            <h4 id="help-m1-h1">視覚的要素の詳細</h4>
                             <ul id="help-m1-list1">
-                                <li><span id="help-m1-l1">優先度アクセント: カード左端の太いラインで重要度を表現。</span></li>
-                                <li><span id="help-m1-l2">タイムスタンプ: 右下に作成日時と最終更新日時を自動表示。</span></li>
-                                <li><span id="help-m1-l3">メモプレビュー: タイトルの下に詳細メモの冒頭2行を自動でプレビュー。</span></li>
-                                <li><span id="help-m1-l4">状態バッジ: 期限切れは赤色、完了済みは緑色のバッジで強調。</span></li>
+                                <li><span id="help-m1-l1">優先度アクセント: 左端のライン色は重要度を直感的に伝えます。</span></li>
+                                <li><span id="help-m1-l2">動的なタイムスタンプ: 作成と更新日時が自動追跡されます。</span></li>
+                                <li><span id="help-m1-l3">メモプレビュー: 詳細メモの冒頭2行を表示。</span></li>
+                                <li><span id="help-m1-l4">期限バッジ: 期限切れは強調されます。</span></li>
                             </ul>
                         </div>
                         <div class="space-y-2">
-                            <h4 id="help-m1-h2">完了時の挙動</h4>
+                            <h4 id="help-m1-h2">ステータス管理</h4>
                             <ul id="help-m1-list2">
-                                <li><span id="help-m1-l5">グレーアウト: Doneレーンにあるタスクは透明度を下げ、集中を妨げないようにします。</span></li>
-                                <li><span id="help-m1-l6">打ち消し線: タイトルに線を引き、完了したことを明示。</span></li>
-                                <li><span id="help-m1-l7">完了時刻: 完了した瞬間の「時・分」を正確に記録し表示します。</span></li>
+                                <li><span id="help-m1-l5">完了済みタスクの減光処理。</span></li>
+                                <li><span id="help-m1-l6">タイトルの打ち消し線表示。</span></li>
+                                <li><span id="help-m1-l7">ISO形式での精密な完了記録。</span></li>
                             </ul>
                         </div>
                     </div>
                     <img src="img/screenshot-add.svg" alt="Screenshot" class="screenshot">
                 </div>
 
+                <!-- 2. Hierarchy -->
                 <div class="feature-card">
-                    <h3 id="help-m2-title">2. 高度な親子関係と「仮想チケット」</h3>
-                    <p id="help-m2-desc">複雑なタスクをサブタスクに分割して管理できます。MonoFlow独自の「仮想チケット」システムが情報の断絶を防ぎます。</p>
+                    <h3 id="help-m2-title">2. 高度な親子関係と階層化</h3>
+                    <p id="help-m2-desc">2階層構造を厳格に維持することで、強力な整理機能を提供します。</p>
                     <div class="grid lg:grid-cols-2 gap-12 mt-10">
                         <div class="space-y-6">
-                            <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800"><h4 id="help-m2-h1" class="mt-0 text-blue-600">仮想親チケット (Virtual Parent)</h4><p id="help-m2-l1" class="mb-0">子タスクが親と別のレーンにあるとき、子の上に親の「残像」が表示されます。</p></div>
-                            <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800"><h4 id="help-m2-h2" class="mt-0 text-indigo-600">仮想子チケット (Virtual Child)</h4><p id="help-m2-l2" class="mb-0">親タスクの下には、他レーンに散らばった子タスクの状況が一覧表示されます。</p></div>
-                            <div class="p-6 bg-blue-600 text-white rounded-2xl shadow-lg"><h4 id="help-m2-h3" class="mt-0 text-white"><i data-lucide="mouse-pointer-click" class="inline w-5 h-5 mr-1"></i> ジャンプ機能</h4><p id="help-m2-l3" class="text-blue-100 mb-0">仮想チケットをクリックすると、実体のある場所まで自動スクロールし、フラッシュして知らせます。</p></div>
+                            <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800"><h4 id="help-m2-h1" class="mt-0 text-blue-600">仮想親チケット</h4><p id="help-m2-l1" class="mb-0">カラムを跨いでも文脈を維持します。</p></div>
+                            <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800"><h4 id="help-m2-h2" class="mt-0 text-indigo-600">仮想子チケット</h4><p id="help-m2-l2" class="mb-0">他カラムの子タスクを一覧表示します。</p></div>
+                            <div class="p-6 bg-blue-600 text-white rounded-2xl shadow-lg"><h4 id="help-m2-h3" class="mt-0 text-white"><i data-lucide="mouse-pointer-click" class="inline w-5 h-5 mr-1"></i> ジャンプ機能</h4><p id="help-m2-l3" class="text-blue-100 mb-0">一瞬でターゲットへ移動します。</p></div>
                         </div>
-                        <div><img src="img/screenshot-nest.svg" alt="Screenshot" class="screenshot !mt-0 shadow-xl"><h4 id="help-m2-extra-title">進捗カウンター</h4><p id="help-m2-extra-desc">親タスクにはサブタスクの消化状況が表示されます。完了数に応じてプログレスバーも伸びていきます。</p>
-                        <p id="help-m2-l4" class="text-[11px] text-slate-400 dark:text-slate-500 mt-4 border-t border-slate-100 dark:border-slate-800 pt-4">階層の制限: 複雑さを避けるため、タスクは最大2階層までに制限されています。</p></div>
+                        <div>
+                            <img src="img/screenshot-nest.svg" alt="Screenshot" class="screenshot !mt-0 shadow-xl">
+                            <h4 id="help-m2-extra-title">進捗バー</h4>
+                            <p id="help-m2-extra-desc">サブタスク全体の消化率を可視化します。</p>
+                            <p id="help-m2-l4" class="text-[11px] text-slate-400 dark:text-slate-500 mt-4 border-t border-slate-100 dark:border-slate-800 pt-4">階層制限について</p>
+                        </div>
                     </div>
                 </div>
 
+                <!-- 3. Search -->
                 <div class="feature-card">
-                    <h3 id="help-m3-title">3. 検索とフィルタリング</h3>
-                    <p id="help-m3-desc">数千のタスクがあっても、目的の情報を数秒で見つけ出すことができます。</p>
+                    <h3 id="help-m3-title">3. 検索と動防フィルタリング</h3>
+                    <p id="help-m3-desc">目的の情報だけを瞬時に抽出できます。</p>
                     <div class="grid md:grid-cols-2 gap-10 mt-8">
-                        <div class="p-8 border border-slate-100 dark:border-slate-800 rounded-3xl"><h4 id="help-m3-h1" class="mt-0 flex items-center gap-2 text-slate-800 dark:text-white"><i data-lucide="search" class="w-5 h-5"></i> 全文検索</h4><p id="help-m3-l1">ツールバーの検索窓にキーワードを入力すると、リアルタイムで絞り込みます。</p></div>
-                        <div class="p-8 border border-slate-100 dark:border-slate-800 rounded-3xl"><h4 id="help-m3-h2" class="mt-0 flex items-center gap-2 text-slate-800 dark:text-white"><i data-lucide="filter" class="w-5 h-5"></i> マルチフィルタ</h4><p id="help-m3-l2">ラベルと優先度の2つのフィルターを組み合わせて詳細な絞り込みが可能です。</p></div>
+                        <div class="p-8 border border-slate-100 dark:border-slate-800 rounded-3xl"><h4 id="help-m3-h1" class="mt-0 flex items-center gap-2 text-slate-800 dark:text-white"><i data-lucide="search" class="w-5 h-5"></i> 全文検索</h4><p id="help-m3-l1">メモの内容も検索対象です。</p></div>
+                        <div class="p-8 border border-slate-100 dark:border-slate-800 rounded-3xl"><h4 id="help-m3-h2" class="mt-0 flex items-center gap-2 text-slate-800 dark:text-white"><i data-lucide="filter" class="w-5 h-5"></i> 複合フィルタ</h4><p id="help-m3-l2">ラベルと優先度を組み合わせます。</p></div>
                     </div>
+                    <p id="help-m3-extra" class="text-[11px] text-slate-400 mt-6 italic">Drag & Dropの制限事項</p>
                 </div>
 
+                <!-- 4. Analytics -->
                 <div class="feature-card">
-                    <h3 id="help-m4-title">4. 分析とデータ管理</h3>
-                    <p id="help-m4-desc">MonoFlowは単なるToDoリストではなく、あなたの生産性を分析するパートナーです。</p>
+                    <h3 id="help-m4-title">4. 進捗分析とデータサイエンス</h3>
+                    <p id="help-m4-desc">客観的な数値でパフォーマンスを可視化します。</p>
                     <div class="grid md:grid-cols-2 gap-10 mt-10">
                         <div class="space-y-6">
-                            <div><h4 id="help-m4-h1" class="dark:text-white">進捗の可視化</h4><ul><li id="help-m4-l1">MetricsやBurndownで、ステータス分布や進捗ペースをグラフで確認できます。</li></ul></div>
-                            <div><h4 id="help-m4-h2" class="dark:text-white">アーカイブと整理</h4><p id="help-m4-l2">完了したタスクをアーカイブへ移動させることで、ボードを常にクリーンに保てます。</p></div>
+                            <div><h4 id="help-m4-h1" class="dark:text-white">Metrics</h4><ul><li id="help-m4-l1">平均完了日数の定義。</li></ul></div>
+                            <div><h4 id="help-m4-h2" class="dark:text-white">Burndown</h4><p id="help-m4-l2">理想線との比較について。</p></div>
                         </div>
                         <div class="space-y-6">
-                            <div><h4 id="help-m4-h3" class="dark:text-white">バックアップ</h4><p id="help-m4-l3">JSON形式でのエクスポート・インポートに対応。データ移行も簡単です。</p></div>
-                            <div class="p-6 bg-slate-900 dark:bg-slate-800 rounded-3xl shadow-xl"><h4 id="help-m4-privacy-title" class="mt-0 text-white text-sm">Data Privacy</h4><p id="help-m4-privacy-desc" class="text-slate-400 text-xs leading-relaxed mb-0">すべてのデータはあなたのブラウザ（LocalStorage）にのみ保存されます。外部サーバーへの送信は一切行われないため、機密情報も安全に管理できます。</p></div>
+                            <div><h4 id="help-m4-h3" class="dark:text-white">アーカイブと整理</h4><p id="help-m4-l3">削除との違いについて。</p></div>
+                            <div class="p-6 bg-slate-900 dark:bg-slate-800 rounded-3xl shadow-xl"><h4 id="help-m4-privacy-title" class="mt-0 text-white text-sm">Data Privacy</h4><p id="help-m4-privacy-desc" class="text-slate-400 text-xs leading-relaxed mb-0">ローカル保存の安全性。</p></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="feature-card bg-slate-50 dark:bg-slate-800/20 border-0">
-                    <h3 id="help-m5-title">5. カスタマイズと設定</h3>
-                    <div class="grid md:grid-cols-2 gap-12">
-                        <div><h4 id="help-m5-h1" class="dark:text-white">ダークモード</h4><p id="help-m5-l1">月アイコンをクリックして切り替え。深夜の作業でも目に優しく集中できます。</p></div>
-                        <div><h4 id="help-m5-h2" class="dark:text-white">マルチ言語対応</h4><p id="help-m5-l2">メニューから日本語と英語を切り替えられます。</p></div>
-                    </div>
-                </div>
-
+                <!-- 5. Shortcuts & More -->
                 <div class="feature-card border-blue-100 dark:border-blue-900/30 bg-blue-50/20 dark:bg-blue-900/10">
                     <h3 id="help-shortcuts-title" class="dark:text-white"><i data-lucide="keyboard" class="w-6 h-6 text-blue-600"></i> Keyboard Shortcuts</h3>
                     <div class="grid md:grid-cols-2 gap-x-12 gap-y-4 mt-6">
@@ -163,12 +166,8 @@
                         <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-search" class="text-sm text-slate-600 dark:text-slate-400">Focus Search Bar</span><kbd class="kbd">/</kbd></div>
                         <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-esc" class="text-sm text-slate-600 dark:text-slate-400">Close / Blur Input</span><kbd class="kbd">Esc</kbd></div>
                         <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-help" class="text-sm text-slate-600 dark:text-slate-400">Show Help Page</span><kbd class="kbd">?</kbd></div>
-                                            <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20">
-                                                <span id="help-shortcuts-board" class="text-sm text-slate-600 dark:text-slate-400">Go to Board</span>
-                                                <div class="flex gap-1"><kbd class="kbd mod-key">Alt</kbd> + <kbd class="kbd">L</kbd></div>
-                                            </div>
-                                            <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20">
-                                                <span id="help-shortcuts-metrics" class="text-sm text-slate-600 dark:text-slate-400">Go to Metrics Page</span><div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">M</kbd></div></div>
+                        <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-board" class="text-sm text-slate-600 dark:text-slate-400">Go to Board</span><div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">L</kbd></div></div>
+                        <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-metrics" class="text-sm text-slate-600 dark:text-slate-400">Go to Metrics Page</span><div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">M</kbd></div></div>
                         <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-burndown" class="text-sm text-slate-600 dark:text-slate-400">Go to Burndown Page</span><div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">B</kbd></div></div>
                     </div>
                 </div>

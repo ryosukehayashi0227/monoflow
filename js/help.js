@@ -1,18 +1,16 @@
 /**
- * MonoFlow Help Page Localization Logic - ID Based Edition
+ * MonoFlow Help Page Localization Logic - Deep Manual Edition
  */
 
 function translateUI() {
-    // Helper to set text by ID
     const setT = (id, key) => {
         const el = document.getElementById(id);
-        if (el) el.textContent = Common.t(key);
+        if (el) el.innerHTML = Common.t(key); // Use innerHTML to support <strong> etc.
     };
 
-    // 1. Header & Basics
+    // 1. Header
     setT('help-page-title', 'help_title');
     setT('help-page-subtitle', 'help_subtitle');
-    setT('about-link', 'about_link');
     setT('back-to-app-text', 'back_to_app');
     
     const h2s = document.querySelectorAll('h2');
@@ -62,6 +60,7 @@ function translateUI() {
     if(m3h2) m3h2.innerHTML = `<i data-lucide="filter" class="w-5 h-5"></i> ${Common.t('help_m3_h2')}`;
     setT('help-m3-l1', 'help_m3_l1');
     setT('help-m3-l2', 'help_m3_l2');
+    setT('help-m3-extra', 'help_m3_extra');
 
     // 6. Detailed Manual - Analytics
     setT('help-m4-title', 'help_m4_t');
@@ -75,37 +74,28 @@ function translateUI() {
     setT('help-m4-privacy-title', 'help_m4_privacy_t');
     setT('help-m4-privacy-desc', 'help_m4_privacy_d');
 
-    // 7. Detailed Manual - Settings
-    setT('help-m5-title', 'help_m5_t');
-    setT('help-m5-h1', 'help_m5_h1');
-    setT('help-m5-l1', 'help_m5_l1');
-    setT('help-m5-h2', 'help_m5_h2');
-    setT('help-m5-l2', 'help_m5_l2');
-
-    // 8. Keyboard Shortcuts
+    // 7. Keyboard Shortcuts
     setT('help-shortcuts-title', 'help_shortcuts_t');
     setT('help-shortcuts-n', 'help_shortcuts_n');
     setT('help-shortcuts-search', 'help_shortcuts_search');
     setT('help-shortcuts-esc', 'help_shortcuts_esc');
     setT('help-shortcuts-help', 'help_shortcuts_help');
+    setT('help-shortcuts-board', 'help_shortcuts_board');
     setT('help-shortcuts-metrics', 'help_shortcuts_metrics');
     setT('help-shortcuts-burndown', 'help_shortcuts_burndown');
-    setT('help-shortcuts-board', 'help_shortcuts_board');
-
-    // 9. Mac OS Modifier Key Support
-    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-    if (isMac) {
-        document.querySelectorAll('.kbd').forEach(kbd => {
-            if (kbd.textContent === 'Alt') {
-                kbd.textContent = '⌥ Option';
-            }
-        });
-    }
 
     // Footer
     setT('help-footer-text', 'help_footer');
 
-    // 10. Image Switcher
+    // 8. Mac OS Modifier Key Support
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    if (isMac) {
+        document.querySelectorAll('.kbd').forEach(kbd => {
+            if (kbd.textContent === 'Alt') kbd.textContent = '⌥ Option';
+        });
+    }
+
+    // 9. Image Switcher
     const suffix = State.language === 'en' ? '-en' : '';
     document.querySelectorAll('img.screenshot').forEach(img => {
         const src = img.getAttribute('src');
