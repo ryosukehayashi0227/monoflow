@@ -58,8 +58,9 @@
                 </div>
             </div>
 
-            <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-                <div class="relative">
+            <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto items-start md:items-center">
+                <!-- Filter Dropdown -->
+                <div class="relative w-full md:w-auto">
                     <select id="label-filter" class="appearance-none bg-white border border-slate-200 rounded-xl px-4 py-2.5 pr-10 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-600 font-medium cursor-pointer hover:border-blue-300 transition-colors w-full md:w-48">
                         <option value="all">すべてのラベル</option>
                     </select>
@@ -68,7 +69,8 @@
                     </div>
                 </div>
 
-                <form id="add-task-form" class="flex gap-2">
+                <!-- Add Task Form -->
+                <form id="add-task-form" class="flex gap-2 w-full md:w-auto">
                     <input type="text" id="new-task-input" placeholder="新しいタスクを入力..." 
                         class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 w-full md:w-64 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
                     <button type="submit" class="bg-blue-600 text-white font-semibold rounded-xl px-4 py-2.5 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all flex items-center gap-2 shrink-0">
@@ -76,6 +78,23 @@
                         <span class="hidden md:inline">追加</span>
                     </button>
                 </form>
+
+                <!-- Settings/Menu Button -->
+                <div class="relative ml-2">
+                    <button onclick="toggleMenu(event)" class="bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:border-slate-300 shadow-sm transition-all flex items-center justify-center">
+                        <i data-lucide="more-horizontal" class="w-5 h-5"></i>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div id="settings-menu" class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 hidden z-20 overflow-hidden">
+                        <button onclick="exportData()" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 transition-colors">
+                            <i data-lucide="download" class="w-4 h-4 text-slate-400"></i> エクスポート (JSON)
+                        </button>
+                        <button onclick="document.getElementById('import-file').click()" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 border-t border-slate-100 transition-colors">
+                            <i data-lucide="upload" class="w-4 h-4 text-slate-400"></i> インポート
+                        </button>
+                        <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(this)">
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -192,7 +211,6 @@
 
         const STORAGE_KEY = 'monoflow-v7-data';
 
-        // Color Map for dynamic labels
         const COLOR_MAP = {
             red: 'bg-red-100 text-red-700 border-red-200',
             blue: 'bg-blue-100 text-blue-700 border-blue-200',
@@ -211,14 +229,14 @@
                 'c3': { id: 'c3', title: 'Done', taskIds: [] },
             },
             columnOrder: ['c1', 'c2', 'c3'],
-            labels: [ // Custom Labels Store
+            labels: [
                 { id: 'l1', name: 'Priority', color: 'red' },
                 { id: 'l2', name: 'Work', color: 'blue' }
             ]
         };
 
         let currentFilter = 'all';
-        let tempTaskLabels = []; // Labels currently selected in modal
+        let tempTaskLabels = []; 
 
         function loadData() {
             const savedData = localStorage.getItem(STORAGE_KEY);
@@ -235,7 +253,6 @@
         function renderBoard() {
             boardElement.innerHTML = '';
             
-            // Sync Filter Options
             updateFilterOptions();
 
             boardData.columnOrder.forEach(columnId => {
@@ -257,7 +274,6 @@
                 taskListElement.className = 'task-list space-y-3 min-h-[100px] pb-4';
                 taskListElement.dataset.columnId = column.id;
 
-                // --- Filtering & Grouping Logic ---
                 const columnTasks = column.taskIds.map(id => boardData.tasks[id]).filter(Boolean);
                 
                 const visibleTasks = columnTasks.filter(task => {
@@ -268,7 +284,6 @@
                 const renderOrder = [];
                 const processedIds = new Set();
 
-                // Extract roots (within visible set)
                 const roots = visibleTasks.filter(task => {
                     if (!task.parentId) return true;
                     const parentIsVisibleHere = visibleTasks.some(t => t.id === task.parentId);
@@ -311,7 +326,6 @@
             taskCard.className = `task-card bg-white border border-slate-200 rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass}`;
             taskCard.dataset.taskId = task.id;
 
-            // Render Labels
             let labelsHtml = '';
             if (task.labels && task.labels.length > 0) {
                 labelsHtml = `<div class="flex flex-wrap gap-1.5 mb-2">`;
@@ -325,7 +339,6 @@
                 labelsHtml += `</div>`;
             }
 
-            // Indicators
             let indicatorsHtml = `<div class="flex items-center gap-3 mt-3">`;
             
             if (task.dueDate) {
@@ -342,7 +355,6 @@
             }
             indicatorsHtml += `</div>`;
 
-            // Parent Indicator
             let parentIndicator = '';
             if (parentId) {
                 const parent = boardData.tasks[parentId];
@@ -371,7 +383,6 @@
             return taskCard;
         }
 
-        // --- Drag & Drop ---
         function initializeDragAndDrop() {
             if (currentFilter !== 'all') return;
             const lists = document.querySelectorAll('.task-list');
@@ -387,7 +398,6 @@
                         boardData.columns[fromColumnId].taskIds.splice(oldIndex, 1);
                         boardData.columns[toColumnId].taskIds.splice(newIndex, 0, taskId);
 
-                        // Force grouping
                         const targetIds = boardData.columns[toColumnId].taskIds;
                         const tasks = targetIds.map(id => boardData.tasks[id]);
                         const finalOrder = [];
@@ -395,11 +405,9 @@
                         
                         tasks.forEach(t => {
                             if(processed.has(t.id)) return;
-                            // if child and parent in col and not processed, wait
                             if(t.parentId && tasks.some(pt => pt.id === t.parentId) && !processed.has(t.parentId)) return;
                             
                             finalOrder.push(t.id); processed.add(t.id);
-                            // add children
                             tasks.filter(c => c.parentId === t.id && !processed.has(c.id)).forEach(c => {
                                 finalOrder.push(c.id); processed.add(c.id);
                             });
@@ -412,7 +420,61 @@
             });
         }
 
-        // --- Label Management ---
+        // --- Import / Export ---
+        
+        const settingsMenu = document.getElementById('settings-menu');
+
+        function toggleMenu(e) {
+            e.stopPropagation();
+            settingsMenu.classList.toggle('hidden');
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', () => {
+            settingsMenu.classList.add('hidden');
+        });
+
+        function exportData() {
+            const dataStr = JSON.stringify(boardData, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `monoflow-backup-${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    // Simple validation
+                    if (!imported.tasks || !imported.columns || !imported.columnOrder) {
+                        throw new Error("Invalid format");
+                    }
+                    if(confirm("現在のデータはすべて上書きされます。よろしいですか？")) {
+                        boardData = imported;
+                        saveData(boardData);
+                        renderBoard();
+                        alert("インポートが完了しました");
+                    }
+                } catch (err) {
+                    alert("ファイルの読み込みに失敗しました。形式が正しいか確認してください。");
+                }
+                input.value = ''; // Reset
+            };
+            reader.readAsText(file);
+        }
+
+
+        // --- Label Management & Other ---
 
         function updateFilterOptions() {
             labelFilterSelect.innerHTML = '<option value="all">すべてのラベル</option>';
@@ -434,7 +496,6 @@
                 const wrapper = document.createElement('div');
                 wrapper.className = `flex items-center gap-1 px-2 py-1 rounded-full border transition-all cursor-pointer ${colorClass} ${isSelected ? 'ring-2 ring-offset-1 ring-slate-400' : 'opacity-60 hover:opacity-100'}`;
                 
-                // Toggle Select
                 const textSpan = document.createElement('span');
                 textSpan.className = 'text-xs font-bold mr-1 select-none';
                 textSpan.textContent = label.name;
@@ -444,7 +505,6 @@
                     renderModalLabels();
                 };
 
-                // Delete Label Button
                 const delBtn = document.createElement('button');
                 delBtn.type = 'button';
                 delBtn.className = 'hover:text-red-900 text-current opacity-50 hover:opacity-100';
@@ -472,38 +532,28 @@
             newLabelNameInput.value = '';
             
             saveData(boardData);
-            renderModalLabels(); // update modal view
-            // No need to full re-render board yet
+            renderModalLabels(); 
         }
 
         function deleteLabel(labelId) {
             if(!confirm('ラベルを削除しますか？')) return;
-            
-            // Remove definition
             boardData.labels = boardData.labels.filter(l => l.id !== labelId);
-            // Remove from all tasks
             Object.values(boardData.tasks).forEach(task => {
                 if(task.labels) task.labels = task.labels.filter(id => id !== labelId);
             });
-            // Remove from current selection if active
             tempTaskLabels = tempTaskLabels.filter(id => id !== labelId);
-
             saveData(boardData);
             renderModalLabels();
-            renderBoard(); // Update background board too
+            renderBoard(); 
         }
 
-        // --- Modal Operations ---
         function openModal(taskId) {
             const task = boardData.tasks[taskId];
             if (!task) return;
-
             editTaskIdInput.value = task.id;
             editTaskContentInput.value = task.content;
             editTaskDescInput.value = task.description || '';
             editTaskDateInput.value = task.dueDate || '';
-            
-            // Parent Options
             editTaskParentInput.innerHTML = '<option value="">(なし)</option>';
             if (!Object.values(boardData.tasks).some(t => t.parentId === taskId)) {
                  Object.values(boardData.tasks).forEach(t => {
@@ -515,8 +565,6 @@
                 });
             }
             editTaskParentInput.value = task.parentId || '';
-
-            // Labels
             tempTaskLabels = task.labels ? [...task.labels] : [];
             renderModalLabels();
 
@@ -546,7 +594,7 @@
                 task.parentId = editTaskParentInput.value || null;
                 task.labels = tempTaskLabels;
 
-                if (task.parentId) { // clear children if became child
+                if (task.parentId) { 
                     Object.values(boardData.tasks).forEach(t => { if(t.parentId === taskId) t.parentId = null; });
                 }
                 saveData(boardData);
