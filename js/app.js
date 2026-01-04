@@ -238,7 +238,23 @@ const UI = {
                 }
             }
     
-            el.className = `task-card bg-white dark:bg-slate-900 border rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass} ${isDone ? 'is-done' : ''} ${isNewClass} ${pBorder}`;
+            // Compact version for Done column
+        if (isDone) {
+            el.className = `task-card bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 shadow-sm group relative cursor-pointer opacity-60 hover:opacity-100 transition-all ${indentClass}`;
+            el.dataset.taskId = task.id;
+            const compTime = task.completedDate ? `<div class="text-[9px] text-slate-400 font-medium mt-1">Done: ${UI.formatTime(task.completedDate)}</div>` : '';
+            el.innerHTML = `
+                <div class="flex justify-between items-center gap-2">
+                    <span class="task-title text-xs font-medium text-slate-500 dark:text-slate-400 line-through truncate flex-grow">${task.content}</span>
+                    <button onclick="event.stopPropagation(); BoardData.deleteTask('${task.id}', '${columnId}')" class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-0.5"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                </div>
+                ${compTime}
+            `;
+            el.addEventListener('click', () => Modal.open(task.id));
+            return el;
+        }
+
+        el.className = `task-card bg-white dark:bg-slate-900 border rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass} ${isNewClass} ${pBorder}`;
             el.dataset.taskId = task.id;
             const pConfig = CONSTANTS.PRIORITIES.find(p => p.value === task.priority);
             const pIcon = (pConfig && pConfig.value !== 'none') ? `<div class="flex items-center justify-center w-6 h-6 rounded-md border ${pConfig.style.replace('text-sm font-bold', '')}"><i data-lucide="${pConfig.icon}" class="w-4 h-4"></i></div>` : '';
