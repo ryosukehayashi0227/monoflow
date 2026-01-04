@@ -36,6 +36,7 @@ const CONSTANTS = {
             menu_burndown: 'Burndown',
             menu_archive: 'アーカイブ',
             menu_help: 'User Guide',
+            menu_about: 'MonoFlowについて',
             menu_reset: 'ボードのリセット',
             modal_title: 'タスク詳細',
             modal_label_title: 'タイトル',
@@ -135,7 +136,19 @@ const CONSTANTS = {
             help_m5_l1: '月アイコンをクリックして切り替え。深夜の作業でも目に優しく集中できます。',
             help_m5_h2: 'マルチ言語対応',
             help_m5_l2: 'メニューから日本語と英語を切り替えられます。',
-            help_footer: 'MonoFlow Productivity System - Built for High-Performance Personal Kanban'
+            help_footer: 'MonoFlow Productivity System - Built for High-Performance Personal Kanban',
+            // About Page
+            about_title: 'MonoFlow',
+            about_subtitle: 'ミニマルで強力な個人用カンバン',
+            about_concept_t: 'コンセプト',
+            about_concept_d: 'MonoFlowは、個人の生産性を最大化するために設計された、ブラウザ完結型のカンバンツールです。複雑な設定やサーバーは不要。開いた瞬間から、あなたの思考をフロー状態へと導きます。',
+            about_features_t: '主な特徴',
+            about_f1_t: 'プライバシー第一',
+            about_f1_d: 'データは100%ローカル（あなたのブラウザ）に保存されます。外部サーバーへの送信は一切ありません。',
+            about_f2_t: '高度な親子関係',
+            about_f2_d: '仮想チケットシステムにより、レーンをまたいだ複雑なプロジェクト構造も直感的に把握できます。',
+            about_f3_t: '分析機能',
+            about_f3_d: 'メトリクスとバーンダウンチャートで、自分のパフォーマンスを客観的に評価できます。'
         },
         en: {
             app_desc: 'Simple Personal Kanban',
@@ -152,6 +165,7 @@ const CONSTANTS = {
             menu_burndown: 'Burndown',
             menu_archive: 'Archive',
             menu_help: 'User Guide',
+            menu_about: 'About MonoFlow',
             menu_reset: 'Reset Board',
             modal_title: 'Task Details',
             modal_label_title: 'Title',
@@ -251,7 +265,19 @@ const CONSTANTS = {
             help_m5_l1: 'Switch via the moon icon. Easy on the eyes during late-night sessions.',
             help_m5_h2: 'Multilingual',
             help_m5_l2: 'Switch between Japanese and English via the top toolbar.',
-            help_footer: 'MonoFlow Productivity System - Built for High-Performance Personal Kanban'
+            help_footer: 'MonoFlow Productivity System - Built for High-Performance Personal Kanban',
+            // About Page
+            about_title: 'About MonoFlow',
+            about_subtitle: 'Minimal yet Powerful Personal Kanban',
+            about_concept_t: 'Concept',
+            about_concept_d: 'MonoFlow is a browser-based Kanban tool designed to maximize individual productivity. No complex setup or servers required. From the moment you open it, it guides your thoughts into a flow state.',
+            about_features_t: 'Key Features',
+            about_f1_t: 'Privacy First',
+            about_f1_d: '100% of your data is stored locally in your browser. No data is ever sent to external servers.',
+            about_f2_t: 'Advanced Hierarchy',
+            about_f2_d: 'The Virtual Ticket system allows you to intuitively grasp complex project structures across multiple lanes.',
+            about_f3_t: 'Built-in Analytics',
+            about_f3_d: 'Evaluate your performance objectively with integrated Metrics and Burndown charts.'
         }
     }
 };
