@@ -163,50 +163,113 @@ const Modal = {
 };
 
 const UI = {
-    formatTime: (iso) => { if (!iso) return ''; const d = Common.parseDate(iso); return d.toLocaleString(State.language === 'ja' ? 'ja-JP' : 'en-US', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }); },
-    createTaskCard: (task, columnId, visibleTasksContext) => {
-        const isDone = columnId === CONSTANTS.DONE_COLUMN_ID; const el = document.createElement('div');
-        const hasParent = !!task.parentId && !!State.data.tasks[task.parentId]; const indentClass = hasParent ? 'child-task scale-95 origin-left' : '';
-        const isNewClass = task.id === State.lastAddedId ? 'is-new' : '';
-        let pBorder = 'border-slate-200 dark:border-slate-700';
-        if (task.priority === 'high') pBorder = 'border-l-4 border-l-red-500 border-slate-200 dark:border-slate-700';
-        else if (task.priority === 'medium') pBorder = 'border-l-4 border-l-orange-400 border-slate-200 dark:border-slate-700';
-        else if (task.priority === 'low') pBorder = 'border-l-4 border-l-blue-400 border-slate-200 dark:border-slate-700';
-
-        let staleIcon = '';
-        if (columnId === 'c1') {
-            const lastActive = Common.parseDate(task.updatedAt || task.createdAt);
-            if (lastActive && (new Date() - lastActive > 7 * 86400000)) {
-                staleIcon = `<div class="absolute -right-1 -top-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-400 border border-slate-200 dark:border-slate-700 shadow-sm animate-pulse z-10" title="${Common.t('stale_task')}"><i data-lucide="wind" class="w-3 h-3"></i></div>`;
+        formatTime: (iso) => { if (!iso) return ''; const d = Common.parseDate(iso); return d.toLocaleString(State.language === 'ja' ? 'ja-JP' : 'en-US', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }); },
+            drawConnectors: (taskId) => {
+                const canvas = document.getElementById('connector-canvas');
+                if (!canvas) return;
+                const task = State.data.tasks[taskId];
+                const sourceEl = document.querySelector(`.task-card[data-task-id="${taskId}"]`);
+                if (!task || !task.blockers || !sourceEl) return;
+        
+                const sRect = sourceEl.getBoundingClientRect();
+                
+                task.blockers.forEach(bid => {
+                    const targetEl = document.querySelector(`.task-card[data-task-id="${bid}"]`);
+                    if (!targetEl) return;
+                    const tRect = targetEl.getBoundingClientRect();
+                    
+                    // Calculate Smart Anchors
+                    let sx, sy, tx, ty;
+                    
+                    // Horizontal relationship
+                    if (sRect.left > tRect.right) { // Source is to the right of target
+                        sx = sRect.left; sy = sRect.top + (sRect.height / 2);
+                        tx = tRect.right; ty = tRect.top + (tRect.height / 2);
+                    } else if (sRect.right < tRect.left) { // Source is to the left of target
+                        sx = sRect.right; sy = sRect.top + (sRect.height / 2);
+                        tx = tRect.left; ty = tRect.top + (tRect.height / 2);
+                    } else { // Vertical relationship (same column or overlapping)
+                        sx = sRect.left + (sRect.width / 2);
+                        tx = tRect.left + (tRect.width / 2);
+                        if (sRect.top > tRect.bottom) { // Source is below target
+                            sy = sRect.top; ty = tRect.bottom;
+                        } else { // Source is above target
+                            sy = sRect.bottom; ty = tRect.top;
+                        }
+                    }
+        
+                    const b = State.data.tasks[bid];
+                    const isBDone = State.data.columns[CONSTANTS.DONE_COLUMN_ID].taskIds.includes(bid) || (b.archived && b.completedDate);
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    
+                    // Smoother Curve
+                    const dist = Math.abs(tx - sx);
+                    const cpOffset = Math.min(dist / 2, 100); // Limit curvature
+                    const cp1x = sx + (tx > sx ? cpOffset : -cpOffset);
+                    const cp2x = tx + (tx > sx ? -cpOffset : cpOffset);
+                    
+                    path.setAttribute('d', `M ${sx} ${sy} C ${cp1x} ${sy}, ${cp2x} ${ty}, ${tx} ${ty}`);
+                    path.setAttribute('class', `connector-path ${isBDone ? 'is-done' : ''}`);
+                    canvas.appendChild(path);
+                });
+            },
+        
+        clearConnectors: () => {
+            const canvas = document.getElementById('connector-canvas');
+            if (canvas) canvas.innerHTML = '';
+        },
+        createTaskCard: (task, columnId, visibleTasksContext) => {
+            const isDone = columnId === CONSTANTS.DONE_COLUMN_ID; const el = document.createElement('div');
+            const hasParent = !!task.parentId && !!State.data.tasks[task.parentId]; const indentClass = hasParent ? 'child-task scale-95 origin-left' : '';
+            const isNewClass = task.id === State.lastAddedId ? 'is-new' : '';
+            let pBorder = 'border-slate-200 dark:border-slate-700';
+            if (task.priority === 'high') pBorder = 'border-l-4 border-l-red-500 border-slate-200 dark:border-slate-700';
+            else if (task.priority === 'medium') pBorder = 'border-l-4 border-l-orange-400 border-slate-200 dark:border-slate-700';
+            else if (task.priority === 'low') pBorder = 'border-l-4 border-l-blue-400 border-slate-200 dark:border-slate-700';
+    
+            let staleIcon = '';
+            if (columnId === 'c1') {
+                const lastActive = Common.parseDate(task.updatedAt || task.createdAt);
+                if (lastActive && (new Date() - lastActive > 7 * 86400000)) {
+                    staleIcon = `<div class="absolute -right-1 -top-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-400 border border-slate-200 dark:border-slate-700 shadow-sm animate-pulse z-10" title="${Common.t('stale_task')}"><i data-lucide="wind" class="w-3 h-3"></i></div>`;
+                }
             }
-        }
-
-        el.className = `task-card bg-white dark:bg-slate-900 border rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass} ${isDone ? 'is-done' : ''} ${isNewClass} ${pBorder}`;
-        el.dataset.taskId = task.id;
-        const pConfig = CONSTANTS.PRIORITIES.find(p => p.value === task.priority);
-        const pIcon = (pConfig && pConfig.value !== 'none') ? `<div class="flex items-center justify-center w-6 h-6 rounded-md border ${pConfig.style.replace('text-sm font-bold', '')}"><i data-lucide="${pConfig.icon}" class="w-4 h-4"></i></div>` : '';
-        const lHtml = task.labels && task.labels.length > 0 ? `<div class="flex flex-wrap gap-1.5 mb-2">` + task.labels.map(lid => { const l = State.data.labels.find(x => x.id === lid); return l ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${CONSTANTS.COLORS[l.color] || CONSTANTS.COLORS.blue}">${l.name}</span>` : ''; }).join('') + `</div>` : '';
-        let pInd = ''; if (task.parentId) { const p = State.data.tasks[task.parentId]; if (p) pInd = `<div class="text-[10px] text-blue-500 font-semibold mb-1 flex items-center gap-1"><i data-lucide="corner-down-right" class="w-3 h-3"></i>${p.content.substring(0,15)}...</div>`; } 
-        let subCounter = ''; const children = Object.values(State.data.tasks).filter(t => t.parentId === task.id && !t.archived);
-        if (children.length > 0) { const dCount = children.filter(c => { for(const cid in State.data.columns) if(State.data.columns[cid].taskIds.includes(c.id) && cid === CONSTANTS.DONE_COLUMN_ID) return true; return false; }).length; const progressPct = Math.round((dCount / children.length) * 100); subCounter = `<div class="mt-3 pt-3 border-t border-slate-50 dark:border-slate-800"><div class="flex justify-between items-center mb-1.5"><div class="flex items-center gap-1 text-[9px] font-black bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700"><i data-lucide="git-merge" class="w-2.5 h-2.5"></i>${dCount}/${children.length}</div><span class="text-[9px] font-bold text-slate-400">${progressPct}%</span></div><div class="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-blue-500 transition-all duration-500" style="width: ${progressPct}%"></div></div></div>`; } 
-        let metaHtml = `<div class="flex items-center gap-3 mt-3">`;
-        if (task.blockers && task.blockers.length > 0) {
-            const doneCount = task.blockers.filter(bid => {
-                const b = State.data.tasks[bid];
-                return b && (State.data.columns[CONSTANTS.DONE_COLUMN_ID].taskIds.includes(bid) || (b.archived && b.completedDate));
-            }).length;
-            const allDone = doneCount === task.blockers.length;
-            const colorClass = allDone ? 'text-green-600 bg-green-50 border-green-100' : 'text-orange-600 bg-orange-50 border-orange-100';
-            metaHtml += `<div class="flex items-center gap-1 text-[10px] font-bold border px-1.5 py-0.5 rounded-md ${colorClass}" title="${Common.t('modal_label_blocker')}"><i data-lucide="link-2" class="w-3 h-3"></i>${doneCount}/${task.blockers.length}</div>`;
-        }
-        if (isDone && task.completedDate) metaHtml += `<div class="flex items-center gap-1 text-[11px] font-bold text-green-600 bg-green-50 border border-green-100 px-2 py-0.5 rounded-md"><i data-lucide="check-circle-2" class="w-3 h-3"></i>${Common.t('task_completed')}: ${UI.formatTime(task.completedDate)}</div>`;
-        else if (task.dueDate) { const overdue = new Date(task.dueDate) < new Date().setHours(0,0,0,0); const style = overdue ? 'text-red-600 bg-red-50 border-red-100' : 'text-slate-500 bg-slate-50 border-slate-100'; metaHtml += `<div class="flex items-center gap-1 text-xs font-medium border px-2 py-1 rounded-md w-fit ${style}"><i data-lucide="clock" class="w-3 h-3"></i>${task.dueDate}</div>`; } 
-        if (task.description) metaHtml += `<i data-lucide="align-left" class="w-3 h-3 text-slate-400"></i>`;
-        if (task.updatedAt) { metaHtml += `<div class="ml-auto flex flex-col items-end gap-0.5"><div class="text-[9px] text-slate-300 font-medium">${Common.t('task_created')}: ${UI.formatTime(task.createdAt)}</div>`; if (task.updatedAt !== task.createdAt) metaHtml += `<div class="flex items-center gap-1 text-[9px] text-blue-400 font-bold"><i data-lucide="refresh-cw" class="w-2 h-2"></i>${Common.t('task_updated')}: ${UI.formatTime(task.updatedAt)}</div>`; metaHtml += `</div>`; } 
-        metaHtml += `</div>`;
-        el.innerHTML = `${staleIcon}${pInd}${lHtml}<div class="flex justify-between items-start gap-2"><div class="flex-grow min-w-0"><span class="task-title text-[15px] font-medium text-slate-700 dark:text-slate-200 leading-relaxed block truncate">${task.content}</span>${task.description ? `<div class="text-[11px] text-slate-400 dark:text-slate-500 line-clamp-2 mt-1 leading-relaxed break-words">${task.description}</div>` : ''}</div><div class="flex flex-col gap-1 items-end">${pIcon}<button onclick="event.stopPropagation(); BoardData.deleteTask('${task.id}', '${columnId}')" class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div>${metaHtml}${subCounter}`;
-        el.addEventListener('click', () => Modal.open(task.id)); return el;
-    },
+    
+            el.className = `task-card bg-white dark:bg-slate-900 border rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass} ${isDone ? 'is-done' : ''} ${isNewClass} ${pBorder}`;
+            el.dataset.taskId = task.id;
+            const pConfig = CONSTANTS.PRIORITIES.find(p => p.value === task.priority);
+            const pIcon = (pConfig && pConfig.value !== 'none') ? `<div class="flex items-center justify-center w-6 h-6 rounded-md border ${pConfig.style.replace('text-sm font-bold', '')}"><i data-lucide="${pConfig.icon}" class="w-4 h-4"></i></div>` : '';
+            const lHtml = task.labels && task.labels.length > 0 ? `<div class="flex flex-wrap gap-1.5 mb-2">` + task.labels.map(lid => { const l = State.data.labels.find(x => x.id === lid); return l ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${CONSTANTS.COLORS[l.color] || CONSTANTS.COLORS.blue}">${l.name}</span>` : ''; }).join('') + `</div>` : '';
+            let pInd = ''; if (task.parentId) { const p = State.data.tasks[task.parentId]; if (p) pInd = `<div class="text-[10px] text-blue-500 font-semibold mb-1 flex items-center gap-1"><i data-lucide="corner-down-right" class="w-3 h-3"></i>${p.content.substring(0,15)}...</div>`; } 
+            let subCounter = ''; const children = Object.values(State.data.tasks).filter(t => t.parentId === task.id && !t.archived);
+            if (children.length > 0) { const dCount = children.filter(c => { for(const cid in State.data.columns) if(State.data.columns[cid].taskIds.includes(c.id) && cid === CONSTANTS.DONE_COLUMN_ID) return true; return false; }).length; const progressPct = Math.round((dCount / children.length) * 100); subCounter = `<div class="mt-3 pt-3 border-t border-slate-50 dark:border-slate-800"><div class="flex justify-between items-center mb-1.5"><div class="flex items-center gap-1 text-[9px] font-black bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700"><i data-lucide="git-merge" class="w-2.5 h-2.5"></i>${dCount}/${children.length}</div><span class="text-[9px] font-bold text-slate-400">${progressPct}%</span></div><div class="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-blue-500 transition-all duration-500" style="width: ${progressPct}%"></div></div></div>`; }
+            let metaHtml = `<div class="flex items-center gap-3 mt-3">`;
+            if (task.blockers && task.blockers.length > 0) {
+                const doneCount = task.blockers.filter(bid => {
+                    const b = State.data.tasks[bid];
+                    return b && (State.data.columns[CONSTANTS.DONE_COLUMN_ID].taskIds.includes(bid) || (b.archived && b.completedDate));
+                }).length;
+                const allDone = doneCount === task.blockers.length;
+                const colorClass = allDone ? 'text-green-600 bg-green-50 border-green-100' : 'text-orange-600 bg-orange-50 border-orange-100';
+                metaHtml += `<div class="blocker-indicator flex items-center gap-1 text-[10px] font-bold border px-1.5 py-0.5 rounded-md ${colorClass}" title="${Common.t('modal_label_blocker')}"><i data-lucide="link-2" class="w-3 h-3"></i>${doneCount}/${task.blockers.length}</div>`;
+            }
+            if (isDone && task.completedDate) metaHtml += `<div class="flex items-center gap-1 text-[11px] font-bold text-green-600 bg-green-50 border border-green-100 px-2 py-0.5 rounded-md"><i data-lucide="check-circle-2" class="w-3 h-3"></i>${Common.t('task_completed')}: ${UI.formatTime(task.completedDate)}</div>`;
+            else if (task.dueDate) { const overdue = new Date(task.dueDate) < new Date().setHours(0,0,0,0); const style = overdue ? 'text-red-600 bg-red-50 border-red-100' : 'text-slate-500 bg-slate-50 border-slate-100'; metaHtml += `<div class="flex items-center gap-1 text-xs font-medium border px-2 py-1 rounded-md w-fit ${style}"><i data-lucide="clock" class="w-3 h-3"></i>${task.dueDate}</div>`; } 
+            if (task.description) metaHtml += `<i data-lucide="align-left" class="w-3 h-3 text-slate-400"></i>`;
+            if (task.updatedAt) { metaHtml += `<div class="ml-auto flex flex-col items-end gap-0.5"><div class="text-[9px] text-slate-300 font-medium">${Common.t('task_created')}: ${UI.formatTime(task.createdAt)}</div>`; if (task.updatedAt !== task.createdAt) metaHtml += `<div class="flex items-center gap-1 text-[9px] text-blue-400 font-bold"><i data-lucide="refresh-cw" class="w-2 h-2"></i>${Common.t('task_updated')}: ${UI.formatTime(task.updatedAt)}</div>`; metaHtml += `</div>`; } 
+            metaHtml += `</div>`;
+            el.innerHTML = `${staleIcon}${pInd}${lHtml}<div class="flex justify-between items-start gap-2"><div class="flex-grow min-w-0"><span class="task-title text-[15px] font-medium text-slate-700 dark:text-slate-200 leading-relaxed block truncate">${task.content}</span>${task.description ? `<div class="text-[11px] text-slate-400 dark:text-slate-500 line-clamp-2 mt-1 leading-relaxed break-words">${task.description}</div>` : ''}</div><div class="flex flex-col gap-1 items-end">${pIcon}<button onclick="event.stopPropagation(); BoardData.deleteTask('${task.id}', '${columnId}')" class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div>${metaHtml}${subCounter}`;
+            
+            // Add indicator events
+            const indicator = el.querySelector('.blocker-indicator');
+            if (indicator) {
+                indicator.addEventListener('mouseenter', () => UI.drawConnectors(task.id));
+                indicator.addEventListener('mouseleave', () => UI.clearConnectors());
+            }
+    
+            el.addEventListener('click', () => Modal.open(task.id)); return el;
+        },
+    
     createVirtualParent: (parentTask) => {
         const el = document.createElement('div'); el.className = 'task-card virtual-parent-card rounded-lg flex items-center transition-all';
         el.innerHTML = `<span class="text-[11px] font-bold text-slate-500 dark:text-slate-300 truncate tracking-tight">${parentTask.content}</span>`;
