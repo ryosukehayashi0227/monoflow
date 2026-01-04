@@ -184,9 +184,29 @@ const Modal = {
         document.getElementById('display-created-at').textContent = `${Common.t('task_created')}: ${task.createdAt ? UI.formatTime(task.createdAt) : '---'}`;
         document.getElementById('display-updated-at').textContent = `${Common.t('task_updated')}: ${task.updatedAt ? UI.formatTime(task.updatedAt) : '---'}`;
         const pRadio = Modal.elements.overlay.querySelector(`input[name="priority"][value="${task.priority || 'none'}"]`); if(pRadio) pRadio.checked = true;
-        Modal.elements.parent.innerHTML = `<option value="">${Common.t('modal_label_none')}</option>`;
-        Object.values(State.data.tasks).forEach(t => { if (t.id !== taskId && !t.parentId && !t.archived) { const opt = document.createElement('option'); opt.value = t.id; opt.textContent = t.content.substring(0, 30); Modal.elements.parent.appendChild(opt); } });
-        Modal.elements.parent.value = task.parentId || '';
+
+        // Parent Selection Logic: Only allow 2 levels (Parent -> Child)
+        const hasChildren = Object.values(State.data.tasks).some(t => t.parentId === taskId);
+        
+        if (hasChildren) {
+            // If it's a parent, it cannot become a child of another task
+            Modal.elements.parent.disabled = true;
+            Modal.elements.parent.classList.add('bg-slate-50', 'text-slate-400', 'cursor-not-allowed');
+            Modal.elements.parent.innerHTML = `<option value="" selected>${Common.t('modal_parent_restricted')}</option>`;
+        } else {
+            Modal.elements.parent.disabled = false;
+            Modal.elements.parent.classList.remove('bg-slate-50', 'text-slate-400', 'cursor-not-allowed');
+            Modal.elements.parent.innerHTML = `<option value="">${Common.t('modal_label_none')}</option>`;
+            Object.values(State.data.tasks).forEach(t => { 
+                if (t.id !== taskId && !t.parentId && !t.archived) { 
+                    const opt = document.createElement('option'); 
+                    opt.value = t.id; 
+                    opt.textContent = t.content.substring(0, 30); 
+                    Modal.elements.parent.appendChild(opt); 
+                } 
+            });
+            Modal.elements.parent.value = task.parentId || '';
+        }
         State.tempLabels = task.labels ? [...task.labels] : []; Modal.renderLabels();
         Modal.elements.overlay.classList.remove('hidden'); void Modal.elements.overlay.offsetWidth;
         Modal.elements.overlay.classList.remove('opacity-0'); Modal.elements.content.classList.remove('scale-95', 'opacity-0');
