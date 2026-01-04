@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MonoFlow - User Guide</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232563eb'/%3E%3Cpath d='M30 30 L 30 70 L 50 50 L 70 70 L 70 30' fill='none' stroke='white' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" type="image/svg+xml">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -15,111 +16,133 @@
     </script>
     <style>
         body { background-color: #f8fafc; color: #1e293b; }
-        .feature-card { @apply bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 overflow-hidden; }
-        .step-num { @apply flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white font-black text-sm shrink-0; }
-        h2 { @apply text-3xl font-black tracking-tighter text-slate-900 mb-10 flex items-center gap-4; }
-        h3 { @apply text-xl font-bold text-slate-800 mb-4 flex items-center gap-2; }
-        .screenshot { @apply w-full rounded-2xl border border-slate-100 shadow-inner mt-8 bg-slate-50; }
+        .feature-card { @apply bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm transition-all hover:shadow-lg overflow-hidden; }
+        .step-num { @apply flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-black text-xs shrink-0; }
+        h2 { @apply text-2xl font-black tracking-tighter text-slate-900 mb-8 flex items-center gap-3 border-l-4 border-l-blue-600 pl-4; }
+        h3 { @apply text-lg font-bold text-slate-800 mb-4 flex items-center gap-2; }
+        .screenshot { @apply w-full rounded-xl border border-slate-100 shadow-inner mt-6 bg-slate-50; }
+        .detail-item { @apply border-b border-slate-100 pb-6 mb-6 last:border-0; }
     </style>
 </head>
 <body class="antialiased">
 
-    <div class="max-w-[1600px] mx-auto px-6 md:px-12 py-20">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
         <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-20 border-b border-slate-200 pb-12 gap-8">
-            <div class="flex items-center gap-6">
-                <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-800 rounded-[1.5rem] flex items-center justify-center shadow-2xl shadow-blue-500/40">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="6" y2="18"></line><line x1="12" y1="6" x2="12" y2="14"></line><line x1="18" y1="6" x2="18" y2="10"></line></svg>
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-20 border-b border-slate-200 pb-10 gap-8">
+            <div class="flex items-center gap-5">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-800 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-500/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="6" y2="18"></line><line x1="12" y1="6" x2="12" y2="14"></line><line x1="18" y1="6" x2="18" y2="10"></line></svg>
                 </div>
                 <div>
-                    <h1 class="text-4xl font-black text-slate-900 tracking-tighter leading-none">User Guide</h1>
-                    <p class="text-slate-400 mt-2 font-bold uppercase tracking-widest text-xs">MonoFlow Operations</p>
+                    <h1 class="text-3xl font-black text-slate-900 tracking-tighter leading-none">User Guide</h1>
+                    <p class="text-slate-400 mt-1 font-bold uppercase tracking-widest text-[10px]">MonoFlow Operations</p>
                 </div>
             </div>
-            <a href="index.html" class="flex items-center gap-3 px-8 py-4 bg-white border border-slate-200 rounded-2xl text-slate-700 hover:bg-slate-50 transition-all font-black shadow-sm active:scale-95">
-                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            <a href="index.html" class="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 transition-all font-bold shadow-sm">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
                 アプリに戻る
             </a>
         </header>
 
-        <div class="space-y-24">
-            <!-- 1. 基本操作 -->
-            <section>
-                <h2><i data-lucide="zap" class="w-8 h-8 text-blue-600 fill-blue-600/20"></i> 基本操作</h2>
-                <div class="grid gap-10">
-                    <div class="feature-card">
-                        <div class="flex gap-6 items-start">
-                            <div class="step-num">01</div>
-                            <div>
-                                <h3>タスクを追加する</h3>
-                                <p class="text-slate-500 text-sm leading-relaxed max-w-xl">
-                                    ヘッダーにある入力フォームにタイトルを入れて「追加」を押すだけ。
-                                    ラベルや優先度は後からゆっくり設定できます。
-                                </p>
-                            </div>
-                        </div>
-                        <img src="img/screenshot-add.svg" alt="タスク追加のスクリーンショット" class="screenshot">
-                    </div>
-
-                    <div class="feature-card">
-                        <div class="flex gap-6 items-start">
-                            <div class="step-num">02</div>
-                            <div>
-                                <h3>移動と完了</h3>
-                                <p class="text-slate-500 text-sm leading-relaxed max-w-xl">
-                                    タスクを掴んで隣のレーンに放り込みましょう。
-                                    「Done」に移動すると、自動的に完了時刻がスタンプされ、グレーアウトされます。
-                                </p>
-                            </div>
-                        </div>
-                        <img src="img/screenshot-move.svg" alt="レーン移動のスクリーンショット" class="screenshot">
-                    </div>
+        <!-- Quick Start (ざっくり説明) -->
+        <section class="mb-32">
+            <h2><i data-lucide="zap" class="w-6 h-6 text-blue-600"></i> クイックスタート</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="feature-card !p-6">
+                    <div class="step-num mb-4">1</div>
+                    <h3>タスクを作る</h3>
+                    <p class="text-slate-500 text-xs leading-relaxed">
+                        ヘッダーの入力欄にタイトルを入れて「追加」を押します。タスクは一番左のレーンに入ります。
+                    </p>
+                    <img src="img/screenshot-add.svg" class="screenshot">
                 </div>
-            </section>
-
-            <!-- 2. 詳細設定 -->
-            <section>
-                <h2><i data-lucide="layers" class="w-8 h-8 text-blue-600 fill-blue-600/20"></i> 詳細設定</h2>
-                <div class="feature-card">
-                    <div class="flex gap-6 items-start mb-8">
-                        <div class="step-num">03</div>
-                        <div>
-                            <h3>タスクをカスタマイズ</h3>
-                            <p class="text-slate-500 text-sm leading-relaxed max-w-xl">
-                                カードをクリックすると詳細パネルが開きます。メモの記述、期限の設定、自分だけのカラーラベルを作成して整理しましょう。
-                            </p>
-                        </div>
-                    </div>
-                    <img src="img/screenshot-edit.svg" alt="詳細編集のスクリーンショット" class="screenshot">
+                <div class="feature-card !p-6">
+                    <div class="step-num mb-4">2</div>
+                    <h3>動かして整理</h3>
+                    <p class="text-slate-500 text-xs leading-relaxed">
+                        カードをドラッグして、ToDo → 進行中 → 完了へと動かします。Doneに入れると自動で完了時間が記録されます。
+                    </p>
+                    <img src="img/screenshot-move.svg" class="screenshot">
                 </div>
-            </section>
-
-            <!-- 3. 親子関係 -->
-            <section>
-                <h2><i data-lucide="git-branch" class="w-8 h-8 text-blue-600 fill-blue-600/20"></i> 親子構造</h2>
-                <div class="feature-card">
-                    <div class="flex gap-6 items-start mb-8">
-                        <div class="step-num">04</div>
-                        <div>
-                            <h3>サブタスクとしての整理</h3>
-                            <p class="text-slate-500 text-sm leading-relaxed max-w-xl">
-                                親タスクを設定すると、子タスクは自動的にインデント表示されます。
-                                親が別のレーンにいても「仮想親カード」が表示されるので、迷子になりません。
-                            </p>
-                        </div>
-                    </div>
-                    <img src="img/screenshot-nest.svg" alt="親子関係のスクリーンショット" class="screenshot">
+                <div class="feature-card !p-6">
+                    <div class="step-num mb-4">3</div>
+                    <h3>詳細を詰める</h3>
+                    <p class="text-slate-500 text-xs leading-relaxed">
+                        カードをクリックして詳細設定。優先度、ラベル、期限、親子関係を自由に設定して管理します。
+                    </p>
+                    <img src="img/screenshot-edit.svg" class="screenshot">
                 </div>
-            </section>
-        </div>
-
-        <footer class="mt-32 pt-16 border-t border-slate-200 text-center">
-            <div class="flex justify-center gap-4 mb-6">
-                <div class="w-2 h-2 rounded-full bg-blue-600 animate-bounce"></div>
-                <div class="w-2 h-2 rounded-full bg-blue-600 animate-bounce [animation-delay:0.2s]"></div>
-                <div class="w-2 h-2 rounded-full bg-blue-600 animate-bounce [animation-delay:0.4s]"></div>
             </div>
-            <p class="text-slate-400 text-xs font-black uppercase tracking-[0.3em]">&copy; 2026 Monoflow Project</p>
+        </section>
+
+        <!-- Detailed Manual (詳細説明) -->
+        <section class="space-y-16">
+            <h2><i data-lucide="book-open" class="w-6 h-6 text-blue-600"></i> 詳細マニュアル</h2>
+
+            <!-- 親子関係 -->
+            <div class="feature-card">
+                <h3><i data-lucide="git-branch" class="w-5 h-5 text-blue-500"></i> 高度な親子関係の管理</h3>
+                <div class="grid lg:grid-cols-2 gap-12 items-start">
+                    <div class="space-y-6">
+                        <div class="detail-item">
+                            <h4 class="font-bold text-slate-700 mb-2">サブタスクとしての整理</h4>
+                            <p class="text-slate-500 text-sm leading-relaxed">
+                                詳細画面の「親タスク」から他のチケットを選択できます。親子関係を作ると、子タスクはインデント（字下げ）表示され、グループ化されます。
+                            </p>
+                        </div>
+                        <div class="detail-item">
+                            <h4 class="font-bold text-slate-700 mb-2">仮想チケット（ゴースト）機能</h4>
+                            <p class="text-slate-500 text-sm leading-relaxed">
+                                親子が別レーンに離れても安心です。親には「他レーンの子の要約」、子には「他レーンの親の残像」が自動表示されます。
+                            </p>
+                        </div>
+                        <div class="detail-item">
+                            <h4 class="font-bold text-slate-700 mb-2">ジャンプ機能</h4>
+                            <p class="text-slate-500 text-sm leading-relaxed">
+                                仮想チケットをクリックすると、本物のチケットがある場所まで画面が自動スクロールし、青くフラッシュして知らせます。
+                            </p>
+                        </div>
+                    </div>
+                    <img src="img/screenshot-nest.svg" class="screenshot !mt-0">
+                </div>
+            </div>
+
+            <!-- 分析機能 -->
+            <div class="feature-card">
+                <h3><i data-lucide="bar-chart-3" class="w-5 h-5 text-blue-500"></i> 分析とデータ管理</h3>
+                <div class="grid md:grid-cols-2 gap-10">
+                    <div>
+                        <h4 class="font-bold text-slate-700 mb-3 flex items-center gap-2">
+                            <i data-lucide="line-chart" class="w-4 h-4"></i> 進捗の可視化
+                        </h4>
+                        <p class="text-slate-500 text-sm leading-relaxed">
+                            「Metrics」ではステータス分布や優先度を、「Burndown」では期限に向けた進捗ペースをグラフで確認できます。日付やラベルでの絞り込みも可能です。
+                        </p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-700 mb-3 flex items-center gap-2">
+                            <i data-lucide="shield-check" class="w-4 h-4"></i> プライバシーとバックアップ
+                        </h4>
+                        <p class="text-slate-500 text-sm leading-relaxed">
+                            データはすべてブラウザ内に保存され、外部には送信されません。別のPCに移したい場合は、設定メニューの「エクスポート」からJSONファイルを書き出してください。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- その他 -->
+            <div class="feature-card bg-slate-900 text-white border-0 shadow-xl">
+                <h3 class="text-white"><i data-lucide="info" class="w-5 h-5 text-blue-400"></i> Tips</h3>
+                <ul class="text-slate-400 text-sm space-y-4 list-disc list-inside">
+                    <li><strong>多言語対応:</strong> メニューから日本語と英語を切り替えられます。</li>
+                    <li><strong>更新日時:</strong> 各チケットの右下には、作成された日時と最後に変更された日時が自動表示されます。</li>
+                    <li><strong>リセット:</strong> データをすべて消去したい場合は「ボードのリセット」を実行してください。2段階の確認が行われます。</li>
+                </ul>
+            </div>
+        </section>
+
+        <footer class="mt-32 pt-16 border-t border-slate-200 text-center text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">
+            &copy; 2026 MonoFlow Productivity - Built for Professionals
         </footer>
     </div>
 
