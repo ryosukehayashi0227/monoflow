@@ -4,16 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monoflow - Professional Kanban</title>
-    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232563eb'/%3E%3Cpath d='M30 30 L 30 70 L 50 50 L 70 70 L 70 30' fill='none' stroke='white' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" type="image/svg+xml">
-    <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Utilities -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -26,83 +24,63 @@
         }
     </script>
     <style>
-        .ghost-card {
-            opacity: 0.2;
-            background: #e2e8f0;
-            border: 2px dashed #cbd5e1;
+        .ghost-card { opacity: 0.2; background: #e2e8f0; border: 2px dashed #cbd5e1; }
+        .task-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .task-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+        .modal { transition: opacity 0.25s ease; }
+        body.modal-open { overflow: hidden; }
+        .child-task { margin-left: 1.5rem; position: relative; width: calc(100% - 1.5rem); margin-top: 0.5rem; }
+        .child-task::before { content: ''; position: absolute; left: -1.0rem; top: -0.8rem; bottom: 50%; width: 2px; background-color: #cbd5e1; border-bottom-left-radius: 4px; }
+        .child-task::after { content: ''; position: absolute; left: -1.0rem; top: 50%; width: 0.8rem; height: 2px; background-color: #cbd5e1; }
+        
+        /* Color Radio Button Styles */
+        .color-radio:checked + label { 
+            box-shadow: 0 0 0 2px white, 0 0 0 4px #94a3b8;
+            transform: scale(1.25);
+            z-index: 10;
         }
-        .task-card {
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .task-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-        /* Modal Animation */
-        .modal {
-            transition: opacity 0.25s ease;
-        }
-        body.modal-open {
-            overflow: hidden;
-        }
-        /* Indent Styles */
-        .child-task {
-            margin-left: 1.5rem;
-            position: relative;
-            width: calc(100% - 1.5rem);
-            margin-top: 0.5rem; /* Space between parent and child */
-        }
-        .child-task::before {
-            content: '';
-            position: absolute;
-            left: -1.0rem;
-            top: -0.8rem; /* Connect to previous sibling or parent */
-            bottom: 50%;
-            width: 2px;
-            background-color: #cbd5e1;
-            border-bottom-left-radius: 4px;
-        }
-        .child-task::after {
-            content: '';
-            position: absolute;
-            left: -1.0rem;
-            top: 50%;
-            width: 0.8rem;
-            height: 2px;
-            background-color: #cbd5e1;
+        .color-label {
+            transition: all 0.2s ease;
         }
     </style>
 </head>
 <body class="bg-[#f8fafc] text-[#1e293b] antialiased">
 
     <div class="max-w-[1200px] mx-auto px-6 py-12">
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
             <div class="flex items-center gap-5">
-                <!-- App Logo -->
                 <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 shrink-0 transform transition-transform hover:scale-105 duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="6" y1="6" x2="6" y2="18"></line>
-                        <line x1="12" y1="6" x2="12" y2="14"></line>
-                        <line x1="18" y1="6" x2="18" y2="10"></line>
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="6" y2="18"></line><line x1="12" y1="6" x2="12" y2="14"></line><line x1="18" y1="6" x2="18" y2="10"></line></svg>
                 </div>
                 <div>
                     <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 leading-tight">Monoflow</h1>
                     <p class="text-slate-500 font-medium">Simple Personal Kanban</p>
                 </div>
             </div>
-            <form id="add-task-form" class="flex w-full md:w-auto gap-2">
-                <input type="text" id="new-task-input" placeholder="新しいタスクを入力..." 
-                    class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 w-full md:w-80 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
-                <button type="submit" class="bg-blue-600 text-white font-semibold rounded-xl px-6 py-2.5 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all flex items-center gap-2 shrink-0">
-                    <i data-lucide="plus" class="w-5 h-5"></i>
-                    <span>追加</span>
-                </button>
-            </form>
+
+            <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                <div class="relative">
+                    <select id="label-filter" class="appearance-none bg-white border border-slate-200 rounded-xl px-4 py-2.5 pr-10 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-600 font-medium cursor-pointer hover:border-blue-300 transition-colors w-full md:w-48">
+                        <option value="all">すべてのラベル</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+                        <i data-lucide="filter" class="w-4 h-4"></i>
+                    </div>
+                </div>
+
+                <form id="add-task-form" class="flex gap-2">
+                    <input type="text" id="new-task-input" placeholder="新しいタスクを入力..." 
+                        class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 w-full md:w-64 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+                    <button type="submit" class="bg-blue-600 text-white font-semibold rounded-xl px-4 py-2.5 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all flex items-center gap-2 shrink-0">
+                        <i data-lucide="plus" class="w-5 h-5"></i>
+                        <span class="hidden md:inline">追加</span>
+                    </button>
+                </form>
+            </div>
         </header>
 
         <main id="board" class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-            <!-- Columns will be injected here -->
+            <!-- Columns injected here -->
         </main>
     </div>
 
@@ -110,7 +88,6 @@
     <div id="task-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm hidden opacity-0">
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl transform transition-all scale-95 opacity-0 modal-content m-4 flex flex-col max-h-[90vh]">
             
-            <!-- Modal Header -->
             <div class="flex justify-between items-center p-6 border-b border-slate-100">
                 <h3 class="text-lg font-bold text-slate-800">タスク詳細</h3>
                 <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition-colors">
@@ -118,9 +95,8 @@
                 </button>
             </div>
 
-            <!-- Modal Body -->
             <div class="p-6 overflow-y-auto">
-                <form id="edit-task-form" class="space-y-5">
+                <form id="edit-task-form" class="space-y-6">
                     <input type="hidden" id="edit-task-id">
                     
                     <div>
@@ -128,23 +104,58 @@
                         <input type="text" id="edit-task-content" class="w-full border border-slate-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
                     </div>
 
+                    <!-- Label Section -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <label class="block text-sm font-semibold text-slate-700 mb-3">ラベル</label>
+                        
+                        <!-- Create New Label -->
+                        <div class="space-y-3 mb-5">
+                            <input type="text" id="new-label-name" placeholder="新しいラベル名" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 shadow-sm">
+                            
+                            <div class="flex items-center justify-between gap-2">
+                                <!-- Color Picker -->
+                                <div class="flex gap-3 items-center bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-sm">
+                                    <input type="radio" name="label-color" value="red" id="c-red" class="hidden color-radio" checked>
+                                    <label for="c-red" class="w-5 h-5 rounded-full bg-red-500 cursor-pointer block color-label hover:scale-110"></label>
+                                    
+                                    <input type="radio" name="label-color" value="blue" id="c-blue" class="hidden color-radio">
+                                    <label for="c-blue" class="w-5 h-5 rounded-full bg-blue-500 cursor-pointer block color-label hover:scale-110"></label>
+                                    
+                                    <input type="radio" name="label-color" value="green" id="c-green" class="hidden color-radio">
+                                    <label for="c-green" class="w-5 h-5 rounded-full bg-green-500 cursor-pointer block color-label hover:scale-110"></label>
+                                    
+                                    <input type="radio" name="label-color" value="yellow" id="c-yellow" class="hidden color-radio">
+                                    <label for="c-yellow" class="w-5 h-5 rounded-full bg-yellow-500 cursor-pointer block color-label hover:scale-110"></label>
+                                    
+                                    <input type="radio" name="label-color" value="purple" id="c-purple" class="hidden color-radio">
+                                    <label for="c-purple" class="w-5 h-5 rounded-full bg-purple-500 cursor-pointer block color-label hover:scale-110"></label>
+                                </div>
+                                
+                                <button type="button" onclick="createLabel()" class="bg-slate-800 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-slate-900 shadow-sm shrink-0">追加</button>
+                            </div>
+                        </div>
+
+                        <!-- Existing Labels List -->
+                        <div id="edit-task-labels" class="flex flex-wrap gap-2">
+                            <!-- Injected JS -->
+                        </div>
+                    </div>
+
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-2">親タスク</label>
                         <div class="relative">
                             <select id="edit-task-parent" class="w-full border border-slate-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none bg-white text-slate-700">
                                 <option value="">(なし)</option>
-                                <!-- options generated dynamically -->
                             </select>
                             <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
                                 <i data-lucide="chevron-down" class="w-4 h-4"></i>
                             </div>
                         </div>
-                        <p class="text-xs text-slate-400 mt-1">1階層のみ設定可能です。</p>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-2">詳細メモ</label>
-                        <textarea id="edit-task-desc" rows="4" placeholder="タスクの詳細を入力..." class="w-full border border-slate-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-600 resize-none"></textarea>
+                        <textarea id="edit-task-desc" rows="3" class="w-full border border-slate-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-600 resize-none"></textarea>
                     </div>
 
                     <div>
@@ -154,7 +165,6 @@
                 </form>
             </div>
 
-            <!-- Modal Footer -->
             <div class="p-6 border-t border-slate-100 bg-slate-50 flex justify-end gap-3 rounded-b-2xl">
                 <button onclick="closeModal()" class="px-5 py-2.5 text-slate-600 font-medium hover:bg-slate-200 rounded-xl transition-colors">キャンセル</button>
                 <button onclick="saveTaskDetails()" class="bg-blue-600 text-white font-semibold rounded-xl px-6 py-2.5 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all">保存</button>
@@ -163,33 +173,52 @@
     </div>
 
     <script>
+        // DOM Elements
         const boardElement = document.getElementById('board');
         const addTaskForm = document.getElementById('add-task-form');
         const newTaskInput = document.getElementById('new-task-input');
-        
-        // Modal Elements
+        const labelFilterSelect = document.getElementById('label-filter');
         const modal = document.getElementById('task-modal');
         const modalContent = modal.querySelector('.modal-content');
+        
+        // Form Inputs
         const editTaskIdInput = document.getElementById('edit-task-id');
         const editTaskContentInput = document.getElementById('edit-task-content');
         const editTaskParentInput = document.getElementById('edit-task-parent');
         const editTaskDescInput = document.getElementById('edit-task-desc');
         const editTaskDateInput = document.getElementById('edit-task-date');
+        const editTaskLabelsContainer = document.getElementById('edit-task-labels');
+        const newLabelNameInput = document.getElementById('new-label-name');
 
-        const STORAGE_KEY = 'monoflow-v5-data'; 
+        const STORAGE_KEY = 'monoflow-v7-data';
+
+        // Color Map for dynamic labels
+        const COLOR_MAP = {
+            red: 'bg-red-100 text-red-700 border-red-200',
+            blue: 'bg-blue-100 text-blue-700 border-blue-200',
+            green: 'bg-green-100 text-green-700 border-green-200',
+            yellow: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+            purple: 'bg-purple-100 text-purple-700 border-purple-200',
+        };
 
         const initialData = {
             tasks: {
-                't1': { id: 't1', content: '親タスク (Parent)', description: '', dueDate: '', parentId: null },
-                't2': { id: 't2', content: '子タスク (Child)', description: '必ず親の下に表示されます', dueDate: '', parentId: 't1' },
+                't1': { id: 't1', content: '初期タスク', description: '', dueDate: '', parentId: null, labels: [] },
             },
             columns: {
-                'c1': { id: 'c1', title: 'To Do', taskIds: ['t1', 't2'] },
+                'c1': { id: 'c1', title: 'To Do', taskIds: ['t1'] },
                 'c2': { id: 'c2', title: 'In Progress', taskIds: [] },
                 'c3': { id: 'c3', title: 'Done', taskIds: [] },
             },
             columnOrder: ['c1', 'c2', 'c3'],
+            labels: [ // Custom Labels Store
+                { id: 'l1', name: 'Priority', color: 'red' },
+                { id: 'l2', name: 'Work', color: 'blue' }
+            ]
         };
+
+        let currentFilter = 'all';
+        let tempTaskLabels = []; // Labels currently selected in modal
 
         function loadData() {
             const savedData = localStorage.getItem(STORAGE_KEY);
@@ -202,15 +231,19 @@
 
         let boardData = loadData();
 
-        // 描画ロジックの改善（親子グループ化強制）
+        // --- Render Board ---
         function renderBoard() {
             boardElement.innerHTML = '';
+            
+            // Sync Filter Options
+            updateFilterOptions();
+
             boardData.columnOrder.forEach(columnId => {
                 const column = boardData.columns[columnId];
                 const columnElement = document.createElement('div');
                 columnElement.className = 'bg-slate-100/50 rounded-2xl p-5 flex flex-col border border-slate-200/60 h-full';
                 
-                const taskCount = column.taskIds.length;
+                const taskCount = column.taskIds.length; 
                 columnElement.innerHTML = `
                     <div class="flex justify-between items-center mb-5 px-1">
                         <h2 class="font-bold text-slate-700 tracking-tight flex items-center gap-2">
@@ -224,32 +257,40 @@
                 taskListElement.className = 'task-list space-y-3 min-h-[100px] pb-4';
                 taskListElement.dataset.columnId = column.id;
 
-                // --- 強制グループ化ロジック ---
-                // 1. カラム内の全タスクを取得
+                // --- Filtering & Grouping Logic ---
                 const columnTasks = column.taskIds.map(id => boardData.tasks[id]).filter(Boolean);
                 
-                // 2. カラム内の「ルートタスク」（親がいない、または親がこのカラムにいない）を抽出
-                //    ※親がいない = null
-                //    ※親がこのカラムにいない = 親はいるが、親のIDがこのカラムのIDリストに含まれていない
-                const rootTasksInColumn = columnTasks.filter(task => {
-                    if (!task.parentId) return true; // 親なし
-                    const parentIsInColumn = column.taskIds.includes(task.parentId);
-                    return !parentIsInColumn; // 親が別カラムなら、ここではルートとして扱う
+                const visibleTasks = columnTasks.filter(task => {
+                    if (currentFilter === 'all') return true;
+                    return task.labels && task.labels.includes(currentFilter);
                 });
 
-                // 3. 描画順序リストを作成
                 const renderOrder = [];
-                rootTasksInColumn.forEach(rootTask => {
-                    renderOrder.push(rootTask);
-                    
-                    // このルートタスクの子で、かつ同じカラムにいるものを探して直下に追加
-                    const childrenInColumn = columnTasks.filter(t => t.parentId === rootTask.id);
-                    renderOrder.push(...childrenInColumn);
+                const processedIds = new Set();
+
+                // Extract roots (within visible set)
+                const roots = visibleTasks.filter(task => {
+                    if (!task.parentId) return true;
+                    const parentIsVisibleHere = visibleTasks.some(t => t.id === task.parentId);
+                    return !parentIsVisibleHere; 
                 });
 
-                // --- 描画実行 ---
+                roots.forEach(root => {
+                    renderOrder.push(root);
+                    processedIds.add(root.id);
+                    const children = visibleTasks.filter(t => t.parentId === root.id);
+                    children.forEach(child => {
+                        renderOrder.push(child);
+                        processedIds.add(child.id);
+                    });
+                });
+
+                visibleTasks.forEach(task => {
+                    if (!processedIds.has(task.id)) renderOrder.push(task);
+                });
+
                 renderOrder.forEach(task => {
-                    const taskCard = createTaskElement(task, column.id);
+                    const taskCard = createTaskElement(task, column.id, visibleTasks);
                     taskListElement.appendChild(taskCard);
                 });
 
@@ -261,178 +302,198 @@
             initializeDragAndDrop();
         }
 
-        function createTaskElement(task, columnId) {
+        function createTaskElement(task, columnId, visibleTasksInColumn) {
             const taskCard = document.createElement('div');
-            
-            // Check if it's a child task AND its parent is in the same column
             const parentId = task.parentId;
-            const parentIsInColumn = parentId && boardData.columns[columnId].taskIds.includes(parentId);
-            
-            const indentClass = parentIsInColumn ? 'child-task scale-95 origin-left' : '';
+            const parentIsInVisibleList = parentId && visibleTasksInColumn.some(t => t.id === parentId);
+            const indentClass = parentIsInVisibleList ? 'child-task scale-95 origin-left' : '';
 
             taskCard.className = `task-card bg-white border border-slate-200 rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass}`;
             taskCard.dataset.taskId = task.id;
+
+            // Render Labels
+            let labelsHtml = '';
+            if (task.labels && task.labels.length > 0) {
+                labelsHtml = `<div class="flex flex-wrap gap-1.5 mb-2">`;
+                task.labels.forEach(labelId => {
+                    const labelDef = boardData.labels.find(l => l.id === labelId);
+                    if (labelDef) {
+                        const colorClass = COLOR_MAP[labelDef.color] || COLOR_MAP['blue'];
+                        labelsHtml += `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${colorClass}">${labelDef.name}</span>`;
+                    }
+                });
+                labelsHtml += `</div>`;
+            }
+
+            // Indicators
+            let indicatorsHtml = `<div class="flex items-center gap-3 mt-3">`;
             
-            // Parent Name Indicator (if child)
+            if (task.dueDate) {
+                const isOverdue = new Date(task.dueDate) < new Date().setHours(0,0,0,0);
+                const colorClass = isOverdue ? 'text-red-600 bg-red-50 border-red-100' : 'text-slate-500 bg-slate-50 border-slate-100';
+                indicatorsHtml += `
+                    <div class="flex items-center gap-1 text-xs font-medium border px-2 py-1 rounded-md w-fit ${colorClass}">
+                        <i data-lucide="clock" class="w-3 h-3"></i>${task.dueDate}
+                    </div>
+                `;
+            }
+            if (task.description) {
+                indicatorsHtml += `<i data-lucide="align-left" class="w-3 h-3 text-slate-400"></i>`;
+            }
+            indicatorsHtml += `</div>`;
+
+            // Parent Indicator
             let parentIndicator = '';
             if (parentId) {
                 const parent = boardData.tasks[parentId];
                 if (parent) {
-                    const parentName = parent.content;
-                    parentIndicator = `
+                     parentIndicator = `
                         <div class="text-[10px] text-blue-500 font-semibold mb-1 flex items-center gap-1">
                             <i data-lucide="corner-down-right" class="w-3 h-3"></i>
-                            ${parentName.substring(0, 20)}${parentName.length > 20 ? '...' : ''}
+                            ${parent.content.substring(0, 15)}...
                         </div>
                     `;
                 }
             }
 
-            // Date Badge
-            let dateBadge = '';
-            if (task.dueDate) {
-                const dateObj = new Date(task.dueDate);
-                const today = new Date();
-                today.setHours(0,0,0,0);
-                const isOverdue = dateObj < today;
-                const colorClass = isOverdue ? 'text-red-600 bg-red-50 border-red-100' : 'text-slate-500 bg-slate-50 border-slate-100';
-                dateBadge = `
-                    <div class="flex items-center gap-1 mt-2 text-xs font-medium border px-2 py-1 rounded-md w-fit ${colorClass}">
-                        <i data-lucide="clock" class="w-3 h-3"></i>
-                        ${task.dueDate}
-                    </div>
-                `;
-            }
-
-            // Description Indicator
-            let descIndicator = '';
-            if (task.description) {
-                descIndicator = `<i data-lucide="align-left" class="w-3 h-3 text-slate-400 mt-0.5"></i>`;
-            }
-
             taskCard.innerHTML = `
                 ${parentIndicator}
+                ${labelsHtml}
                 <div class="flex justify-between items-start gap-2">
                     <span class="text-[15px] font-medium text-slate-700 leading-relaxed">${task.content}</span>
                     <button onclick="event.stopPropagation(); deleteTask('${task.id}', '${columnId}')" class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-1 -mr-2 -mt-2">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>
                 </div>
-                <div class="flex items-center gap-3 mt-1">
-                    ${dateBadge}
-                    ${descIndicator}
-                </div>
+                ${indicatorsHtml}
             `;
-            
             taskCard.addEventListener('click', () => openModal(task.id));
             return taskCard;
         }
 
+        // --- Drag & Drop ---
         function initializeDragAndDrop() {
+            if (currentFilter !== 'all') return;
             const lists = document.querySelectorAll('.task-list');
             lists.forEach(list => {
                 new Sortable(list, {
-                    group: 'tasks',
-                    animation: 250,
-                    ghostClass: 'ghost-card',
+                    group: 'tasks', animation: 250, ghostClass: 'ghost-card',
                     onEnd: (evt) => {
                         const { from, to, newIndex, oldIndex, item } = evt;
                         const taskId = item.dataset.taskId;
-                        const fromColumnId = from.dataset.columnId;
                         const toColumnId = to.dataset.columnId;
+                        const fromColumnId = from.dataset.columnId;
 
-                        // 1. 移動処理 (通常通り)
                         boardData.columns[fromColumnId].taskIds.splice(oldIndex, 1);
                         boardData.columns[toColumnId].taskIds.splice(newIndex, 0, taskId);
 
-                        // 2. 移動先カラムでの並び順の正規化 (親子の順序を強制)
-                        const targetColumnTasks = boardData.columns[toColumnId].taskIds.map(id => boardData.tasks[id]);
-                        
-                        // 親子関係に基づきソートし直したIDリストを作成
-                        const sortedIds = [];
-                        
-                        // 親がこのカラムにいないタスク（ルート）をまず探す
-                        const roots = targetColumnTasks.filter(t => {
-                            if (!t.parentId) return true;
-                            // 親がいる場合、その親もこのカラムにいるか？
-                            const parentInCol = targetColumnTasks.some(pt => pt.id === t.parentId);
-                            return !parentInCol;
-                        });
-
-                        // 既存の並び順（ドラッグ位置）を尊重しつつ、子を親の下に移動させる
-                        // ここでは簡易的に「ルート→その子」の順で再構築する
-                        // (ユーザーが意図した並び順を完全に維持するのは難しいが、整合性を優先する)
-                        
-                        // NOTE: 完全に並び替えるとドラッグ位置が無視されるため、
-                        // 「現在リストにある順序」を走査し、親が出現したらその直後に子を割り込ませる戦略をとる。
-                        
-                        const processedIds = new Set();
+                        // Force grouping
+                        const targetIds = boardData.columns[toColumnId].taskIds;
+                        const tasks = targetIds.map(id => boardData.tasks[id]);
                         const finalOrder = [];
-
-                        targetColumnTasks.forEach(task => {
-                            if (processedIds.has(task.id)) return;
-
-                            // もし自分が子で、かつ親がまだ処理されておらず、かつ親が同じカラムにいるなら
-                            // ここでは処理せず、親が出てくるまで待つ（スキップ）
-                            if (task.parentId) {
-                                const parentInCol = targetColumnTasks.some(pt => pt.id === task.parentId);
-                                if (parentInCol && !processedIds.has(task.parentId)) {
-                                    return; 
-                                }
-                            }
-
-                            // 自身を追加
-                            finalOrder.push(task.id);
-                            processedIds.add(task.id);
-
-                            // 自身の子で、同じカラムにいるものを直後に追加
-                            const children = targetColumnTasks.filter(t => t.parentId === task.id);
-                            children.forEach(child => {
-                                if (!processedIds.has(child.id)) {
-                                    finalOrder.push(child.id);
-                                    processedIds.add(child.id);
-                                }
+                        const processed = new Set();
+                        
+                        tasks.forEach(t => {
+                            if(processed.has(t.id)) return;
+                            // if child and parent in col and not processed, wait
+                            if(t.parentId && tasks.some(pt => pt.id === t.parentId) && !processed.has(t.parentId)) return;
+                            
+                            finalOrder.push(t.id); processed.add(t.id);
+                            // add children
+                            tasks.filter(c => c.parentId === t.id && !processed.has(c.id)).forEach(c => {
+                                finalOrder.push(c.id); processed.add(c.id);
                             });
                         });
-
+                        
                         boardData.columns[toColumnId].taskIds = finalOrder;
-
-                        saveData(boardData);
-                        renderBoard();
+                        saveData(boardData); renderBoard();
                     }
                 });
             });
         }
 
-        // --- Modal Functions ---
+        // --- Label Management ---
 
-        function updateParentOptions(currentTaskId) {
-            editTaskParentInput.innerHTML = '<option value="">(なし)</option>';
-            
-            // 自分自身、または自分が親になっている（子供がいる）タスクはリストに出さない
-            // 現在のタスクが既に誰かの親であるかチェック
-            const isParent = Object.values(boardData.tasks).some(t => t.parentId === currentTaskId);
-            
-            if (isParent) {
-                 // 自分が親なら、さらに誰かの子になることはできない（3階層NG）
-                 // selectを無効化するか、メッセージを出すのが親切だが、今回は候補を出さない
-                 return; 
-            }
-
-            Object.values(boardData.tasks).forEach(task => {
-                if (task.id === currentTaskId) return;
-                
-                // 候補となるタスク自体が既に親を持っている場合（つまり子タスクの場合）、
-                // そのタスクを親に選ぶことはできない（3階層NG）
-                if (task.parentId) return;
-
+        function updateFilterOptions() {
+            labelFilterSelect.innerHTML = '<option value="all">すべてのラベル</option>';
+            boardData.labels.forEach(label => {
                 const option = document.createElement('option');
-                option.value = task.id;
-                option.textContent = task.content.substring(0, 40) + (task.content.length > 40 ? '...' : '');
-                editTaskParentInput.appendChild(option);
+                option.value = label.id;
+                option.textContent = label.name;
+                if (label.id === currentFilter) option.selected = true;
+                labelFilterSelect.appendChild(option);
             });
         }
 
+        function renderModalLabels() {
+            editTaskLabelsContainer.innerHTML = '';
+            boardData.labels.forEach(label => {
+                const isSelected = tempTaskLabels.includes(label.id);
+                const colorClass = COLOR_MAP[label.color] || COLOR_MAP['blue'];
+                
+                const wrapper = document.createElement('div');
+                wrapper.className = `flex items-center gap-1 px-2 py-1 rounded-full border transition-all cursor-pointer ${colorClass} ${isSelected ? 'ring-2 ring-offset-1 ring-slate-400' : 'opacity-60 hover:opacity-100'}`;
+                
+                // Toggle Select
+                const textSpan = document.createElement('span');
+                textSpan.className = 'text-xs font-bold mr-1 select-none';
+                textSpan.textContent = label.name;
+                textSpan.onclick = () => {
+                    if(isSelected) tempTaskLabels = tempTaskLabels.filter(id => id !== label.id);
+                    else tempTaskLabels.push(label.id);
+                    renderModalLabels();
+                };
+
+                // Delete Label Button
+                const delBtn = document.createElement('button');
+                delBtn.type = 'button';
+                delBtn.className = 'hover:text-red-900 text-current opacity-50 hover:opacity-100';
+                delBtn.innerHTML = '<i data-lucide="x" class="w-3 h-3"></i>';
+                delBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteLabel(label.id);
+                };
+
+                wrapper.appendChild(textSpan);
+                wrapper.appendChild(delBtn);
+                editTaskLabelsContainer.appendChild(wrapper);
+            });
+            lucide.createIcons();
+        }
+
+        function createLabel() {
+            const name = newLabelNameInput.value.trim();
+            if(!name) return;
+            const colorRadio = document.querySelector('input[name="label-color"]:checked');
+            const color = colorRadio ? colorRadio.value : 'blue';
+            
+            const newLabel = { id: `l-${Date.now()}`, name, color };
+            boardData.labels.push(newLabel);
+            newLabelNameInput.value = '';
+            
+            saveData(boardData);
+            renderModalLabels(); // update modal view
+            // No need to full re-render board yet
+        }
+
+        function deleteLabel(labelId) {
+            if(!confirm('ラベルを削除しますか？')) return;
+            
+            // Remove definition
+            boardData.labels = boardData.labels.filter(l => l.id !== labelId);
+            // Remove from all tasks
+            Object.values(boardData.tasks).forEach(task => {
+                if(task.labels) task.labels = task.labels.filter(id => id !== labelId);
+            });
+            // Remove from current selection if active
+            tempTaskLabels = tempTaskLabels.filter(id => id !== labelId);
+
+            saveData(boardData);
+            renderModalLabels();
+            renderBoard(); // Update background board too
+        }
+
+        // --- Modal Operations ---
         function openModal(taskId) {
             const task = boardData.tasks[taskId];
             if (!task) return;
@@ -442,8 +503,22 @@
             editTaskDescInput.value = task.description || '';
             editTaskDateInput.value = task.dueDate || '';
             
-            updateParentOptions(taskId);
+            // Parent Options
+            editTaskParentInput.innerHTML = '<option value="">(なし)</option>';
+            if (!Object.values(boardData.tasks).some(t => t.parentId === taskId)) {
+                 Object.values(boardData.tasks).forEach(t => {
+                    if (t.id !== taskId && !t.parentId) {
+                        const op = document.createElement('option');
+                        op.value = t.id; op.textContent = t.content.substring(0,30);
+                        editTaskParentInput.appendChild(op);
+                    }
+                });
+            }
             editTaskParentInput.value = task.parentId || '';
+
+            // Labels
+            tempTaskLabels = task.labels ? [...task.labels] : [];
+            renderModalLabels();
 
             modal.classList.remove('hidden');
             void modal.offsetWidth; 
@@ -457,40 +532,32 @@
             modal.classList.add('opacity-0');
             modalContent.classList.remove('scale-100', 'opacity-100');
             modalContent.classList.add('scale-95', 'opacity-0');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                document.body.classList.remove('modal-open');
-            }, 250);
+            setTimeout(() => { modal.classList.add('hidden'); document.body.classList.remove('modal-open'); }, 250);
         }
 
         function saveTaskDetails() {
             const taskId = editTaskIdInput.value;
             const content = editTaskContentInput.value.trim();
-            
             if (content && boardData.tasks[taskId]) {
-                boardData.tasks[taskId].content = content;
-                boardData.tasks[taskId].description = editTaskDescInput.value;
-                boardData.tasks[taskId].dueDate = editTaskDateInput.value;
-                boardData.tasks[taskId].parentId = editTaskParentInput.value || null;
-                
-                // もし自分が子になった場合、自分が持っていた子は解放する（整合性維持）
-                if (boardData.tasks[taskId].parentId) {
-                    Object.values(boardData.tasks).forEach(t => {
-                        if (t.parentId === taskId) t.parentId = null;
-                    });
-                }
+                const task = boardData.tasks[taskId];
+                task.content = content;
+                task.description = editTaskDescInput.value;
+                task.dueDate = editTaskDateInput.value;
+                task.parentId = editTaskParentInput.value || null;
+                task.labels = tempTaskLabels;
 
+                if (task.parentId) { // clear children if became child
+                    Object.values(boardData.tasks).forEach(t => { if(t.parentId === taskId) t.parentId = null; });
+                }
                 saveData(boardData);
                 renderBoard();
                 closeModal();
             }
         }
 
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal();
-            }
+        labelFilterSelect.addEventListener('change', (e) => {
+            currentFilter = e.target.value;
+            renderBoard();
         });
 
         addTaskForm.addEventListener('submit', (e) => {
@@ -499,14 +566,9 @@
             if (content) {
                 const newTaskId = `task-${Date.now()}`;
                 boardData.tasks[newTaskId] = { 
-                    id: newTaskId, 
-                    content: content, 
-                    description: '', 
-                    dueDate: '',
-                    parentId: null 
+                    id: newTaskId, content, description: '', dueDate: '', parentId: null, labels: [] 
                 };
                 boardData.columns['c1'].taskIds.unshift(newTaskId);
-                
                 saveData(boardData);
                 renderBoard();
                 newTaskInput.value = '';
@@ -514,20 +576,16 @@
         });
 
         window.deleteTask = (taskId, columnId) => {
-            if (confirm('このタスクを削除しますか？')) {
+            if (confirm('タスクを削除しますか？')) {
                 boardData.columns[columnId].taskIds = boardData.columns[columnId].taskIds.filter(id => id !== taskId);
                 delete boardData.tasks[taskId];
-                
-                Object.values(boardData.tasks).forEach(t => {
-                    if (t.parentId === taskId) {
-                        t.parentId = null;
-                    }
-                });
-
+                Object.values(boardData.tasks).forEach(t => { if(t.parentId === taskId) t.parentId = null; });
                 saveData(boardData);
                 renderBoard();
             }
         };
+
+        modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
 
         renderBoard();
     </script>
