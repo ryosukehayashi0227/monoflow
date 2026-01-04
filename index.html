@@ -62,6 +62,17 @@
             min-height: 40px;
         }
 
+        /* Completed Task Styles */
+        .task-card.is-done {
+            opacity: 0.6;
+            filter: grayscale(0.5);
+            background-color: #f1f5f9;
+        }
+        .task-card.is-done .task-title {
+            text-decoration: line-through;
+            color: #94a3b8;
+        }
+
         .color-radio:checked + label { 
             box-shadow: 0 0 0 2px white, 0 0 0 4px #94a3b8;
             transform: scale(1.25);
@@ -323,9 +334,9 @@
         }
 
         function createTaskCard(task, columnId) {
+            const isDone = columnId === 'c3';
             const taskCard = document.createElement('div');
-            taskCard.className = `task-card bg-white border border-slate-200 rounded-xl p-4 shadow-sm group relative`;
-            // Note: We don't put data-taskId here because the Wrapper is the draggable item in the list
+            taskCard.className = `task-card bg-white border border-slate-200 rounded-xl p-4 shadow-sm group relative ${isDone ? 'is-done' : ''}`;
             
             // Priority
             let priorityHtml = '';
@@ -354,7 +365,18 @@
 
             // Meta
             let metaHtml = `<div class="flex items-center gap-3 mt-3">`;
-            if (task.dueDate) {
+            
+            // Show Completed Date if available
+            if (isDone && task.completedDate) {
+                metaHtml += `
+                    <div class="flex items-center gap-1 text-[11px] font-bold text-green-600 bg-green-50 border border-green-100 px-2 py-0.5 rounded-md">
+                        <i data-lucide="check-circle-2" class="w-3 h-3"></i>
+                        完了: ${task.completedDate}
+                    </div>
+                `;
+            }
+
+            if (task.dueDate && !isDone) {
                 const overdue = new Date(task.dueDate) < new Date().setHours(0,0,0,0);
                 const cc = overdue ? 'text-red-600 bg-red-50 border-red-100' : 'text-slate-500 bg-slate-50 border-slate-100';
                 metaHtml += `<div class="flex items-center gap-1 text-xs font-medium border px-2 py-1 rounded-md w-fit ${cc}"><i data-lucide="clock" class="w-3 h-3"></i>${task.dueDate}</div>`;
@@ -365,7 +387,7 @@
             taskCard.innerHTML = `
                 ${labelsHtml}
                 <div class="flex justify-between items-start gap-2">
-                    <span class="text-[15px] font-medium text-slate-700 leading-relaxed flex-grow">${task.content}</span>
+                    <span class="task-title text-[15px] font-medium text-slate-700 leading-relaxed flex-grow">${task.content}</span>
                     <div class="flex flex-col gap-1 items-end">
                         ${priorityHtml}
                         <button onclick="event.stopPropagation(); deleteTask('${task.id}', '${columnId}')" class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-1">
@@ -444,6 +466,18 @@
             const task = boardData.tasks[taskId];
             const oldParentId = task.parentId;
             task.parentId = newParentId;
+
+            // 1.5 Update Completed Date
+            if (toColumnId === 'c3') {
+                if (!task.completedDate) {
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }).replaceAll('/', '-');
+                    const timeStr = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+                    task.completedDate = `${dateStr} ${timeStr}`;
+                }
+            } else {
+                task.completedDate = null;
+            }
 
             // 2. Update Column Lists (taskIds)
             // Flatten logic: The `taskIds` array in a column should contain ALL tasks in that column (roots + children) in visual order?
