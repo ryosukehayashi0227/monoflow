@@ -19,7 +19,21 @@ const CONSTANTS = {
         { value: 'medium', label: { ja: '中', en: 'Med' }, icon: 'minus', style: 'text-orange-600 bg-orange-50 border-orange-200' },
         { value: 'low', label: { ja: '低', en: 'Low' }, icon: 'chevrons-down', style: 'text-blue-600 bg-blue-50 border-blue-200' },
         { value: 'none', label: { ja: '指定なし', en: 'None' }, icon: '', style: 'text-slate-600 bg-slate-100 border-slate-300' }
-    ],
+    ]
+};
+
+const State = {
+    data: null,
+    filter: 'all',
+    priorityFilter: 'all',
+    searchQuery: '',
+    language: 'ja',
+    theme: 'light',
+    tempLabels: [],
+    lastAddedId: null
+};
+
+const Common = {
     I18N: {
         ja: {
             app_desc: 'Simple Personal Kanban',
@@ -74,9 +88,13 @@ const CONSTANTS = {
             metrics_total: '全タスク数',
             metrics_rate: '完了率',
             metrics_avg: '平均完了日数',
+            metrics_cycle_time: '平均滞留時間',
+            metrics_est_finish: '予測完了日',
             metrics_done: '合計完了数',
             metrics_dist: 'ステータス分布',
             metrics_prio_dist: '優先度別の分布',
+            metrics_throughput: '完了スピードの推移',
+            metrics_tasks_left: '残タスク数',
             metrics_label_select: 'ラベルを選択',
             metrics_clear: 'クリア',
             burndown_title: 'MonoFlow',
@@ -99,7 +117,7 @@ const CONSTANTS = {
             help_q3_t: '情報の詳細化',
             help_q3_d: 'カードをクリックして詳細パネルへ。優先度の設定、メモの追記、ラベルでの分類が行えます。',
             help_m1_t: '1. タスクカードの構造',
-            help_m1_d: 'MonoFlowのタスクカードは、情報の優先順位を整理し、一目で状況を把握できるように設計されています均衡。',
+            help_m1_d: 'MonoFlowのタスクカードは、情報の優先順位を整理し、一目で状況を把握できるように設計されています。',
             help_m1_h1: '視覚的要素の詳細',
             help_m1_l1: '<strong>優先度アクセント:</strong> 左端のライン色は重要度を直感的に伝えます。',
             help_m1_l2: '<strong>動的なタイムスタンプ:</strong> 作成と更新日時が自動追跡されます。',
@@ -119,14 +137,14 @@ const CONSTANTS = {
             help_m2_l3: '一瞬でターゲットへ移動します。',
             help_m2_extra: 'サブタスク全体の消化率を可視化します。',
             help_m2_l4: '階層の制限: 複雑さを避けるため、タスクは最大2階層（親タスクと子タスク）までに制限されています。',
-            help_m3_t: '3. 検索と動的フィルタリング',
+            help_m3_t: '3. 検索とフィルタリング',
             help_m3_d: '目的の情報だけを瞬時に抽出できます。',
             help_m3_h1: '全文検索',
             help_m3_l1: 'メモの内容も検索対象です。',
             help_m3_h2: '複合フィルタ',
             help_m3_l2: 'ラベルと優先度を組み合わせます。',
             help_m3_extra: '注：フィルタ適用中はドラッグ＆ドロップによる並べ替えが一時的に無効化されます。',
-            help_m4_t: '4. 進捗分析とデータサイエンス',
+            help_m4_t: '4. 分析とデータ管理',
             help_m4_d: '客観的な数値でパフォーマンスを可視化します。',
             help_m4_h1: 'Metrics',
             help_m4_l1: '<strong>平均完了日数 (Lead Time):</strong> タスク作成から完了までにかかった時間の平均。',
@@ -150,12 +168,6 @@ const CONSTANTS = {
             help_shortcuts_burndown: 'Burndown ページへ移動 (Alt / ⌥)',
             help_shortcuts_board: 'ボード画面へ移動 (Alt / ⌥)',
             help_footer: 'MonoFlow Productivity System - Built for High-Performance Personal Kanban',
-            // Notifications
-            notify_title: '通知センター',
-            notify_overdue: '期限切れ',
-            notify_due_today: '今日の期限',
-            notify_none: '緊急のタスクはありません',
-            // About Page
             about_title: 'MonoFlow',
             about_link: 'What is MonoFlow?',
             about_subtitle: 'ミニマルで強力な個人用カンバン',
@@ -222,9 +234,13 @@ const CONSTANTS = {
             metrics_total: 'Total Tasks',
             metrics_rate: 'Comp. Rate',
             metrics_avg: 'Avg Lead Time',
+            metrics_cycle_time: 'Avg. Cycle Time',
+            metrics_est_finish: 'Est. Completion',
             metrics_done: 'Total Done',
             metrics_dist: 'Status Distribution',
             metrics_prio_dist: 'Priority Distribution',
+            metrics_throughput: 'Throughput Trend',
+            metrics_tasks_left: 'Tasks Remaining',
             metrics_label_select: 'Select Labels',
             metrics_clear: 'Clear',
             burndown_title: 'MonoFlow',
@@ -264,7 +280,7 @@ const CONSTANTS = {
             help_m2_h2: 'Virtual Child (Subtask Preview)',
             help_m2_l2: 'Under a parent task, all subtasks in other lanes are shown as a compact list.',
             help_m2_h3: 'Jump & Flash Navigation',
-            help_m2_l3: 'Click any virtual card to instantly scroll to the real task.',
+            help_m2_l3: 'Click any virtual card to instantly scroll and flash the real task.',
             help_m2_extra: 'Parents display a progress percentage and bar.',
             help_m2_l4: '<strong>Hierarchy Limit:</strong> Tasks are limited to 2 levels. Tasks with children cannot be assigned a parent.',
             help_m3_t: '3. Search & Advanced Filtering',
@@ -298,12 +314,6 @@ const CONSTANTS = {
             help_shortcuts_burndown: 'Go to Burndown Page (Alt / ⌥)',
             help_shortcuts_board: 'Go to Board (Alt / ⌥)',
             help_footer: 'MonoFlow Productivity System - Built for High-Performance Personal Kanban',
-            // Notifications
-            notify_title: 'Notification Center',
-            notify_overdue: 'Overdue',
-            notify_due_today: 'Due Today',
-            notify_none: 'No urgent tasks found',
-            // About Page
             about_title: 'About MonoFlow',
             about_link: 'What is MonoFlow?',
             about_subtitle: 'Minimal yet Powerful Personal Kanban',
@@ -320,26 +330,28 @@ const CONSTANTS = {
     }
 };
 
-const State = {
-    data: null,
-    filter: 'all',
-    priorityFilter: 'all',
-    searchQuery: '',
-    language: 'ja',
-    theme: 'light',
-    tempLabels: [],
-    lastAddedId: null
-};
-
 const Common = {
-    t: (key) => (CONSTANTS.I18N[State.language] && CONSTANTS.I18N[State.language][key]) || key,
+    t: (key) => (Common.I18N[State.language] && Common.I18N[State.language][key]) || key,
     
+    parseDate: (dateStr) => {
+        if (!dateStr) return null;
+        const normalized = dateStr.includes('T') ? dateStr : dateStr.replace(/-/g, '/');
+        const d = new Date(normalized);
+        return isNaN(d.getTime()) ? null : d;
+    },
+
+    toDateKey: (date) => {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    },
+
     init: () => {
         State.language = localStorage.getItem(CONSTANTS.LANG_KEY) || (navigator.language.startsWith('ja') ? 'ja' : 'en');
         State.theme = localStorage.getItem(CONSTANTS.THEME_KEY) || 'light';
         Common.applyTheme();
         
-        // Global Click to close menus properly on iOS (capture phase)
         document.addEventListener('click', (e) => {
             const settingsMenu = document.getElementById('settings-menu');
             const notifyMenu = document.getElementById('notify-menu');
@@ -354,7 +366,7 @@ const Common = {
                     notifyMenu.classList.add('hidden');
                 }
             }
-        }, true);
+        });
 
         NotificationService.updateBadge();
     },
@@ -389,8 +401,9 @@ const Common = {
 
 const DataService = {
     export: () => {
+        const rawData = localStorage.getItem(CONSTANTS.STORAGE_KEY);
         const fullState = {
-            data: JSON.parse(localStorage.getItem(CONSTANTS.STORAGE_KEY)),
+            data: rawData ? JSON.parse(rawData) : null,
             lang: localStorage.getItem(CONSTANTS.LANG_KEY),
             theme: localStorage.getItem(CONSTANTS.THEME_KEY),
             version: 'v10-unified'
@@ -436,9 +449,7 @@ const NotificationService = {
         const data = JSON.parse(raw);
         const tasks = Object.values(data.tasks);
         const now = new Date();
-        const todayStr = now.toISOString().split('T')[0];
-        
-        // Find tasks in Done column to exclude them
+        const todayStr = Common.toDateKey(now);
         const doneIds = new Set(data.columns[CONSTANTS.DONE_COLUMN_ID]?.taskIds || []);
 
         return {
@@ -461,59 +472,37 @@ const NotificationService = {
         if (e) { e.preventDefault(); e.stopPropagation(); }
         const menu = document.getElementById('notify-menu');
         if (!menu) return;
-        
         if (menu.classList.contains('hidden')) {
             NotificationService.renderList();
             menu.classList.remove('hidden');
-        } else {
-            menu.classList.add('hidden');
-        }
+        } else { menu.classList.add('hidden'); }
     },
 
     renderList: () => {
         const { overdue, dueToday } = NotificationService.getUrgentTasks();
         const container = document.getElementById('notify-list');
         if (!container) return;
-
         if (overdue.length === 0 && dueToday.length === 0) {
             container.innerHTML = `<p class="text-center text-slate-400 py-8 text-sm">${Common.t('notify_none')}</p>`;
             return;
         }
-
         let html = '';
-        const renderItem = (t, labelClass, labelText) => `
-            <div onclick="NotificationService.jumpTo('${t.id}')" class="p-3 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors border-b border-slate-50 dark:border-slate-800 last:border-0 group">
-                <div class="flex items-center gap-2 mb-1">
-                    <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase ${labelClass}">${Common.t(labelText)}</span>
-                    <span class="text-[10px] font-bold text-slate-400">${t.dueDate}</span>
-                </div>
-                <div class="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover:text-blue-600 transition-colors truncate">${t.content}</div>
-            </div>
-        `;
-
+        const renderItem = (t, labelClass, labelText) => `<div onclick="NotificationService.jumpTo('${t.id}')" class="p-3 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors border-b border-slate-50 dark:border-slate-800 last:border-0 group"><div class="flex items-center gap-2 mb-1"><span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase ${labelClass}">${Common.t(labelText)}</span><span class="text-[10px] font-bold text-slate-400">${t.dueDate}</span></div><div class="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover:text-blue-600 transition-colors truncate">${t.content}</div></div>`;
         overdue.forEach(t => html += renderItem(t, 'bg-red-100 text-red-600 dark:bg-red-900/30', 'notify_overdue'));
         dueToday.forEach(t => html += renderItem(t, 'bg-orange-100 text-orange-600 dark:bg-orange-900/30', 'notify_due_today'));
-        
         container.innerHTML = html;
     },
 
     jumpTo: (taskId) => {
         const isBoard = window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/');
-        if (isBoard && typeof App !== 'undefined' && App.jumpToTask) {
-            App.jumpToTask(taskId);
-            document.getElementById('notify-menu').classList.add('hidden');
-        } else {
-            window.location.href = `index.html?jumpTaskId=${taskId}`;
-        }
+        if (isBoard && typeof App !== 'undefined' && App.jumpToTask) { App.jumpToTask(taskId); const m = document.getElementById('notify-menu'); if(m) m.classList.add('hidden'); } 
+        else { window.location.href = `index.html?jumpTaskId=${taskId}`; }
     }
 };
 
 // Global Keyboard Shortcuts
 document.addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        if (e.key === 'Escape') e.target.blur();
-        return;
-    }
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') { if (e.key === 'Escape') e.target.blur(); return; }
     if (e.altKey) {
         if (e.code === 'KeyM') { e.preventDefault(); window.location.href = 'metrics.html'; }
         if (e.code === 'KeyB') { e.preventDefault(); window.location.href = 'burndown.html'; }
