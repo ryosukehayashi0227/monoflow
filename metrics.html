@@ -68,13 +68,48 @@
                 <button onclick="initMetrics()" class="bg-slate-900 dark:bg-blue-600 text-white p-3 rounded-2xl hover:opacity-90 transition-all active:scale-90 shadow-lg"><i data-lucide="refresh-cw" class="w-5 h-5"></i></button>
             </div>
         </header>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-            <div class="stat-card"><div id="total-tasks" class="stat-value">0</div><div class="stat-label">全タスク数</div></div>
-            <div class="stat-card"><div id="completion-rate" class="stat-value">0%</div><div class="stat-label">完了率</div></div>
-            <div class="stat-card"><div id="avg-days" class="stat-value">0.0</div><div class="stat-label">平均完了日数</div></div>
-            <div class="stat-card border-green-200 bg-green-50/30 dark:bg-green-900/10"><div id="done-tasks" class="stat-value text-green-600">0</div><div class="stat-label text-green-500/70">合計完了数</div></div>
+        <!-- Stats Overview Row -->
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
+            <div class="stat-card">
+                <div id="total-tasks" class="stat-value">0</div>
+                <div class="stat-label">全タスク数</div>
+            </div>
+            <div class="stat-card">
+                <div id="completion-rate" class="stat-value">0%</div>
+                <div class="stat-label">完了率</div>
+            </div>
+            <div class="stat-card">
+                <div id="avg-days" class="stat-value">0.0</div>
+                <div class="stat-label">平均完了日数</div>
+            </div>
+            <div class="stat-card">
+                <div id="cycle-time" class="stat-value">0.0</div>
+                <div class="stat-label">平均滞留時間</div>
+            </div>
+            <div class="stat-card border-blue-200 bg-blue-50/30 dark:bg-blue-900/10">
+                <div id="est-finish" class="stat-value text-blue-600 text-2xl py-2">--</div>
+                <div class="stat-label text-blue-500/70">予測完了日</div>
+            </div>
+            <div class="stat-card border-green-200 bg-green-50/30 dark:bg-green-900/10">
+                <div id="done-tasks" class="stat-value text-green-600">0</div>
+                <div class="stat-label text-green-500/70">合計完了数</div>
+            </div>
         </div>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- Charts Grid -->
+        <div class="space-y-8">
+            <!-- Throughput Trend (Full Width) -->
+            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+                <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                    <i data-lucide="trending-up" class="w-4 h-4"></i> <span id="throughput-title">完了スピードの推移</span>
+                </h2>
+                <div class="h-64 relative">
+                    <canvas id="throughputChart"></canvas>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
             <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm"><h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4"></i> ステータス分布</h2><div class="h-64 relative flex items-center justify-center"><canvas id="statusChart"></canvas></div></div>
             <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm"><h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> 優先度別の分布</h2><div class="h-64 relative flex items-center justify-center"><canvas id="priorityChart"></canvas></div></div>
         </div>
