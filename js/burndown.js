@@ -1,5 +1,5 @@
 /**
- * MonoFlow Burndown Calculation Logic
+ * MonoFlow Burndown Calculation Logic with Localization
  */
 
 const STORAGE_KEY = 'monoflow-v10-refactored';
@@ -10,16 +10,25 @@ function loadData() {
     return saved ? JSON.parse(saved) : null;
 }
 
+function translateUI() {
+    document.querySelector('h1').textContent = Common.t('burndown_title');
+    document.querySelector('h1 + p').textContent = Common.t('burndown_subtitle');
+    document.querySelector('.text-slate-300').previousElementSibling.previousElementSibling.textContent = Common.t('burndown_period');
+    document.querySelector('h2').innerHTML = `<i data-lucide="line-chart" class="w-4 h-4"></i> ${Common.t('burndown_trend')}`;
+    document.querySelector('a[href="index.html"] span').textContent = Common.t('back_to_app');
+}
+
 function initBurndown() {
     const data = loadData();
     if (!data) return;
+
+    translateUI();
 
     // 1. Get Date Range
     let startDateVal = document.getElementById('start-date').value;
     let endDateVal = document.getElementById('end-date').value;
 
     if (!startDateVal) {
-        // Default to 14 days ago
         const d = new Date();
         d.setDate(d.getDate() - 14);
         startDateVal = d.toISOString().split('T')[0];
@@ -39,8 +48,9 @@ function initBurndown() {
     const labels = [];
     const dateArray = [];
     let current = new Date(start);
+    const locale = State.language === 'ja' ? 'ja-JP' : 'en-US';
     while (current <= end) {
-        labels.push(current.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' }));
+        labels.push(current.toLocaleDateString(locale, { month: 'short', day: 'numeric' }));
         dateArray.push(new Date(current));
         current.setDate(current.getDate() + 1);
     }
@@ -49,25 +59,19 @@ function initBurndown() {
     const tasks = Object.values(data.tasks);
     const burndownData = dateArray.map(day => {
         const dayEnd = new Date(day).setHours(23, 59, 59, 999);
-        
-        // Count tasks that existed on this day and were not yet completed
         return tasks.filter(t => {
             const created = new Date(t.createdAt).getTime();
-            // Exist on this day?
             if (created > dayEnd) return false;
-            
-            // Completed by this day?
             if (t.completedDate) {
                 const completed = new Date(t.completedDate.replace(/-/g, '/')).getTime();
                 if (completed <= dayEnd) return false;
             }
-            
             return true;
         }).length;
     });
 
     // Update Current count
-    document.getElementById('active-task-count').textContent = `現在: ${burndownData[burndownData.length - 1]} タスク`;
+    document.getElementById('active-task-count').textContent = `${Common.t('burndown_current')}: ${burndownData[burndownData.length - 1]}`;
 
     renderChart(labels, burndownData);
 }
@@ -76,7 +80,6 @@ function renderChart(labels, dataPoints) {
     const ctx = document.getElementById('burndownChart').getContext('2d');
     if (burndownChart) burndownChart.destroy();
 
-    // Ideal Line (Starts at same point as real data, ends at 0)
     const idealData = [];
     const startVal = dataPoints[0];
     const steps = dataPoints.length - 1;
@@ -84,13 +87,15 @@ function renderChart(labels, dataPoints) {
         idealData.push(startVal - (startVal / steps) * i);
     }
 
+    const textColor = State.theme === 'dark' ? '#94a3b8' : '#64748b';
+
     burndownChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: [
                 {
-                    label: '実際の残りタスク',
+                    label: Common.t('burndown_actual'),
                     data: dataPoints,
                     borderColor: '#2563EB',
                     backgroundColor: 'rgba(37, 99, 235, 0.1)',
@@ -102,7 +107,7 @@ function renderChart(labels, dataPoints) {
                     pointBorderWidth: 3
                 },
                 {
-                    label: '理想的な進捗',
+                    label: Common.t('burndown_ideal'),
                     data: idealData,
                     borderColor: '#E2E8F0',
                     borderDash: [5, 5],
@@ -118,11 +123,11 @@ function renderChart(labels, dataPoints) {
             maintainAspectRatio: false,
             interaction: { intersect: false, mode: 'index' },
             plugins: {
-                legend: { position: 'top', align: 'end', labels: { usePointStyle: true, font: { weight: 'bold', family: 'Inter' } } }
+                legend: { position: 'top', align: 'end', labels: { usePointStyle: true, font: { weight: 'bold', family: 'Inter' }, color: textColor } }
             },
             scales: {
-                y: { beginAtZero: true, grid: { color: '#F1F5F9' }, ticks: { stepSize: 1, font: { family: 'Inter' } } },
-                x: { grid: { display: false }, ticks: { font: { family: 'Inter' } } }
+                y: { beginAtZero: true, grid: { color: State.theme === 'dark' ? '#1e293b' : '#F1F5F9' }, ticks: { stepSize: 1, font: { family: 'Inter' }, color: textColor } },
+                x: { grid: { display: false }, ticks: { font: { family: 'Inter' }, color: textColor } }
             }
         }
     });

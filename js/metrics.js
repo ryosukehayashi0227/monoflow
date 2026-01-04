@@ -1,8 +1,8 @@
 /**
- * Monoflow Metrics Logic with Date & Multi-Label Popover Filter
+ * MonoFlow Metrics Logic with Date & Multi-Label Popover Filter
  */
 
-const STORAGE_KEY = 'monoflow-v10-refactored'; // Keeping the storage key same to avoid data loss
+const STORAGE_KEY = 'monoflow-v10-refactored';
 let statusChart = null;
 let priorityChart = null;
 let selectedLabels = new Set(); 
@@ -30,16 +30,16 @@ function clearLabels() {
     selectedLabels.clear();
     initMetrics();
 }
-document.addEventListener('click', () => labelMenu.classList.add('hidden'));
-labelMenu.addEventListener('click', (e) => e.stopPropagation());
+document.addEventListener('click', () => { if(labelMenu) labelMenu.classList.add('hidden'); });
+if(labelMenu) labelMenu.addEventListener('click', (e) => e.stopPropagation());
 
 function renderLabelList(data) {
     const container = document.getElementById('metrics-label-chips');
     const countDisplay = document.getElementById('selected-label-count');
-    if (!data || !data.labels) return;
+    if (!data || !data.labels || !container) return;
 
     // Update count display
-    countDisplay.textContent = selectedLabels.size > 0 ? `${selectedLabels.size}個` : 'すべて';
+    countDisplay.textContent = selectedLabels.size > 0 ? `${selectedLabels.size}` : Common.t('filter_all');
 
     container.innerHTML = '';
     data.labels.forEach(l => {
@@ -47,13 +47,13 @@ function renderLabelList(data) {
         const colorClass = COLORS[l.color] || COLORS.blue;
         
         const item = document.createElement('button');
-        item.className = `w-full flex items-center gap-3 p-2 rounded-xl transition-all ${isActive ? 'bg-slate-50' : 'hover:bg-slate-50/50'}`;
+        item.className = `w-full flex items-center gap-3 p-2 rounded-xl transition-all ${isActive ? 'bg-slate-50 dark:bg-slate-800' : 'hover:bg-slate-50/50'}`;
         
         item.innerHTML = `
-            <div class="w-4 h-4 rounded-full border flex items-center justify-center ${isActive ? colorClass : 'border-slate-200 bg-white'}">
+            <div class="w-4 h-4 rounded-full border flex items-center justify-center ${isActive ? colorClass : 'border-slate-200 bg-white dark:bg-slate-700 dark:border-slate-600'}">
                 ${isActive ? '<i data-lucide="check" class="w-2.5 h-2.5"></i>' : ''}
             </div>
-            <span class="text-sm font-semibold ${isActive ? 'text-slate-900' : 'text-slate-500'}">${l.name}</span>
+            <span class="text-sm font-semibold ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-500'}">${l.name}</span>
         `;
         
         item.onclick = () => {
@@ -67,10 +67,35 @@ function renderLabelList(data) {
     lucide.createIcons();
 }
 
+function translateUI() {
+    // Page Title & Subtitle
+    document.querySelector('h1').textContent = Common.t('metrics_title');
+    document.querySelector('h1 + p').textContent = Common.t('metrics_subtitle');
+    
+    // Labels in Filter
+    document.querySelector('.text-slate-300').previousElementSibling.previousElementSibling.textContent = Common.t('metrics_period');
+    document.querySelector('#metrics-label-menu span').textContent = Common.t('metrics_label_select');
+    document.querySelector('#metrics-label-menu button').textContent = Common.t('metrics_clear');
+    document.querySelector('a[href="index.html"] span').textContent = Common.t('back_to_app');
+    
+    // Stat Cards
+    const cards = document.querySelectorAll('.stat-card');
+    cards[0].querySelector('.stat-label').textContent = Common.t('metrics_total');
+    cards[1].querySelector('.stat-label').textContent = Common.t('metrics_rate');
+    cards[2].querySelector('.stat-label').textContent = Common.t('metrics_avg');
+    cards[3].querySelector('.stat-label').textContent = Common.t('metrics_done');
+    
+    // Chart Titles
+    const h2s = document.querySelectorAll('h2');
+    h2s[0].innerHTML = `<i data-lucide="pie-chart" class="w-4 h-4"></i> ${Common.t('metrics_dist')}`;
+    h2s[1].innerHTML = `<i data-lucide="bar-chart-3" class="w-4 h-4"></i> ${Common.t('metrics_prio_dist')}`;
+}
+
 function initMetrics() {
     const data = loadData();
     if (!data) return;
 
+    translateUI();
     renderLabelList(data);
 
     const startDate = document.getElementById('start-date').value;
@@ -153,7 +178,7 @@ function renderStatusChart(counts) {
     statusChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['未着手', '進行中', '完了'],
+            labels: [Common.t('col_todo'), Common.t('col_progress'), Common.t('col_done')],
             datasets: [{
                 data: [counts.todo, counts.progress, counts.done],
                 backgroundColor: ['#E2E8F0', '#3B82F6', '#22C55E'],
@@ -166,7 +191,7 @@ function renderStatusChart(counts) {
             maintainAspectRatio: false,
             cutout: '70%',
             plugins: {
-                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { weight: 'bold', family: 'Inter' } } }
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { weight: 'bold', family: 'Inter' }, color: State.theme === 'dark' ? '#cbd5e1' : '#64748b' } }
             }
         }
     });
@@ -175,13 +200,17 @@ function renderStatusChart(counts) {
 function renderPriorityChart(counts) {
     const ctx = document.getElementById('priorityChart').getContext('2d');
     if (priorityChart) priorityChart.destroy();
+    
+    const labels = CONSTANTS.PRIORITIES.map(p => p.label[State.language]);
+    const values = CONSTANTS.PRIORITIES.map(p => counts[p.value]);
+
     priorityChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['高', '中', '低', 'なし'],
+            labels: labels,
             datasets: [{
-                label: 'タスク数',
-                data: [counts.high, counts.medium, counts.low, counts.none],
+                label: Common.t('metrics_total'),
+                data: values,
                 backgroundColor: ['#FEE2E2', '#FFEDD5', '#DBEAFE', '#F1F5F9'],
                 borderColor: ['#EF4444', '#F97316', '#3B82F6', '#94A3B8'],
                 borderWidth: 2,
@@ -192,8 +221,8 @@ function renderPriorityChart(counts) {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                y: { beginAtZero: true, grid: { display: false }, ticks: { stepSize: 1 } },
-                x: { grid: { display: false } }
+                y: { beginAtZero: true, grid: { display: false }, ticks: { stepSize: 1, color: State.theme === 'dark' ? '#94a3b8' : '#64748b' } },
+                x: { grid: { display: false }, ticks: { color: State.theme === 'dark' ? '#94a3b8' : '#64748b' } }
             },
             plugins: { legend: { display: false } }
         }

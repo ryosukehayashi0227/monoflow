@@ -41,12 +41,15 @@
                     <h1 class="text-2xl font-black tracking-tighter text-slate-900 dark:text-white leading-tight">MonoFlow</h1>
                     <p class="text-slate-400 font-bold uppercase tracking-widest text-[8px] mt-0 opacity-80">Simple Personal Kanban</p>
                 </div>
-                <!-- Theme Toggle -->
+                <!-- Global Toolbar -->
                 <div class="flex items-center gap-2 ml-auto">
                     <a href="help.html" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center" title="User Guide">
                         <i data-lucide="help-circle" class="w-4 h-4"></i>
                     </a>
-                    <button onclick="App.toggleTheme()" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center">
+                    <button onclick="Common.setLanguage(State.language === 'ja' ? 'en' : 'ja')" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center" title="Switch Language">
+                        <i data-lucide="languages" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="Common.toggleTheme()" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center">
                         <i data-lucide="sun" id="theme-icon-light" class="w-4 h-4 hidden"></i>
                         <i data-lucide="moon" id="theme-icon-dark" class="w-4 h-4"></i>
                     </button>
@@ -206,6 +209,7 @@
     </div>
 
     <!-- Application Logic -->
+    <script src="js/common.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
