@@ -250,7 +250,7 @@ const UI = {
             subCounter = `<div class="mt-3 pt-3 border-t border-slate-50 dark:border-slate-800"><div class="flex justify-between items-center mb-1.5"><div class="flex items-center gap-1 text-[9px] font-black bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700"><i data-lucide="git-merge" class="w-2.5 h-2.5"></i>${dCount}/${children.length}</div><span class="text-[9px] font-bold text-slate-400">${progressPct}%</span></div><div class="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-blue-500 transition-all duration-500" style="width: ${progressPct}%"></div></div></div>`;
         }
         let metaHtml = `<div class="flex items-center gap-3 mt-3">`;
-        if (isDone && task.completedDate) metaHtml += `<div class="flex items-center gap-1 text-[11px] font-bold text-green-600 bg-green-50 border border-green-100 px-2 py-0.5 rounded-md"><i data-lucide="check-circle-2" class="w-3 h-3"></i>${Common.t('task_completed')}: ${task.completedDate}</div>`;
+        if (isDone && task.completedDate) metaHtml += `<div class="flex items-center gap-1 text-[11px] font-bold text-green-600 bg-green-50 border border-green-100 px-2 py-0.5 rounded-md"><i data-lucide="check-circle-2" class="w-3 h-3"></i>${Common.t('task_completed')}: ${UI.formatTime(task.completedDate)}</div>`;
         else if (task.dueDate) { const overdue = new Date(task.dueDate) < new Date().setHours(0,0,0,0); const style = overdue ? 'text-red-600 bg-red-50 border-red-100' : 'text-slate-500 bg-slate-50 border-slate-100'; metaHtml += `<div class="flex items-center gap-1 text-xs font-medium border px-2 py-1 rounded-md w-fit ${style}"><i data-lucide="clock" class="w-3 h-3"></i>${task.dueDate}</div>`; } 
         if (task.description) metaHtml += `<i data-lucide="align-left" class="w-3 h-3 text-slate-400"></i>`;
         if (task.updatedAt) { metaHtml += `<div class="ml-auto flex flex-col items-end gap-0.5"><div class="text-[9px] text-slate-300 font-medium">${Common.t('task_created')}: ${UI.formatTime(task.createdAt)}</div>`;
@@ -421,7 +421,11 @@ const App = {
                 const newTaskIds = []; Array.from(to.children).forEach(child => { if (!child.classList.contains('virtual-parent-card') && !child.classList.contains('virtual-child-card') && child.dataset.taskId) newTaskIds.push(child.dataset.taskId); });
                 State.data.columns[toCol].taskIds = newTaskIds;
                 const task = State.data.tasks[taskId];
-                if (toCol === CONSTANTS.DONE_COLUMN_ID) { if (!task.completedDate) { const now = new Date(); task.completedDate = `${now.toLocaleDateString(State.language === 'ja' ? 'ja-JP' : 'en-US', {year:'numeric',month:'2-digit',day:'2-digit'}).replaceAll('/','-')} ${now.toLocaleTimeString(State.language === 'ja' ? 'ja-JP' : 'en-US', {hour:'2-digit',minute:'2-digit'})}`; } } else task.completedDate = null;
+                if (toCol === CONSTANTS.DONE_COLUMN_ID) { 
+                    if (!task.completedDate) task.completedDate = new Date().toISOString(); 
+                } else {
+                    task.completedDate = null;
+                }
                 task.updatedAt = new Date().toISOString(); DataService.save(); App.render();
             }});
         });

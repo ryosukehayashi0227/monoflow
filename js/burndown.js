@@ -1,5 +1,5 @@
 /**
- * MonoFlow Burndown Calculation Logic with Localization
+ * MonoFlow Burndown Calculation Logic - Robust Date Handling
  */
 
 const STORAGE_KEY = 'monoflow-v10-refactored';
@@ -10,8 +10,18 @@ function loadData() {
     return saved ? JSON.parse(saved) : null;
 }
 
+// Robust date parser to handle various formats
+function parseDate(dateStr) {
+    if (!dateStr) return null;
+    // Replace - with / for better cross-browser parsing if needed, 
+    // but ISO strings (with T) should usually be fine.
+    const d = new Date(dateStr); 
+    return isNaN(d.getTime()) ? null : d;
+}
+
 function translateUI() {
-    document.querySelector('h1').textContent = Common.t('burndown_title');
+    const titleEl = document.querySelector('h1');
+    if (titleEl) titleEl.textContent = Common.t('burndown_title');
     const subtitle = document.querySelector('h1 + p');
     if (subtitle) subtitle.textContent = Common.t('burndown_subtitle');
     
@@ -21,11 +31,11 @@ function translateUI() {
     const trendTitle = document.querySelector('h2');
     if (trendTitle) trendTitle.innerHTML = `<i data-lucide="line-chart" class="w-4 h-4"></i> ${Common.t('burndown_trend')}`;
     
-    const aboutLink = document.getElementById('about-link');
-    if (aboutLink) aboutLink.textContent = Common.t('about_link');
-    
     const backLink = document.querySelector('a[href="index.html"] span');
     if (backLink) backLink.textContent = Common.t('back_to_app');
+    
+    const aboutLink = document.getElementById('about-link');
+    if (aboutLink) aboutLink.textContent = Common.t('about_link');
 }
 
 function initBurndown() {
@@ -48,37 +58,50 @@ function initBurndown() {
         document.getElementById('end-date').value = endDateVal;
     }
 
-    const start = new Date(startDateVal);
+    const start = parseDate(startDateVal);
+    const end = parseDate(endDateVal);
+    if (!start || !end) return;
+
     start.setHours(0, 0, 0, 0);
-    const end = new Date(endDateVal);
     end.setHours(23, 59, 59, 999);
 
     const labels = [];
     const dateArray = [];
     let current = new Date(start);
     const locale = State.language === 'ja' ? 'ja-JP' : 'en-US';
-    while (current <= end) {
+    
+    // Safety break to prevent infinite loops if dates are somehow messed up
+    let safetyCounter = 0;
+    while (current <= end && safetyCounter < 1000) {
         labels.push(current.toLocaleDateString(locale, { month: 'short', day: 'numeric' }));
         dateArray.push(new Date(current));
         current.setDate(current.getDate() + 1);
+        safetyCounter++;
     }
 
     const tasks = Object.values(data.tasks);
     const burndownData = dateArray.map(day => {
-        const dayEnd = new Date(day).setHours(23, 59, 59, 999);
+        const dayEnd = day.getTime() + (24 * 60 * 60 * 1000) - 1;
         return tasks.filter(t => {
-            const created = new Date(t.createdAt).getTime();
-            if (created > dayEnd) return false;
+            const created = parseDate(t.createdAt);
+            if (!created || created.getTime() > dayEnd) return false;
+
             if (t.completedDate) {
-                const completed = new Date(t.completedDate.replace(/-/g, '/')).getTime();
-                if (completed <= dayEnd) return false;
+                const completed = parseDate(t.completedDate);
+                if (completed && completed.getTime() <= dayEnd) return false;
             }
+            
+            if (t.archived && !t.completedDate) return false;
+
             return true;
         }).length;
     });
 
     const activeCountEl = document.getElementById('active-task-count');
-    if (activeCountEl) activeCountEl.textContent = `${Common.t('burndown_current')}: ${burndownData[burndownData.length - 1]}`;
+    if (activeCountEl && burndownData.length > 0) {
+        const currentCount = burndownData[burndownData.length - 1];
+        activeCountEl.textContent = `${Common.t('burndown_current')}: ${currentCount}`;
+    }
 
     renderChart(labels, burndownData);
 }
@@ -88,10 +111,11 @@ function renderChart(labels, dataPoints) {
     if (burndownChart) burndownChart.destroy();
 
     const idealData = [];
-    const startVal = dataPoints[0];
+    const startVal = dataPoints[0] || 0;
     const steps = dataPoints.length - 1;
     for (let i = 0; i <= steps; i++) {
-        idealData.push(startVal - (startVal / steps) * i);
+        if (steps === 0) idealData.push(startVal);
+        else idealData.push(Math.max(0, startVal - (startVal / steps) * i));
     }
 
     const textColor = State.theme === 'dark' ? '#94a3b8' : '#64748b';
@@ -116,7 +140,7 @@ function renderChart(labels, dataPoints) {
                 {
                     label: Common.t('burndown_ideal'),
                     data: idealData,
-                    borderColor: '#E2E8F0',
+                    borderColor: State.theme === 'dark' ? '#334155' : '#E2E8F0',
                     borderDash: [5, 5],
                     borderWidth: 2,
                     fill: false,

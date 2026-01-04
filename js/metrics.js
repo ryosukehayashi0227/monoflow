@@ -1,5 +1,5 @@
 /**
- * MonoFlow Metrics Logic with Date & Multi-Label Popover Filter
+ * MonoFlow Metrics Logic - High Accuracy Update
  */
 
 const STORAGE_KEY = 'monoflow-v10-refactored';
@@ -20,6 +20,15 @@ function loadData() {
     return saved ? JSON.parse(saved) : null;
 }
 
+// Robust date parser for all browsers and formats
+function parseDate(dateStr) {
+    if (!dateStr) return null;
+    // Replace - with / for Safari compatibility if no T (ISO) is present
+    const normalized = dateStr.includes('T') ? dateStr : dateStr.replace(/-/g, '/');
+    const d = new Date(normalized);
+    return isNaN(d.getTime()) ? null : d;
+}
+
 // --- UI Interaction for Label Menu ---
 const labelMenu = document.getElementById('metrics-label-menu');
 function toggleLabelMenu(e) {
@@ -38,61 +47,37 @@ function renderLabelList(data) {
     const countDisplay = document.getElementById('selected-label-count');
     if (!data || !data.labels || !container) return;
 
-    // Update count display
     countDisplay.textContent = selectedLabels.size > 0 ? `${selectedLabels.size}` : Common.t('filter_all');
 
     container.innerHTML = '';
     data.labels.forEach(l => {
         const isActive = selectedLabels.has(l.id);
         const colorClass = COLORS[l.color] || COLORS.blue;
-        
         const item = document.createElement('button');
         item.className = `w-full flex items-center gap-3 p-2 rounded-xl transition-all ${isActive ? 'bg-slate-50 dark:bg-slate-800' : 'hover:bg-slate-50/50'}`;
-        
-        item.innerHTML = `
-            <div class="w-4 h-4 rounded-full border flex items-center justify-center ${isActive ? colorClass : 'border-slate-200 bg-white dark:bg-slate-700 dark:border-slate-600'}">
-                ${isActive ? '<i data-lucide="check" class="w-2.5 h-2.5"></i>' : ''}
-            </div>
-            <span class="text-sm font-semibold ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-500'}">${l.name}</span>
-        `;
-        
-        item.onclick = () => {
-            if (isActive) selectedLabels.delete(l.id);
-            else selectedLabels.add(l.id);
-            initMetrics(); // Refresh data
-        };
-        
+        item.innerHTML = `<div class="w-4 h-4 rounded-full border flex items-center justify-center ${isActive ? colorClass : 'border-slate-200 bg-white dark:bg-slate-700 dark:border-slate-600'}">${isActive ? '<i data-lucide="check" class="w-2.5 h-2.5"></i>' : ''}</div><span class="text-sm font-semibold ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-500'}">${l.name}</span>`;
+        item.onclick = () => { if (isActive) selectedLabels.delete(l.id); else selectedLabels.add(l.id); initMetrics(); };
         container.appendChild(item);
     });
     lucide.createIcons();
 }
 
 function translateUI() {
-    // Page Title & Subtitle
     document.querySelector('h1').textContent = Common.t('metrics_title');
     const subtitle = document.querySelector('h1 + p');
     if (subtitle) subtitle.textContent = Common.t('metrics_subtitle');
-    
-    // Labels in Filter using IDs
     const periodLabel = document.getElementById('metrics-period-label');
     if (periodLabel) periodLabel.textContent = Common.t('metrics_period');
-    
     const labelLabel = document.getElementById('metrics-label-label');
     if (labelLabel) labelLabel.textContent = Common.t('filter_label');
-
     const aboutLink = document.getElementById('about-link');
     if (aboutLink) aboutLink.textContent = Common.t('about_link');
-
     const menuTitle = document.querySelector('#metrics-label-menu span');
     if (menuTitle) menuTitle.textContent = Common.t('metrics_label_select');
-
     const menuClear = document.querySelector('#metrics-label-menu button');
     if (menuClear) menuClear.textContent = Common.t('metrics_clear');
-
     const backLink = document.querySelector('a[href="index.html"] span');
     if (backLink) backLink.textContent = Common.t('back_to_app');
-    
-    // Stat Cards
     const cards = document.querySelectorAll('.stat-card');
     if (cards.length >= 4) {
         cards[0].querySelector('.stat-label').textContent = Common.t('metrics_total');
@@ -100,8 +85,6 @@ function translateUI() {
         cards[2].querySelector('.stat-label').textContent = Common.t('metrics_avg');
         cards[3].querySelector('.stat-label').textContent = Common.t('metrics_done');
     }
-    
-    // Chart Titles
     const h2s = document.querySelectorAll('h2');
     if (h2s.length >= 2) {
         h2s[0].innerHTML = `<i data-lucide="pie-chart" class="w-4 h-4"></i> ${Common.t('metrics_dist')}`;
@@ -116,75 +99,73 @@ function initMetrics() {
     translateUI();
     renderLabelList(data);
 
-    const startDate = document.getElementById('start-date').value;
-    const endDate = document.getElementById('end-date').value;
+    let startDateVal = document.getElementById('start-date').value;
+    let endDateVal = document.getElementById('end-date').value;
 
-    const start = startDate ? new Date(startDate).setHours(0,0,0,0) : null;
-    const end = endDate ? new Date(endDate).setHours(23,59,59,999) : null;
+    if (!startDateVal) {
+        const d = new Date();
+        d.setDate(d.getDate() - 14);
+        startDateVal = d.toISOString().split('T')[0];
+        document.getElementById('start-date').value = startDateVal;
+    }
+    if (!endDateVal) {
+        endDateVal = new Date().toISOString().split('T')[0];
+        document.getElementById('end-date').value = endDateVal;
+    }
+
+    const startTs = new Date(startDateVal).setHours(0,0,0,0);
+    const endTs = new Date(endDateVal).setHours(23,59,59,999);
 
     const allTasks = Object.values(data.tasks);
     const filteredTasks = allTasks.filter(t => {
-        let datePass = true;
-        if (start || end) {
-            const created = new Date(t.createdAt).getTime();
-            const completed = t.completedDate ? new Date(t.completedDate.replace(/-/g, '/')).getTime() : null;
-            if (start && end) {
-                datePass = (created >= start && created <= end) || (completed && completed >= start && completed <= end);
-            } else if (start) {
-                datePass = created >= start || (completed && completed >= start);
-            } else if (end) {
-                datePass = created <= end || (completed && completed <= end);
-            }
-        }
-
-        let labelPass = true;
-        if (selectedLabels.size > 0) {
-            labelPass = t.labels && t.labels.some(lid => selectedLabels.has(lid));
-        }
-
-        return datePass && labelPass;
+        if (selectedLabels.size > 0 && (!t.labels || !t.labels.some(lid => selectedLabels.has(lid)))) return false;
+        const created = parseDate(t.createdAt);
+        const completed = parseDate(t.completedDate);
+        if (!created) return false;
+        
+        // Task was relevant if it was created before period end AND (was never completed OR completed after period start)
+        return created.getTime() <= endTs && (!completed || completed.getTime() >= startTs);
     });
 
-    // Stats
     const statusCounts = { todo: 0, progress: 0, done: 0 };
+    const priorityCounts = { high: 0, medium: 0, low: 0, none: 0 };
+    let doneInPeriod = 0;
+    let leadTimeTotal = 0;
+
     filteredTasks.forEach(t => {
-        for (const colId in data.columns) {
-            if (data.columns[colId].taskIds.includes(t.id)) {
-                if (colId === 'c1') statusCounts.todo++;
-                else if (colId === 'c2') statusCounts.progress++;
-                else if (colId === 'c3') statusCounts.done++;
-                break;
+        priorityCounts[t.priority || 'none']++;
+
+        const completed = parseDate(t.completedDate);
+        // Determine status based on columns OR completed flag
+        let currentStatus = 'todo';
+        if (completed) currentStatus = 'done';
+        else {
+            for (const colId in data.columns) {
+                if (data.columns[colId].taskIds.includes(t.id)) {
+                    if (colId === 'c2') currentStatus = 'progress';
+                    if (colId === 'c3') currentStatus = 'done';
+                    break;
+                }
             }
         }
-    });
+        statusCounts[currentStatus]++;
 
-    const priorityCounts = { high: 0, medium: 0, low: 0, none: 0 };
-    filteredTasks.forEach(t => priorityCounts[t.priority || 'none']++);
+        // Lead time for tasks COMPLETED in this specific window
+        if (completed && completed.getTime() >= startTs && completed.getTime() <= endTs) {
+            doneInPeriod++;
+            const created = parseDate(t.createdAt);
+            if (created) leadTimeTotal += (completed.getTime() - created.getTime());
+        }
+    });
 
     const total = filteredTasks.length;
-    const doneTasks = statusCounts.done;
-    const completionRate = total > 0 ? Math.round((doneTasks / total) * 100) : 0;
-
-    let totalLeadTime = 0;
-    let timedTasksCount = 0;
-    filteredTasks.forEach(t => {
-        if (t.completedDate && t.createdAt) {
-            const s = new Date(t.createdAt);
-            const e = new Date(t.completedDate.replace(/-/g, '/'));
-            if (!isNaN(s) && !isNaN(e)) {
-                totalLeadTime += (e - s);
-                timedTasksCount++;
-            }
-        }
-    });
-    const avgDays = timedTasksCount > 0 
-        ? (totalLeadTime / timedTasksCount / (1000 * 60 * 60 * 24)).toFixed(1) 
-        : "0.0";
+    const compRate = total > 0 ? Math.round((statusCounts.done / total) * 100) : 0;
+    const avgDays = doneInPeriod > 0 ? (leadTimeTotal / doneInPeriod / (1000 * 60 * 60 * 24)).toFixed(1) : "0.0";
 
     document.getElementById('total-tasks').textContent = total;
-    document.getElementById('completion-rate').textContent = `${completionRate}%`;
+    document.getElementById('completion-rate').textContent = `${compRate}%`;
     document.getElementById('avg-days').textContent = avgDays;
-    document.getElementById('done-tasks').textContent = doneTasks;
+    document.getElementById('done-tasks').textContent = doneInPeriod;
 
     renderStatusChart(statusCounts);
     renderPriorityChart(priorityCounts);
@@ -218,10 +199,8 @@ function renderStatusChart(counts) {
 function renderPriorityChart(counts) {
     const ctx = document.getElementById('priorityChart').getContext('2d');
     if (priorityChart) priorityChart.destroy();
-    
     const labels = CONSTANTS.PRIORITIES.map(p => p.label[State.language]);
-    const values = CONSTANTS.PRIORITIES.map(p => counts[p.value]);
-
+    const values = CONSTANTS.PRIORITIES.map(p => counts[p.value] || 0);
     priorityChart = new Chart(ctx, {
         type: 'bar',
         data: {
