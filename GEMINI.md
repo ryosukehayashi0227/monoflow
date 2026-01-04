@@ -5,12 +5,15 @@
 It is designed to be fully self-contained in a single HTML file (`index.html`) without requiring a build process or a backend server.
 
 ## Architecture
-- **Single File Component:** All logic (HTML, CSS, JS) resides in `index.html`.
-- **Styling:** Tailwind CSS (via Play CDN for zero-config portability).
+- **Structure:** `index.html` (Main entry point).
+- **Logic:** `app.js` (Core application logic, modularized).
+- **Styling:** 
+    - Tailwind CSS (via Play CDN).
+    - `style.css` (Custom styles for Kanban specific UI).
 - **Icons:** Lucide Icons (via CDN).
-- **Drag & Drop:** SortableJS (via CDN) with **nested list** support.
+- **Drag & Drop:** SortableJS (via CDN).
 - **Data Persistence:** `localStorage` is used to persist tasks, columns, and custom labels.
-- **No Build Step:** The project runs directly by opening the file in a browser.
+- **No Build Step:** The project runs directly by opening `index.html` in a browser.
 
 ## Key Features
 - **Nested Kanban Board:** Support for parent-child relationships (1-level deep).

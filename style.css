@@ -1,0 +1,32 @@
+/* --- Base & Utility Styles --- */
+body.modal-open { overflow: hidden; }
+.ghost-card { opacity: 0.2; background: #e2e8f0; border: 2px dashed #cbd5e1; }
+.modal { transition: opacity 0.25s ease; }
+.color-label { transition: all 0.2s ease; }
+.color-radio:checked + label { box-shadow: 0 0 0 2px white, 0 0 0 4px #94a3b8; transform: scale(1.25); z-index: 10; }
+
+/* --- Task Card Styles --- */
+.task-card { transition: transform 0.2s, box-shadow 0.2s; cursor: grab; }
+.task-card:active { cursor: grabbing; }
+.task-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+
+/* Completed State */
+.task-card.is-done { opacity: 0.6; filter: grayscale(0.5); background-color: #f1f5f9; }
+.task-card.is-done .task-title { text-decoration: line-through; color: #94a3b8; }
+
+/* Virtual Parent (Ghost) */
+.virtual-parent-card {
+    border: 2px dashed #e2e8f0; background: rgba(248, 250, 252, 0.5);
+    opacity: 0.6; cursor: default !important; pointer-events: none;
+}
+
+/* Indentation for Subtasks */
+.child-task { margin-left: 1.5rem; position: relative; width: calc(100% - 1.5rem); margin-top: 0.5rem; }
+.child-task::before {
+    content: ''; position: absolute; left: -1.0rem; top: -0.8rem; bottom: 50%; width: 2px;
+    background-color: #cbd5e1; border-bottom-left-radius: 4px;
+}
+.child-task::after {
+    content: ''; position: absolute; left: -1.0rem; top: 50%; width: 0.8rem; height: 2px;
+    background-color: #cbd5e1;
+}
