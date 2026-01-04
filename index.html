@@ -15,82 +15,50 @@
     <script>
         tailwind.config = {
             theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                }
+                extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } }
             }
         }
     </script>
     <style>
+        /* --- Base & Utility Styles --- */
+        body.modal-open { overflow: hidden; }
         .ghost-card { opacity: 0.2; background: #e2e8f0; border: 2px dashed #cbd5e1; }
+        .modal { transition: opacity 0.25s ease; }
+        .color-label { transition: all 0.2s ease; }
+        .color-radio:checked + label { box-shadow: 0 0 0 2px white, 0 0 0 4px #94a3b8; transform: scale(1.25); z-index: 10; }
+
+        /* --- Task Card Styles --- */
         .task-card { transition: transform 0.2s, box-shadow 0.2s; cursor: grab; }
         .task-card:active { cursor: grabbing; }
         .task-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
-        .modal { transition: opacity 0.25s ease; }
-        body.modal-open { overflow: hidden; }
         
-        /* Visual Indentation for Subtasks */
-        .child-task {
-            margin-left: 1.5rem;
-            position: relative;
-            width: calc(100% - 1.5rem);
-            margin-top: 0.5rem;
+        /* Completed State */
+        .task-card.is-done { opacity: 0.6; filter: grayscale(0.5); background-color: #f1f5f9; }
+        .task-card.is-done .task-title { text-decoration: line-through; color: #94a3b8; }
+
+        /* Virtual Parent (Ghost) */
+        .virtual-parent-card {
+            border: 2px dashed #e2e8f0; background: rgba(248, 250, 252, 0.5);
+            opacity: 0.6; cursor: default !important; pointer-events: none;
         }
+
+        /* Indentation for Subtasks */
+        .child-task { margin-left: 1.5rem; position: relative; width: calc(100% - 1.5rem); margin-top: 0.5rem; }
         .child-task::before {
-            content: '';
-            position: absolute;
-            left: -1.0rem;
-            top: -0.8rem;
-            bottom: 50%;
-            width: 2px;
-            background-color: #cbd5e1;
-            border-bottom-left-radius: 4px;
+            content: ''; position: absolute; left: -1.0rem; top: -0.8rem; bottom: 50%; width: 2px;
+            background-color: #cbd5e1; border-bottom-left-radius: 4px;
         }
         .child-task::after {
-            content: '';
-            position: absolute;
-            left: -1.0rem;
-            top: 50%;
-            width: 0.8rem;
-            height: 2px;
+            content: ''; position: absolute; left: -1.0rem; top: 50%; width: 0.8rem; height: 2px;
             background-color: #cbd5e1;
-        }
-
-        /* Completed Task Styles */
-        .task-card.is-done {
-            opacity: 0.6;
-            filter: grayscale(0.5);
-            background-color: #f1f5f9;
-        }
-        .task-card.is-done .task-title {
-            text-decoration: line-through;
-            color: #94a3b8;
-        }
-
-        .color-radio:checked + label { 
-            box-shadow: 0 0 0 2px white, 0 0 0 4px #94a3b8;
-            transform: scale(1.25);
-            z-index: 10;
-        }
-        .color-label { transition: all 0.2s ease; }
-
-        /* Virtual Parent Styles */
-        .virtual-parent-card {
-            border: 2px dashed #e2e8f0;
-            background: rgba(248, 250, 252, 0.5);
-            opacity: 0.6;
-            cursor: default !important;
-            pointer-events: none;
         }
     </style>
 </head>
 <body class="bg-[#f8fafc] text-[#1e293b] antialiased">
 
     <div class="max-w-[1200px] mx-auto px-6 py-12">
+        <!-- Header Section -->
         <header class="flex flex-col gap-6 mb-10">
-            <!-- Row 1: Logo & Title -->
             <div class="flex items-center gap-5 pb-6 border-b border-slate-100">
                 <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 shrink-0 transform transition-transform hover:scale-105 duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="6" y2="18"></line><line x1="12" y1="6" x2="12" y2="14"></line><line x1="18" y1="6" x2="18" y2="10"></line></svg>
@@ -101,9 +69,8 @@
                 </div>
             </div>
 
-            <!-- Row 2: Toolbar -->
+            <!-- Toolbar -->
             <div class="flex flex-col md:flex-row justify-between gap-3 w-full items-start md:items-center">
-                <!-- Filter Dropdown -->
                 <div class="relative w-full md:w-auto">
                     <select id="label-filter" class="appearance-none bg-white border border-slate-200 rounded-xl px-4 py-2.5 pr-10 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-600 font-medium cursor-pointer hover:border-blue-300 transition-colors w-full md:w-48">
                         <option value="all">すべてのラベル</option>
@@ -113,46 +80,40 @@
                     </div>
                 </div>
                 <div class="flex gap-2 w-full md:w-auto ml-auto">
-                    <!-- Add Task Form -->
                     <form id="add-task-form" class="flex gap-2 w-full md:w-auto">
-                    <input type="text" id="new-task-input" placeholder="新しいタスクを入力..." 
-                        class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 w-full md:w-64 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
-                    <button type="submit" class="bg-blue-600 text-white font-semibold rounded-xl px-4 py-2.5 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all flex items-center gap-2 shrink-0">
-                        <i data-lucide="plus" class="w-5 h-5"></i>
-                        <span class="hidden md:inline">追加</span>
-                    </button>
-                </form>
-                <div class="relative ml-2">
-                    <button onclick="toggleMenu(event)" class="bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:border-slate-300 shadow-sm transition-all flex items-center justify-center">
-                        <i data-lucide="more-horizontal" class="w-5 h-5"></i>
-                    </button>
-                    <div id="settings-menu" class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 hidden z-20 overflow-hidden">
-                        <button onclick="exportData()" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 transition-colors">
-                            <i data-lucide="download" class="w-4 h-4 text-slate-400"></i> エクスポート (JSON)
+                        <input type="text" id="new-task-input" placeholder="新しいタスクを入力..." class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 w-full md:w-64 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+                        <button type="submit" class="bg-blue-600 text-white font-semibold rounded-xl px-4 py-2.5 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all flex items-center gap-2 shrink-0">
+                            <i data-lucide="plus" class="w-5 h-5"></i> <span class="hidden md:inline">追加</span>
                         </button>
-                        <button onclick="document.getElementById('import-file').click()" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 border-t border-slate-100 transition-colors">
-                            <i data-lucide="upload" class="w-4 h-4 text-slate-400"></i> インポート
+                    </form>
+                    <div class="relative ml-2">
+                        <button onclick="toggleMenu(event)" class="bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:border-slate-300 shadow-sm transition-all flex items-center justify-center">
+                            <i data-lucide="more-horizontal" class="w-5 h-5"></i>
                         </button>
-                        <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(this)">
+                        <div id="settings-menu" class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 hidden z-20 overflow-hidden">
+                            <button onclick="DataService.export()" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 transition-colors">
+                                <i data-lucide="download" class="w-4 h-4 text-slate-400"></i> エクスポート (JSON)
+                            </button>
+                            <button onclick="document.getElementById('import-file').click()" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 border-t border-slate-100 transition-colors">
+                                <i data-lucide="upload" class="w-4 h-4 text-slate-400"></i> インポート
+                            </button>
+                            <input type="file" id="import-file" class="hidden" accept=".json" onchange="DataService.import(this)">
+                        </div>
                     </div>
-                </div>
                 </div>
             </div>
         </header>
 
-        <main id="board" class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-            <!-- Columns injected here -->
-        </main>
+        <!-- Kanban Board -->
+        <main id="board" class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start"></main>
     </div>
 
     <!-- Task Detail Modal -->
-    <div id="task-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm hidden opacity-0">
+    <div id="task-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm hidden opacity-0 modal">
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl transform transition-all scale-95 opacity-0 modal-content m-4 flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-center p-6 border-b border-slate-100">
                 <h3 class="text-lg font-bold text-slate-800">タスク詳細</h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition-colors">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
+                <button onclick="Modal.close()" class="text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <div class="p-6 overflow-y-auto">
                 <form id="edit-task-form" class="space-y-6">
@@ -163,23 +124,8 @@
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-2">優先度</label>
-                        <div class="flex gap-2">
-                            <label class="cursor-pointer">
-                                <input type="radio" name="priority" value="high" class="peer sr-only">
-                                <div class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 peer-checked:bg-red-50 peer-checked:text-red-600 peer-checked:border-red-200 text-sm font-bold flex items-center gap-1 transition-all hover:bg-slate-50"><i data-lucide="chevrons-up" class="w-4 h-4"></i> 高</div>
-                            </label>
-                            <label class="cursor-pointer">
-                                <input type="radio" name="priority" value="medium" class="peer sr-only">
-                                <div class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 peer-checked:bg-orange-50 peer-checked:text-orange-600 peer-checked:border-orange-200 text-sm font-bold flex items-center gap-1 transition-all hover:bg-slate-50"><i data-lucide="minus" class="w-4 h-4"></i> 中</div>
-                            </label>
-                            <label class="cursor-pointer">
-                                <input type="radio" name="priority" value="low" class="peer sr-only">
-                                <div class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 peer-checked:bg-blue-50 peer-checked:text-blue-600 peer-checked:border-blue-200 text-sm font-bold flex items-center gap-1 transition-all hover:bg-slate-50"><i data-lucide="chevrons-down" class="w-4 h-4"></i> 低</div>
-                            </label>
-                            <label class="cursor-pointer">
-                                <input type="radio" name="priority" value="none" class="peer sr-only">
-                                <div class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-400 peer-checked:bg-slate-100 peer-checked:text-slate-600 peer-checked:border-slate-300 text-sm font-medium transition-all hover:bg-slate-50">指定なし</div>
-                            </label>
+                        <div class="flex gap-2" id="priority-options-container">
+                            <!-- Injected by JS -->
                         </div>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
@@ -187,14 +133,10 @@
                         <div class="space-y-3 mb-5">
                             <input type="text" id="new-label-name" placeholder="新しいラベル名" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 shadow-sm">
                             <div class="flex items-center justify-between gap-2">
-                                <div class="flex gap-3 items-center bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-sm">
-                                    <input type="radio" name="label-color" value="red" id="c-red" class="hidden color-radio" checked><label for="c-red" class="w-5 h-5 rounded-full bg-red-500 cursor-pointer block color-label hover:scale-110"></label>
-                                    <input type="radio" name="label-color" value="blue" id="c-blue" class="hidden color-radio"><label for="c-blue" class="w-5 h-5 rounded-full bg-blue-500 cursor-pointer block color-label hover:scale-110"></label>
-                                    <input type="radio" name="label-color" value="green" id="c-green" class="hidden color-radio"><label for="c-green" class="w-5 h-5 rounded-full bg-green-500 cursor-pointer block color-label hover:scale-110"></label>
-                                    <input type="radio" name="label-color" value="yellow" id="c-yellow" class="hidden color-radio"><label for="c-yellow" class="w-5 h-5 rounded-full bg-yellow-500 cursor-pointer block color-label hover:scale-110"></label>
-                                    <input type="radio" name="label-color" value="purple" id="c-purple" class="hidden color-radio"><label for="c-purple" class="w-5 h-5 rounded-full bg-purple-500 cursor-pointer block color-label hover:scale-110"></label>
+                                <div class="flex gap-3 items-center bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-sm" id="label-color-picker">
+                                    <!-- Injected by JS -->
                                 </div>
-                                <button type="button" onclick="createLabel()" class="bg-slate-800 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-slate-900 shadow-sm shrink-0">追加</button>
+                                <button type="button" onclick="LabelManager.create()" class="bg-slate-800 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-slate-900 shadow-sm shrink-0">追加</button>
                             </div>
                         </div>
                         <div id="edit-task-labels" class="flex flex-wrap gap-2"></div>
@@ -205,9 +147,7 @@
                             <select id="edit-task-parent" class="w-full border border-slate-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none bg-white text-slate-700">
                                 <option value="">(なし)</option>
                             </select>
-                            <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
-                                <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                            </div>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
                         </div>
                     </div>
                     <div>
@@ -221,444 +161,566 @@
                 </form>
             </div>
             <div class="p-6 border-t border-slate-100 bg-slate-50 flex justify-end gap-3 rounded-b-2xl">
-                <button onclick="closeModal()" class="px-5 py-2.5 text-slate-600 font-medium hover:bg-slate-200 rounded-xl transition-colors">キャンセル</button>
-                <button onclick="saveTaskDetails()" class="bg-blue-600 text-white font-semibold rounded-xl px-6 py-2.5 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all">保存</button>
+                <button onclick="Modal.close()" class="px-5 py-2.5 text-slate-600 font-medium hover:bg-slate-200 rounded-xl transition-colors">キャンセル</button>
+                <button onclick="Modal.save()" class="bg-blue-600 text-white font-semibold rounded-xl px-6 py-2.5 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all">保存</button>
             </div>
         </div>
     </div>
 
     <script>
-        const boardElement = document.getElementById('board');
-        const addTaskForm = document.getElementById('add-task-form');
-        const newTaskInput = document.getElementById('new-task-input');
-        const labelFilterSelect = document.getElementById('label-filter');
-        const modal = document.getElementById('task-modal');
-        const modalContent = modal.querySelector('.modal-content');
-        
-        const editTaskIdInput = document.getElementById('edit-task-id');
-        const editTaskContentInput = document.getElementById('edit-task-content');
-        const editTaskParentInput = document.getElementById('edit-task-parent');
-        const editTaskDescInput = document.getElementById('edit-task-desc');
-        const editTaskDateInput = document.getElementById('edit-task-date');
-        const editTaskLabelsContainer = document.getElementById('edit-task-labels');
-        const newLabelNameInput = document.getElementById('new-label-name');
+        /**
+         * ==========================================================================================
+         *  Monoflow - Core Application Logic
+         *  Organized into Modules: Constants, State, DataService, UI, LabelManager, Modal, Main
+         * ==========================================================================================
+         */
 
-        const STORAGE_KEY = 'monoflow-v9-stable-data';
-        const COLOR_MAP = { red: 'bg-red-100 text-red-700 border-red-200', blue: 'bg-blue-100 text-blue-700 border-blue-200', green: 'bg-green-100 text-green-700 border-green-200', yellow: 'bg-yellow-100 text-yellow-700 border-yellow-200', purple: 'bg-purple-100 text-purple-700 border-purple-200' };
-
-        const initialData = {
-            tasks: {
-                't1': { id: 't1', content: '親タスクのテスト', description: '', dueDate: '', parentId: null, labels: [], priority: 'high' },
-                't2': { id: 't2', content: 'モーダルで親を設定してください', description: '', dueDate: '', parentId: null, labels: [], priority: 'medium' },
+        // --- 1. Constants & Config ---
+        const CONSTANTS = {
+            STORAGE_KEY: 'monoflow-v10-refactored',
+            DONE_COLUMN_ID: 'c3',
+            COLORS: {
+                red: 'bg-red-100 text-red-700 border-red-200',
+                blue: 'bg-blue-100 text-blue-700 border-blue-200',
+                green: 'bg-green-100 text-green-700 border-green-200',
+                yellow: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+                purple: 'bg-purple-100 text-purple-700 border-purple-200'
             },
-            columns: {
-                'c1': { id: 'c1', title: 'To Do', taskIds: ['t1', 't2'] },
-                'c2': { id: 'c2', title: 'In Progress', taskIds: [] },
-                'c3': { id: 'c3', title: 'Done', taskIds: [] },
-            },
-            columnOrder: ['c1', 'c2', 'c3'],
-            labels: [{ id: 'l1', name: 'Priority', color: 'red' }, { id: 'l2', name: 'Work', color: 'blue' }]
+            PRIORITIES: [
+                { value: 'high', label: '高', icon: 'chevrons-up', style: 'text-red-600 bg-red-50 border-red-200' },
+                { value: 'medium', label: '中', icon: 'minus', style: 'text-orange-600 bg-orange-50 border-orange-200' },
+                { value: 'low', label: '低', icon: 'chevrons-down', style: 'text-blue-600 bg-blue-50 border-blue-200' },
+                { value: 'none', label: '指定なし', icon: '', style: 'text-slate-600 bg-slate-100 border-slate-300' }
+            ]
         };
 
-        let currentFilter = 'all';
-        let tempTaskLabels = []; 
+        // --- 2. State Management ---
+        const State = {
+            data: null,
+            filter: 'all',
+            tempLabels: [] // Labels selected in modal
+        };
 
-        function loadData() {
-            const savedData = localStorage.getItem(STORAGE_KEY);
-            return savedData ? JSON.parse(savedData) : initialData;
-        }
+        // --- 3. Data Service ---
+        const DataService = {
+            init: () => {
+                const initialData = {
+                    tasks: {
+                        't1': { id: 't1', content: 'Monoflowへようこそ', description: 'これはサンプルタスクです。', dueDate: '', parentId: null, labels: [], priority: 'high' },
+                    },
+                    columns: {
+                        'c1': { id: 'c1', title: 'To Do', taskIds: ['t1'] },
+                        'c2': { id: 'c2', title: 'In Progress', taskIds: [] },
+                        'c3': { id: 'c3', title: 'Done', taskIds: [] },
+                    },
+                    columnOrder: ['c1', 'c2', 'c3'],
+                    labels: [
+                        { id: 'l1', name: 'Priority', color: 'red' },
+                        { id: 'l2', name: 'Work', color: 'blue' }
+                    ]
+                };
+                const saved = localStorage.getItem(CONSTANTS.STORAGE_KEY);
+                State.data = saved ? JSON.parse(saved) : initialData;
+                DataService.ensureIntegrity();
+            },
 
-        function saveData(data) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        }
+            save: () => {
+                localStorage.setItem(CONSTANTS.STORAGE_KEY, JSON.stringify(State.data));
+            },
 
-        let boardData = loadData();
+            ensureIntegrity: () => {
+                // Recover orphans
+                const allTaskIds = new Set(Object.values(State.data.columns).flatMap(c => c.taskIds));
+                Object.keys(State.data.tasks).forEach(id => {
+                    if (!allTaskIds.has(id)) {
+                        State.data.columns['c1'].taskIds.push(id);
+                    }
+                });
+                DataService.save();
+            },
 
-        function renderBoard() {
-            boardElement.innerHTML = '';
-            
-            // Orphan recovery safety
-            const allTaskIdsInColumns = new Set(Object.values(boardData.columns).flatMap(c => c.taskIds));
-            Object.keys(boardData.tasks).forEach(taskId => {
-                if (!allTaskIdsInColumns.has(taskId)) {
-                    boardData.columns['c1'].taskIds.push(taskId);
+            deleteTask: (taskId, colId) => {
+                if(!confirm('タスクを削除しますか？')) return;
+                State.data.columns[colId].taskIds = State.data.columns[colId].taskIds.filter(id => id !== taskId);
+                delete State.data.tasks[taskId];
+                // Reset parentId for children
+                Object.values(State.data.tasks).forEach(t => { if(t.parentId === taskId) t.parentId = null; });
+                DataService.save();
+                App.render();
+            },
+
+            export: () => {
+                const blob = new Blob([JSON.stringify(State.data, null, 2)], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `monoflow-backup-${new Date().toISOString().slice(0,10)}.json`;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+            },
+
+            import: (input) => {
+                const file = input.files[0]; if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const imported = JSON.parse(e.target.result);
+                        if(confirm("現在のデータはすべて上書きされます。よろしいですか？")) {
+                            State.data = imported;
+                            DataService.save();
+                            App.render();
+                        }
+                    } catch(err) { alert("ファイルの読み込みに失敗しました。"); }
+                    input.value = '';
+                };
+                reader.readAsText(file);
+            }
+        };
+
+        // --- 4. Label Manager ---
+        const LabelManager = {
+            create: () => {
+                const nameInput = document.getElementById('new-label-name');
+                const name = nameInput.value.trim();
+                if(!name) return;
+                const color = document.querySelector('input[name="label-color"]:checked')?.value || 'blue';
+                State.data.labels.push({ id: `l-${Date.now()}`, name, color });
+                DataService.save();
+                nameInput.value = '';
+                Modal.renderLabels();
+            },
+            delete: (id) => {
+                if(!confirm('ラベルを削除しますか？')) return;
+                State.data.labels = State.data.labels.filter(l => l.id !== id);
+                Object.values(State.data.tasks).forEach(t => { 
+                    if(t.labels) t.labels = t.labels.filter(lid => lid !== id); 
+                });
+                State.tempLabels = State.tempLabels.filter(lid => lid !== id);
+                DataService.save();
+                Modal.renderLabels();
+                App.render();
+            }
+        };
+
+        // --- 5. Modal Logic ---
+        const Modal = {
+            elements: {
+                overlay: document.getElementById('task-modal'),
+                content: document.querySelector('#task-modal .modal-content'),
+                id: document.getElementById('edit-task-id'),
+                title: document.getElementById('edit-task-content'),
+                desc: document.getElementById('edit-task-desc'),
+                date: document.getElementById('edit-task-date'),
+                parent: document.getElementById('edit-task-parent'),
+                labelsContainer: document.getElementById('edit-task-labels')
+            },
+
+            init: () => {
+                // Generate Priority Options
+                const pContainer = document.getElementById('priority-options-container');
+                pContainer.innerHTML = CONSTANTS.PRIORITIES.map(p => `
+                    <label class="cursor-pointer">
+                        <input type="radio" name="priority" value="${p.value}" class="peer sr-only">
+                        <div class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 peer-checked:${p.style} text-sm font-bold flex items-center gap-1 transition-all hover:bg-slate-50">
+                            ${p.icon ? `<i data-lucide="${p.icon}" class="w-4 h-4"></i>` : ''} ${p.label}
+                        </div>
+                    </label>
+                `).join('');
+
+                // Generate Color Picker
+                const cContainer = document.getElementById('label-color-picker');
+                const colors = ['red', 'blue', 'green', 'yellow', 'purple'];
+                cContainer.innerHTML = colors.map((c, i) => `
+                    <input type="radio" name="label-color" value="${c}" id="c-${c}" class="hidden color-radio" ${i===0?'checked':''}>
+                    <label for="c-${c}" class="w-5 h-5 rounded-full bg-${c}-500 cursor-pointer block color-label hover:scale-110"></label>
+                `).join('');
+            },
+
+            open: (taskId) => {
+                const task = State.data.tasks[taskId];
+                if (!task) return;
+
+                const { elements } = Modal;
+                elements.id.value = task.id;
+                elements.title.value = task.content;
+                elements.desc.value = task.description || '';
+                elements.date.value = task.dueDate || '';
+                
+                // Priority
+                const pVal = task.priority || 'none';
+                const pRadio = document.querySelector(`input[name="priority"][value="${pVal}"]`);
+                if(pRadio) pRadio.checked = true;
+
+                // Parent Options
+                elements.parent.innerHTML = '<option value="">(なし)</option>';
+                Object.values(State.data.tasks).forEach(t => {
+                    if (t.id !== taskId && !t.parentId) {
+                        const opt = document.createElement('option');
+                        opt.value = t.id;
+                        opt.textContent = t.content.substring(0, 30);
+                        elements.parent.appendChild(opt);
+                    }
+                });
+                elements.parent.value = task.parentId || '';
+
+                // Labels
+                State.tempLabels = task.labels ? [...task.labels] : [];
+                Modal.renderLabels();
+
+                Modal.elements.overlay.classList.remove('hidden');
+                void Modal.elements.overlay.offsetWidth; // trigger reflow
+                Modal.elements.overlay.classList.remove('opacity-0');
+                Modal.elements.content.classList.remove('scale-95', 'opacity-0');
+                Modal.elements.content.classList.add('scale-100', 'opacity-100');
+                document.body.classList.add('modal-open');
+            },
+
+            close: () => {
+                Modal.elements.overlay.classList.add('opacity-0');
+                Modal.elements.content.classList.remove('scale-100', 'opacity-100');
+                Modal.elements.content.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    Modal.elements.overlay.classList.add('hidden');
+                    document.body.classList.remove('modal-open');
+                }, 250);
+            },
+
+            save: () => {
+                const id = Modal.elements.id.value;
+                const content = Modal.elements.title.value.trim();
+                
+                if (content && State.data.tasks[id]) {
+                    const t = State.data.tasks[id];
+                    t.content = content;
+                    t.description = Modal.elements.desc.value;
+                    t.dueDate = Modal.elements.date.value;
+                    t.labels = State.tempLabels;
+                    t.priority = document.querySelector('input[name="priority"]:checked')?.value || 'none';
+                    t.parentId = Modal.elements.parent.value || null;
+
+                    // If became child, reset own children
+                    if (t.parentId) {
+                        Object.values(State.data.tasks).forEach(child => {
+                            if (child.parentId === id) child.parentId = null;
+                        });
+                    }
+
+                    DataService.save();
+                    App.render();
+                    Modal.close();
                 }
-            });
-            saveData(boardData);
+            },
 
-            updateFilterOptions();
+            renderLabels: () => {
+                const container = Modal.elements.labelsContainer;
+                container.innerHTML = '';
+                State.data.labels.forEach(label => {
+                    const isSelected = State.tempLabels.includes(label.id);
+                    const colorClass = CONSTANTS.COLORS[label.color] || CONSTANTS.COLORS.blue;
+                    
+                    const el = document.createElement('div');
+                    el.className = `flex items-center gap-1 px-2 py-1 rounded-full border cursor-pointer transition-all ${colorClass} ${isSelected ? 'ring-2 ring-slate-400' : 'opacity-60 hover:opacity-100'}`;
+                    el.innerHTML = `
+                        <span class="text-xs font-bold mr-1 select-none">${label.name}</span>
+                        <button type="button" class="hover:text-red-900"><i data-lucide="x" class="w-3 h-3"></i></button>
+                    `;
+                    
+                    // Click handlers
+                    el.onclick = (e) => {
+                        // Delete button click
+                        if (e.target.closest('button')) {
+                            e.stopPropagation();
+                            LabelManager.delete(label.id);
+                            return;
+                        }
+                        // Toggle Selection
+                        if (isSelected) State.tempLabels = State.tempLabels.filter(id => id !== label.id);
+                        else State.tempLabels.push(label.id);
+                        Modal.renderLabels();
+                    };
+                    
+                    container.appendChild(el);
+                });
+                lucide.createIcons();
+            }
+        };
 
-            boardData.columnOrder.forEach(columnId => {
-                const column = boardData.columns[columnId];
-                const columnElement = document.createElement('div');
-                columnElement.className = 'bg-slate-100/50 rounded-2xl p-5 flex flex-col border border-slate-200/60 h-full';
-                const taskCount = column.taskIds.length; 
-                columnElement.innerHTML = `
-                    <div class="flex justify-between items-center mb-5 px-1">
-                        <h2 class="font-bold text-slate-700 tracking-tight flex items-center gap-2">
-                            ${column.title}
-                            <span class="bg-slate-200 text-slate-500 text-[11px] px-2 py-0.5 rounded-full">${taskCount}</span>
-                        </h2>
+        // --- 6. UI Generator ---
+        const UI = {
+            createTaskCard: (task, columnId, visibleTasksContext) => {
+                const isDone = columnId === CONSTANTS.DONE_COLUMN_ID;
+                const el = document.createElement('div');
+                
+                // Indent Check
+                const parentExists = task.parentId && visibleTasksContext.some(t => t.id === task.parentId);
+                const indentClass = parentExists ? 'child-task scale-95 origin-left' : '';
+                
+                el.className = `task-card bg-white border border-slate-200 rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass} ${isDone ? 'is-done' : ''}`;
+                el.dataset.taskId = task.id;
+
+                // Priority Icon
+                const pConfig = CONSTANTS.PRIORITIES.find(p => p.value === task.priority);
+                const priorityHtml = (pConfig && pConfig.value !== 'none') 
+                    ? `<div class="flex items-center justify-center w-6 h-6 rounded-md border ${pConfig.style.replace('text-sm font-bold', '')}"><i data-lucide="${pConfig.icon}" class="w-4 h-4"></i></div>` 
+                    : '';
+
+                // Labels
+                const labelsHtml = task.labels && task.labels.length > 0
+                    ? `<div class="flex flex-wrap gap-1.5 mb-2">` + task.labels.map(lid => {
+                        const l = State.data.labels.find(x => x.id === lid);
+                        return l ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${CONSTANTS.COLORS[l.color] || CONSTANTS.COLORS.blue}">${l.name}</span>` : '';
+                      }).join('') + `</div>`
+                    : '';
+
+                // Parent Indicator
+                let parentIndicator = '';
+                if (task.parentId) {
+                    const p = State.data.tasks[task.parentId];
+                    if (p) parentIndicator = `<div class="text-[10px] text-blue-500 font-semibold mb-1 flex items-center gap-1"><i data-lucide="corner-down-right" class="w-3 h-3"></i>${p.content.substring(0,15)}...</div>`;
+                }
+
+                // Meta (Date/Time)
+                let metaHtml = `<div class="flex items-center gap-3 mt-3">`;
+                if (isDone && task.completedDate) {
+                    metaHtml += `<div class="flex items-center gap-1 text-[11px] font-bold text-green-600 bg-green-50 border border-green-100 px-2 py-0.5 rounded-md"><i data-lucide="check-circle-2" class="w-3 h-3"></i>完了: ${task.completedDate}</div>`;
+                } else if (task.dueDate) {
+                    const overdue = new Date(task.dueDate) < new Date().setHours(0,0,0,0);
+                    const style = overdue ? 'text-red-600 bg-red-50 border-red-100' : 'text-slate-500 bg-slate-50 border-slate-100';
+                    metaHtml += `<div class="flex items-center gap-1 text-xs font-medium border px-2 py-1 rounded-md w-fit ${style}"><i data-lucide="clock" class="w-3 h-3"></i>${task.dueDate}</div>`;
+                }
+                if (task.description) metaHtml += `<i data-lucide="align-left" class="w-3 h-3 text-slate-400"></i>`;
+                metaHtml += `</div>`;
+
+                el.innerHTML = `
+                    ${parentIndicator}
+                    ${labelsHtml}
+                    <div class="flex justify-between items-start gap-2">
+                        <span class="task-title text-[15px] font-medium text-slate-700 leading-relaxed flex-grow">${task.content}</span>
+                        <div class="flex flex-col gap-1 items-end">
+                            ${priorityHtml}
+                            <button onclick="event.stopPropagation(); DataService.deleteTask('${task.id}', '${columnId}')" class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-1">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
                     </div>
+                    ${metaHtml}
                 `;
+                
+                el.addEventListener('click', () => Modal.open(task.id));
+                return el;
+            },
 
-                const taskListElement = document.createElement('div');
-                taskListElement.className = 'task-list space-y-3 min-h-[100px] pb-4';
-                taskListElement.dataset.columnId = column.id;
+            createVirtualParent: (parentTask) => {
+                const el = document.createElement('div');
+                let laneName = '不明';
+                for(const cid in State.data.columns) {
+                    if(State.data.columns[cid].taskIds.includes(parentTask.id)) { laneName = State.data.columns[cid].title; break; }
+                }
+                el.className = 'task-card virtual-parent-card rounded-xl p-3 flex flex-col gap-1';
+                el.innerHTML = `
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1"><i data-lucide="link" class="w-3 h-3"></i> 実体は「${laneName}」</div>
+                    <span class="text-sm font-semibold text-slate-400 truncate">${parentTask.content}</span>
+                `;
+                return el;
+            }
+        };
 
-                // Flattened but grouped render logic
-                const columnTasks = column.taskIds.map(id => boardData.tasks[id]).filter(Boolean);
-                const visibleTasks = columnTasks.filter(task => {
-                    if (currentFilter === 'all') return true;
-                    return task.labels && task.labels.includes(currentFilter);
+        // --- 7. Main Application Controller ---
+        const App = {
+            init: () => {
+                DataService.init();
+                Modal.init();
+                
+                // Event Listeners
+                document.getElementById('add-task-form').addEventListener('submit', App.handleAddTask);
+                document.getElementById('label-filter').addEventListener('change', (e) => {
+                    State.filter = e.target.value;
+                    App.render();
+                });
+                
+                // Close modal listener
+                document.getElementById('task-modal').addEventListener('click', (e) => {
+                    if (e.target.id === 'task-modal') Modal.close();
                 });
 
-                // Grouping Logic: Render Parent then its children
-                const renderOrder = []; // Elements to render: { type: 'real'|'virtual', task: object }
-                const processedIds = new Set();
+                // Global Settings Toggle
+                const menu = document.getElementById('settings-menu');
+                window.toggleMenu = (e) => { e.stopPropagation(); menu.classList.toggle('hidden'); };
+                document.addEventListener('click', () => menu.classList.add('hidden'));
 
-                // 1. Root Tasks & Real Parents
-                const roots = visibleTasks.filter(task => !task.parentId);
-                roots.forEach(root => {
-                    renderOrder.push({ type: 'real', task: root });
-                    processedIds.add(root.id);
+                App.render();
+            },
+
+            handleAddTask: (e) => {
+                e.preventDefault();
+                const input = document.getElementById('new-task-input');
+                const content = input.value.trim();
+                if (content) {
+                    const id = `task-${Date.now()}`;
+                    State.data.tasks[id] = { 
+                        id, content, description: '', dueDate: '', 
+                        parentId: null, labels: [], priority: 'none' 
+                    };
+                    State.data.columns['c1'].taskIds.unshift(id);
+                    DataService.save();
+                    App.render();
+                    input.value = '';
+                }
+            },
+
+            render: () => {
+                const board = document.getElementById('board');
+                board.innerHTML = '';
+                App.updateFilterDropdown();
+
+                State.data.columnOrder.forEach(colId => {
+                    const column = State.data.columns[colId];
+                    const colEl = document.createElement('div');
+                    colEl.className = 'bg-slate-100/50 rounded-2xl p-5 flex flex-col border border-slate-200/60 h-full';
+                    colEl.innerHTML = `
+                        <div class="flex justify-between items-center mb-5 px-1">
+                            <h2 class="font-bold text-slate-700 tracking-tight flex items-center gap-2">
+                                ${column.title}
+                                <span class="bg-slate-200 text-slate-500 text-[11px] px-2 py-0.5 rounded-full">${column.taskIds.length}</span>
+                            </h2>
+                        </div>
+                    `;
+
+                    const listEl = document.createElement('div');
+                    listEl.className = 'task-list space-y-3 min-h-[100px] pb-4';
+                    listEl.dataset.columnId = colId;
+
+                    // --- Filtering & Grouping Logic ---
+                    const tasks = column.taskIds.map(id => State.data.tasks[id]).filter(Boolean);
+                    const visible = tasks.filter(t => State.filter === 'all' || (t.labels && t.labels.includes(State.filter)));
+
+                    const renderItems = []; // { type: 'real'|'virtual', task }
+                    const processed = new Set();
+
+                    // 1. Roots (parent not in visible list or parent is null)
+                    const roots = visible.filter(t => !t.parentId || !visible.some(pt => pt.id === t.parentId));
                     
-                    // Add its children that are in this column
-                    const children = visibleTasks.filter(t => t.parentId === root.id);
-                    children.forEach(child => {
-                        renderOrder.push({ type: 'real', task: child });
-                        processedIds.add(child.id);
+                    roots.forEach(root => {
+                        // If root has a parent (meaning parent is in another column), add virtual parent
+                        if (root.parentId) {
+                            const pTask = State.data.tasks[root.parentId];
+                            if (pTask && !renderItems.some(i => i.type === 'virtual' && i.task.id === pTask.id)) {
+                                renderItems.push({ type: 'virtual', task: pTask });
+                            }
+                        }
+                        
+                        renderItems.push({ type: 'real', task: root });
+                        processed.add(root.id);
+
+                        // Children (if in same column)
+                        visible.filter(c => c.parentId === root.id).forEach(child => {
+                            renderItems.push({ type: 'real', task: child });
+                            processed.add(child.id);
+                        });
+                    });
+
+                    // Fallback
+                    visible.forEach(t => { if(!processed.has(t.id)) renderItems.push({ type: 'real', task: t }); });
+
+                    renderItems.forEach(item => {
+                        const el = item.type === 'virtual' 
+                            ? UI.createVirtualParent(item.task) 
+                            : UI.createTaskCard(item.task, colId, visible);
+                        listEl.appendChild(el);
+                    });
+
+                    colEl.appendChild(listEl);
+                    board.appendChild(colEl);
+                });
+
+                lucide.createIcons();
+                App.initDragAndDrop();
+            },
+
+            updateFilterDropdown: () => {
+                const select = document.getElementById('label-filter');
+                select.innerHTML = '<option value="all">すべてのラベル</option>';
+                State.data.labels.forEach(l => {
+                    const opt = document.createElement('option');
+                    opt.value = l.id; opt.textContent = l.name;
+                    if(l.id === State.filter) opt.selected = true;
+                    select.appendChild(opt);
+                });
+            },
+
+            initDragAndDrop: () => {
+                if (State.filter !== 'all') return;
+                document.querySelectorAll('.task-list').forEach(list => {
+                    new Sortable(list, {
+                        group: 'tasks', animation: 250, ghostClass: 'ghost-card',
+                        onEnd: (evt) => {
+                            const { item, to, from, newIndex, oldIndex } = evt;
+                            
+                            // Check if Virtual Card (ignore drag, though usually filtered by class)
+                            if (item.classList.contains('virtual-parent-card')) return;
+
+                            const taskId = item.dataset.taskId;
+                            const toCol = to.dataset.columnId;
+                            const fromCol = from.dataset.columnId;
+
+                            // Correctly calculate new index in DATA array by ignoring virtual elements in DOM
+                            // Sortable gives index based on DOM children. Data array only has real tasks.
+                            // We need to count how many 'real' tasks are before the drop position.
+                            
+                            const getRealIndex = (container, domIndex) => {
+                                const children = Array.from(container.children);
+                                let realIdx = 0;
+                                for (let i = 0; i < domIndex; i++) {
+                                    if (!children[i].classList.contains('virtual-parent-card')) {
+                                        realIdx++;
+                                    }
+                                }
+                                return realIdx;
+                            };
+
+                            // Note: 'oldIndex' is from the source list, 'newIndex' is in the target list.
+                            // However, Sortable has already mutated the DOM.
+                            // We should trust the DOM state for the TARGET list order to be robust.
+                            
+                            // 1. Remove from Source Data
+                            State.data.columns[fromCol].taskIds = State.data.columns[fromCol].taskIds.filter(id => id !== taskId);
+
+                            // 2. Insert into Target Data based on new DOM order
+                            // Iterate target DOM children, extract task IDs, ignore virtuals.
+                            const newTaskIds = [];
+                            Array.from(to.children).forEach(child => {
+                                if (!child.classList.contains('virtual-parent-card') && child.dataset.taskId) {
+                                    newTaskIds.push(child.dataset.taskId);
+                                }
+                            });
+                            
+                            State.data.columns[toCol].taskIds = newTaskIds;
+
+                            // 3. Update Task Metadata
+                            const task = State.data.tasks[taskId];
+                            
+                            // Completed Logic
+                            if (toCol === CONSTANTS.DONE_COLUMN_ID) {
+                                if (!task.completedDate) {
+                                    const now = new Date();
+                                    const d = now.toLocaleDateString('ja-JP', {year:'numeric',month:'2-digit',day:'2-digit'}).replaceAll('/','-');
+                                    const t = now.toLocaleTimeString('ja-JP', {hour:'2-digit',minute:'2-digit'});
+                                    task.completedDate = `${d} ${t}`;
+                                }
+                            } else {
+                                task.completedDate = null;
+                            }
+
+                            DataService.save();
+                            App.render();
+                        }
                     });
                 });
-
-                // 2. Identify "Orphan" children whose parents are in DIFFERENT columns
-                visibleTasks.forEach(task => {
-                    if (processedIds.has(task.id)) return;
-                    
-                    if (task.parentId) {
-                        const parentTask = boardData.tasks[task.parentId];
-                        if (parentTask) {
-                            // Check if a virtual parent for this ID is already in our render list
-                            const virtualExists = renderOrder.some(item => item.type === 'virtual' && item.task.id === task.parentId);
-                            
-                            if (!virtualExists) {
-                                renderOrder.push({ type: 'virtual', task: parentTask });
-                            }
-                            renderOrder.push({ type: 'real', task: task });
-                            processedIds.add(task.id);
-                        }
-                    }
-                });
-
-                renderOrder.forEach(item => {
-                    if (item.type === 'virtual') {
-                        const vpEl = createVirtualParentElement(item.task);
-                        taskListElement.appendChild(vpEl);
-                    } else {
-                        const taskCard = createTaskElement(item.task, column.id, visibleTasks);
-                        taskListElement.appendChild(taskCard);
-                    }
-                });
-
-                columnElement.appendChild(taskListElement);
-                boardElement.appendChild(columnElement);
-            });
-
-            lucide.createIcons();
-            initializeDragAndDrop();
-        }
-
-        function createVirtualParentElement(parentTask) {
-            const vpCard = document.createElement('div');
-            // Find where the real parent is
-            let realLaneName = '不明';
-            for (const colId in boardData.columns) {
-                if (boardData.columns[colId].taskIds.includes(parentTask.id)) {
-                    realLaneName = boardData.columns[colId].title;
-                    break;
-                }
-            }
-
-            vpCard.className = 'task-card virtual-parent-card rounded-xl p-3 flex flex-col gap-1';
-            vpCard.innerHTML = `
-                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                    <i data-lucide="link" class="w-3 h-3"></i> 実体は「${realLaneName}」
-                </div>
-                <span class="text-sm font-semibold text-slate-400 truncate">${parentTask.content}</span>
-            `;
-            return vpCard;
-        }
-
-        function createTaskElement(task, columnId, visibleTasksInColumn) {
-            const isDone = columnId === 'c3';
-            const taskCard = document.createElement('div');
-            
-            // Indent Logic
-            const parentId = task.parentId;
-            // It is indented if parent is in this column (real or virtual)
-            const parentExistsInAnyForm = parentId && boardData.tasks[parentId];
-            const indentClass = parentExistsInAnyForm ? 'child-task scale-95 origin-left' : '';
-
-            taskCard.className = `task-card bg-white border border-slate-200 rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass} ${isDone ? 'is-done' : ''}`;
-            taskCard.dataset.taskId = task.id;
-
-            // Labels
-            let labelsHtml = '';
-            if (task.labels && task.labels.length > 0) {
-                labelsHtml = `<div class="flex flex-wrap gap-1.5 mb-2">`;
-                task.labels.forEach(labelId => {
-                    const l = boardData.labels.find(x => x.id === labelId);
-                    if (l) {
-                        const cc = COLOR_MAP[l.color] || COLOR_MAP['blue'];
-                        labelsHtml += `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${cc}">${l.name}</span>`;
-                    }
-                });
-                labelsHtml += `</div>`;
-            }
-
-            // Priority
-            let priorityHtml = '';
-            if (task.priority && task.priority !== 'none') {
-                const p = task.priority;
-                let c = 'text-slate-400', i = 'minus';
-                if (p === 'high') { c = 'text-red-600 bg-red-50 border-red-100'; i = 'chevrons-up'; }
-                else if (p === 'medium') { c = 'text-orange-500 bg-orange-50 border-orange-100'; i = 'minus'; }
-                else if (p === 'low') { c = 'text-blue-500 bg-blue-50 border-blue-100'; i = 'chevrons-down'; }
-                priorityHtml = `<div class="flex items-center justify-center w-6 h-6 rounded-md border ${c}" title="優先度"><i data-lucide="${i}" class="w-4 h-4"></i></div>`;
-            }
-
-            // Meta
-            let metaHtml = `<div class="flex items-center gap-3 mt-3">`;
-            if (isDone && task.completedDate) {
-                metaHtml += `<div class="flex items-center gap-1 text-[11px] font-bold text-green-600 bg-green-50 border border-green-100 px-2 py-0.5 rounded-md"><i data-lucide="check-circle-2" class="w-3 h-3"></i>完了: ${task.completedDate}</div>`;
-            }
-            if (task.dueDate && !isDone) {
-                const overdue = new Date(task.dueDate) < new Date().setHours(0,0,0,0);
-                const cc = overdue ? 'text-red-600 bg-red-50 border-red-100' : 'text-slate-500 bg-slate-50 border-slate-100';
-                metaHtml += `<div class="flex items-center gap-1 text-xs font-medium border px-2 py-1 rounded-md w-fit ${cc}"><i data-lucide="clock" class="w-3 h-3"></i>${task.dueDate}</div>`;
-            }
-            if (task.description) metaHtml += `<i data-lucide="align-left" class="w-3 h-3 text-slate-400"></i>`;
-            metaHtml += `</div>`;
-
-            taskCard.innerHTML = `
-                ${labelsHtml}
-                <div class="flex justify-between items-start gap-2">
-                    <span class="task-title text-[15px] font-medium text-slate-700 leading-relaxed flex-grow">${task.content}</span>
-                    <div class="flex flex-col gap-1 items-end">
-                        ${priorityHtml}
-                        <button onclick="event.stopPropagation(); deleteTask('${task.id}', '${columnId}')" class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-1">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
-                ${metaHtml}
-            `;
-            taskCard.addEventListener('click', () => openModal(task.id));
-            return taskCard;
-        }
-
-        function initializeDragAndDrop() {
-            if (currentFilter !== 'all') return;
-            const lists = document.querySelectorAll('.task-list');
-            lists.forEach(list => {
-                new Sortable(list, {
-                    group: 'tasks', animation: 250, ghostClass: 'ghost-card',
-                    onEnd: handleDrop
-                });
-            });
-        }
-
-        function handleDrop(evt) {
-            const { item, to, from } = evt;
-            const taskId = item.dataset.taskId;
-            const toColumnId = to.dataset.columnId;
-            const fromColumnId = from.dataset.columnId;
-
-            // Basic List Reordering Logic
-            boardData.columns[fromColumnId].taskIds = boardData.columns[fromColumnId].taskIds.filter(id => id !== taskId);
-            
-            // For destination, we need to find the correct index.
-            // Sortable has already moved the DOM element.
-            // We can reconstruct the order from the DOM of the target list.
-            const newOrder = Array.from(to.children).map(el => el.dataset.taskId).filter(Boolean);
-            boardData.columns[toColumnId].taskIds = newOrder;
-
-            // Logic: Force Grouping (Child under Parent) after Drop
-            // We iterate through the new list and enforce the "Root then Children" visual grouping logic
-            // into the actual data array if we want persistence to match visual?
-            // Actually, we can just save the flat order as user dropped it, 
-            // BUT renderBoard will re-group them visually next time.
-            // If we want "magnetic" grouping (child snaps to parent), we do it here.
-            
-            const targetTasks = newOrder.map(id => boardData.tasks[id]);
-            const finalOrder = [];
-            const processed = new Set();
-
-            targetTasks.forEach(t => {
-                if(processed.has(t.id)) return;
-                
-                // If it's a child and its parent is present in this column but hasn't been processed yet,
-                // SKIP it (it will be added when parent is processed).
-                if(t.parentId) {
-                    const parentInCol = targetTasks.some(pt => pt.id === t.parentId);
-                    if(parentInCol && !processed.has(t.parentId)) return; 
-                }
-
-                finalOrder.push(t.id); processed.add(t.id);
-                
-                // If I am a parent, immediately append my children that are in this column
-                const children = targetTasks.filter(c => c.parentId === t.id);
-                children.forEach(c => {
-                    if(!processed.has(c.id)) {
-                        finalOrder.push(c.id); processed.add(c.id);
-                    }
-                });
-            });
-            boardData.columns[toColumnId].taskIds = finalOrder;
-
-            // Update Meta (Completed Date)
-            const task = boardData.tasks[taskId];
-            if (toColumnId === 'c3') {
-                if (!task.completedDate) {
-                    const now = new Date();
-                    const dateStr = now.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }).replaceAll('/', '-');
-                    const timeStr = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
-                    task.completedDate = `${dateStr} ${timeStr}`;
-                }
-            } else {
-                task.completedDate = null;
-            }
-
-            saveData(boardData);
-            renderBoard(); 
-        }
-
-        // --- Standard Functions ---
-        const settingsMenu = document.getElementById('settings-menu');
-        function toggleMenu(e) { e.stopPropagation(); settingsMenu.classList.toggle('hidden'); }
-        document.addEventListener('click', () => { settingsMenu.classList.add('hidden'); });
-
-        function exportData() {
-            const dataStr = JSON.stringify(boardData, null, 2);
-            const blob = new Blob([dataStr], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `monoflow-backup.json`;
-            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-        }
-        function importData(input) {
-            const file = input.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    if(confirm("上書きしますか？")) { boardData = imported; saveData(boardData); renderBoard(); }
-                } catch(err) { alert("エラー"); }
-                input.value = '';
-            };
-            reader.readAsText(file);
-        }
-        function updateFilterOptions() {
-            labelFilterSelect.innerHTML = '<option value="all">すべてのラベル</option>';
-            boardData.labels.forEach(l => {
-                const o = document.createElement('option'); o.value = l.id; o.textContent = l.name;
-                if(l.id === currentFilter) o.selected = true; labelFilterSelect.appendChild(o);
-            });
-        }
-        function renderModalLabels() {
-            editTaskLabelsContainer.innerHTML = '';
-            boardData.labels.forEach(l => {
-                const sel = tempTaskLabels.includes(l.id);
-                const c = COLOR_MAP[l.color] || COLOR_MAP['blue'];
-                const d = document.createElement('div');
-                d.className = `flex items-center gap-1 px-2 py-1 rounded-full border cursor-pointer ${c} ${sel ? 'ring-2 ring-slate-400' : 'opacity-60 hover:opacity-100'}`;
-                d.innerHTML = `<span class="text-xs font-bold mr-1">${l.name}</span><button type="button" class="hover:text-red-900"><i data-lucide="x" class="w-3 h-3"></i></button>`;
-                d.onclick = (e) => { 
-                    if(e.target.tagName === 'BUTTON' || e.target.closest('button')) { e.stopPropagation(); deleteLabel(l.id); return; }
-                    if(sel) tempTaskLabels = tempTaskLabels.filter(id=>id!==l.id); else tempTaskLabels.push(l.id); renderModalLabels();
-                };
-                editTaskLabelsContainer.appendChild(d);
-            });
-            lucide.createIcons();
-        }
-        function createLabel() {
-            const name = newLabelNameInput.value.trim(); if(!name) return;
-            const color = document.querySelector('input[name="label-color"]:checked')?.value || 'blue';
-            boardData.labels.push({ id: `l-${Date.now()}`, name, color });
-            newLabelNameInput.value = ''; saveData(boardData); renderModalLabels();
-        }
-        function deleteLabel(id) {
-            if(!confirm('削除？')) return;
-            boardData.labels = boardData.labels.filter(l=>l.id!==id);
-            Object.values(boardData.tasks).forEach(t=>{ if(t.labels) t.labels = t.labels.filter(x=>x!==id); });
-            tempTaskLabels = tempTaskLabels.filter(x=>x!==id);
-            saveData(boardData); renderModalLabels(); renderBoard();
-        }
-        function updateParentOptions(currentTaskId) {
-            editTaskParentInput.innerHTML = '<option value="">(なし)</option>';
-            // Valid parents: Not self, Not my child (1 level limit)
-            Object.values(boardData.tasks).forEach(t => {
-                if (t.id === currentTaskId) return;
-                if (t.parentId) return; // Cannot be a parent if it is already a child (max 1 depth)
-                const op = document.createElement('option');
-                op.value = t.id; op.textContent = t.content.substring(0, 30);
-                editTaskParentInput.appendChild(op);
-            });
-        }
-        function openModal(id) {
-            const t = boardData.tasks[id]; if(!t) return;
-            editTaskIdInput.value = t.id; editTaskContentInput.value = t.content; editTaskDescInput.value = t.description||''; editTaskDateInput.value = t.dueDate||'';
-            const pVal = t.priority || 'none';
-            const r = document.querySelector(`input[name="priority"][value="${pVal}"]`); if(r) r.checked = true;
-            tempTaskLabels = t.labels ? [...t.labels] : []; renderModalLabels();
-            
-            updateParentOptions(id);
-            editTaskParentInput.value = t.parentId || '';
-
-            modal.classList.remove('hidden'); void modal.offsetWidth; modal.classList.remove('opacity-0'); modalContent.classList.remove('scale-95','opacity-0'); modalContent.classList.add('scale-100','opacity-100'); document.body.classList.add('modal-open');
-        }
-        function closeModal() {
-            modal.classList.add('opacity-0'); modalContent.classList.remove('scale-100','opacity-100'); modalContent.classList.add('scale-95','opacity-0');
-            setTimeout(() => { modal.classList.add('hidden'); document.body.classList.remove('modal-open'); }, 250);
-        }
-        function saveTaskDetails() {
-            const id = editTaskIdInput.value; const content = editTaskContentInput.value.trim();
-            if(content && boardData.tasks[id]) {
-                const t = boardData.tasks[id];
-                t.content = content; t.description = editTaskDescInput.value; t.dueDate = editTaskDateInput.value; t.labels = tempTaskLabels;
-                t.priority = document.querySelector('input[name="priority"]:checked')?.value || 'none';
-                t.parentId = editTaskParentInput.value || null;
-                
-                // If I become a child, I cannot have children (reset my children)
-                if (t.parentId) {
-                    Object.values(boardData.tasks).forEach(child => { if(child.parentId === id) child.parentId = null; });
-                }
-
-                saveData(boardData); renderBoard(); closeModal();
-            }
-        }
-        addTaskForm.addEventListener('submit', (e) => {
-            e.preventDefault(); const c = newTaskInput.value.trim();
-            if(c) {
-                const id = `task-${Date.now()}`;
-                boardData.tasks[id] = { id, content: c, description:'', dueDate:'', parentId:null, labels:[], priority:'none' };
-                boardData.columns['c1'].taskIds.unshift(id);
-                saveData(boardData); renderBoard(); newTaskInput.value='';
-            }
-        });
-        window.deleteTask = (id, colId) => {
-            if(confirm('削除？')) {
-                boardData.columns[colId].taskIds = boardData.columns[colId].taskIds.filter(x=>x!==id);
-                delete boardData.tasks[id];
-                Object.values(boardData.tasks).forEach(t=>{if(t.parentId===id)t.parentId=null;});
-                saveData(boardData); renderBoard();
             }
         };
-        labelFilterSelect.addEventListener('change', (e) => { currentFilter = e.target.value; renderBoard(); });
-        modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
 
-        renderBoard();
+        // Start App
+        App.init();
+
     </script>
 </body>
 </html>
