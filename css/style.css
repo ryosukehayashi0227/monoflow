@@ -19,7 +19,7 @@ body.modal-open { overflow: hidden; }
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid rgba(226, 232, 240, 0.8);
     background: rgba(255, 255, 255, 0.95);
-    padding: 0.75rem !important;
+    padding: 0.6rem !important; /* Reduced from 0.75rem */
 }
 
 .dark .task-card {
@@ -29,14 +29,9 @@ body.modal-open { overflow: hidden; }
 }
 
 .task-card:hover {
-    transform: translateY(-2px) scale(1.005);
-    box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px) scale(1.002);
+    box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.08);
     border-color: rgba(37, 99, 235, 0.3);
-}
-
-.dark .task-card:hover {
-    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.3);
-    border-color: rgba(59, 130, 246, 0.5);
 }
 
 .task-card:active { transform: scale(0.99); }
@@ -59,7 +54,7 @@ body.modal-open { overflow: hidden; }
 
 /* Animations */
 @keyframes task-pop-in {
-    0% { transform: scale(0.95) translateY(-10px); opacity: 0; border-color: #3b82f6; background-color: #eff6ff; }
+    0% { transform: scale(0.98) translateY(-5px); opacity: 0; border-color: #3b82f6; background-color: #eff6ff; }
     100% { transform: scale(1) translateY(0); opacity: 1; }
 }
 
@@ -83,14 +78,15 @@ body.modal-open { overflow: hidden; }
 /* Virtual Cards - More compact */
 .virtual-parent-card, .virtual-child-card {
     border: 1px dashed #cbd5e1;
-    background: rgba(241, 245, 249, 0.3);
-    opacity: 0.6;
-    padding: 0.4rem 0.6rem !important;
+    background: rgba(226, 232, 240, 0.4);
+    opacity: 0.85;
+    padding: 0.3rem 0.5rem !important; /* Even more compact */
 }
 
 .dark .virtual-parent-card, .dark .virtual-child-card {
-    border-color: #334155;
-    background: rgba(30, 41, 59, 0.4);
+    border-color: #475569;
+    background: rgba(30, 41, 59, 0.6);
+    opacity: 0.9;
 }
 
 .virtual-parent-card:hover, .virtual-child-card:hover {
@@ -105,9 +101,9 @@ body.modal-open { overflow: hidden; }
 }
 
 .virtual-child-card {
-    margin-left: 1.25rem;
-    width: calc(100% - 1.25rem);
-    margin-top: 0.2rem;
+    margin-left: 1rem;
+    width: calc(100% - 1rem);
+    margin-top: 0.15rem;
 }
 
 /* --- Layout Elements --- */
@@ -115,18 +111,18 @@ body.modal-open { overflow: hidden; }
 
 /* --- Indentation for Subtasks --- */
 .child-task {
-    margin-left: 1.25rem;
-    width: calc(100% - 1.25rem);
-    margin-top: 0.4rem;
+    margin-left: 1rem;
+    width: calc(100% - 1rem);
+    margin-top: 0.25rem;
 }
 
 .child-task::before {
-    content: ''; position: absolute; left: -0.8rem; top: -0.8rem; bottom: 50%; width: 1.5px;
-    background: #cbd5e1; border-bottom-left-radius: 3px;
+    content: ''; position: absolute; left: -0.6rem; top: -0.6rem; bottom: 50%; width: 1.5px;
+    background: #cbd5e1; border-bottom-left-radius: 2px;
 }
 
 .child-task::after {
-    content: ''; position: absolute; left: -0.8rem; top: 50%; width: 0.6rem; height: 1.5px;
+    content: ''; position: absolute; left: -0.6rem; top: 50%; width: 0.4rem; height: 1.5px;
     background-color: #cbd5e1;
 }
 

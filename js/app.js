@@ -416,14 +416,14 @@ const UI = {
     },
     createVirtualParent: (parentTask) => {
         const el = document.createElement('div'); el.className = 'task-card virtual-parent-card rounded-lg flex items-center transition-all';
-        el.innerHTML = `<span class="text-[11px] font-bold text-slate-400 truncate tracking-tight">${parentTask.content}</span>`;
+        el.innerHTML = `<span class="text-[11px] font-bold text-slate-500 dark:text-slate-300 truncate tracking-tight">${parentTask.content}</span>`;
         el.addEventListener('click', () => App.jumpToTask(parentTask.id)); return el;
     },
     createVirtualChild: (childTask) => {
         const el = document.createElement('div'); let laneName = '???';
         for(const cid in State.data.columns) if(State.data.columns[cid].taskIds.includes(childTask.id)) { laneName = App.t(cid === 'c1' ? 'col_todo' : (cid === 'c2' ? 'col_progress' : 'col_done')); break; }
         el.className = 'task-card virtual-child-card rounded-lg p-2 flex items-center gap-2 justify-between cursor-pointer hover:border-blue-400 hover:opacity-100 transition-all';
-        el.innerHTML = `<span class="text-[11px] font-medium text-slate-400 truncate flex-grow">${childTask.content}</span><div class="text-[9px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1 shrink-0 bg-slate-50/50 px-1.5 py-0.5 rounded border border-slate-100"><i data-lucide="external-link" class="w-2.5 h-2.5"></i> ${laneName}</div>`;
+        el.innerHTML = `<span class="text-[11px] font-medium text-slate-600 dark:text-slate-300 truncate flex-grow">${childTask.content}</span><div class="text-[9px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1 shrink-0 bg-slate-50/50 dark:bg-slate-800/50 px-1.5 py-0.5 rounded border border-slate-100 dark:border-slate-700"><i data-lucide="external-link" class="w-2.5 h-2.5"></i> ${laneName}</div>`;
         el.addEventListener('click', () => App.jumpToTask(childTask.id)); return el;
     }
 };
@@ -554,9 +554,9 @@ const App = {
 
         State.data.columnOrder.forEach(colId => {
             const col = State.data.columns[colId]; const colTitle = colId === 'c1' ? App.t('col_todo') : (colId === 'c2' ? App.t('col_progress') : App.t('col_done'));
-            const colEl = document.createElement('div'); colEl.className = 'bg-slate-200/40 dark:bg-slate-800/40 backdrop-blur-sm rounded-[1.25rem] p-4 flex flex-col border border-white/20 dark:border-slate-700 shadow-inner h-full min-h-[500px]';
-            colEl.innerHTML = `<div class="flex justify-between items-center mb-4 px-1"><h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">${colTitle}</h2><span class="bg-white/60 dark:bg-slate-700/60 text-slate-500 dark:text-slate-300 text-[9px] font-black px-2 py-0.5 rounded-full border border-slate-100 dark:border-slate-600">${col.taskIds.length}</span></div>`;
-            const listEl = document.createElement('div'); listEl.className = 'task-list space-y-3 pb-20 flex-grow min-h-[200px]'; listEl.dataset.columnId = colId;
+            const colEl = document.createElement('div'); colEl.className = 'bg-slate-200/40 dark:bg-slate-800/40 backdrop-blur-sm rounded-2xl p-2.5 flex flex-col border border-white/20 dark:border-slate-700 shadow-inner h-full min-h-[500px]';
+            colEl.innerHTML = `<div class="flex justify-between items-center mb-3 px-1"><h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">${colTitle}</h2><span class="bg-white/60 dark:bg-slate-700/60 text-slate-500 dark:text-slate-300 text-[9px] font-black px-2 py-0.5 rounded-full border border-slate-100 dark:border-slate-600">${col.taskIds.length}</span></div>`;
+            const listEl = document.createElement('div'); listEl.className = 'task-list space-y-2 pb-20 flex-grow min-h-[200px]'; listEl.dataset.columnId = colId;
             
             const tasks = col.taskIds.map(id => State.data.tasks[id]).filter(Boolean);
             const visible = tasks.filter(t => { 
