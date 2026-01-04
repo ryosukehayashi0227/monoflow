@@ -110,8 +110,108 @@
             <p class="text-slate-300 dark:text-slate-600 text-[10px] font-medium tracking-widest uppercase">Built for High-Performance Personal Kanban &copy; 2026</p>
         </footer>
     </div>
-    <div id="archive-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm hidden opacity-0 modal"><div class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[2.5rem] shadow-2xl transform transition-all scale-95 opacity-0 modal-content m-4 flex flex-col max-h-[80vh]"><div class="flex justify-between items-center p-8 border-b border-slate-100 dark:border-slate-800"><h3 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><i data-lucide="archive" class="w-6 h-6 text-slate-400"></i> Archived Tasks</h3><button onclick="Archive.close()" class="text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div><div id="archive-list" class="p-8 overflow-y-auto space-y-4 flex-grow"></div></div></div>
-    <div id="task-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm hidden opacity-0 modal"><div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl transform transition-all scale-95 opacity-0 modal-content m-4 flex flex-col max-h-[90vh]"><div class="flex justify-between items-center p-6 border-b border-slate-100 dark:border-slate-800"><h3 class="text-lg font-bold text-slate-800 dark:text-white">タスク詳細</h3><button onclick="Modal.close()" class="text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button></div><div class="p-6 overflow-y-auto"><div id="modal-meta-info" class="mb-6 flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-50 dark:border-slate-800 pb-4"><span id="display-created-at">作成: ---</span><span id="display-updated-at">更新: ---</span></div><form id="edit-task-form" class="space-y-6"><input type="hidden" id="edit-task-id"><div><label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">タイトル</label><input type="text" id="edit-task-content" class="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"></div><div><label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">優先度</label><div class="flex gap-2" id="priority-options-container"></div></div><div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700"><label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">ラベル</label><div class="space-y-3 mb-5"><input type="text" id="new-label-name" placeholder="新しいラベル名" class="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 shadow-sm"><div class="flex items-center justify-between gap-2"><div class="flex gap-3 items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 shadow-sm" id="label-color-picker"></div><button id="modal-add-tag-btn" type="button" onclick="LabelManager.create()" class="bg-slate-800 dark:bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-slate-900 dark:hover:bg-blue-700 shadow-sm shrink-0">追加</button></div></div><div id="edit-task-labels" class="flex flex-wrap gap-2"></div></div><div><label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">親タスク</label><div class="relative"><select id="edit-task-parent" class="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none bg-white"><option value="">(なし)</option></select><div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></div></div></div><div><label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">詳細メモ</label><textarea id="edit-task-desc" rows="3" class="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-600 dark:text-slate-300 resize-none"></textarea></div><div><label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">期限</label><input type="date" id="edit-task-date" class="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"></div></form></div><div class="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3 rounded-b-2xl"><button id="modal-cancel-btn" onclick="Modal.close()" class="px-5 py-2.5 text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors">キャンセル</button><button id="modal-save-btn" onclick="Modal.save()" class="bg-blue-600 text-white font-semibold rounded-xl px-6 py-2.5 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all">保存</button></div></div></div>
+    
+    <!-- Archive Modal -->
+    <div id="archive-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm hidden opacity-0 modal">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[2.5rem] shadow-2xl transform transition-all scale-95 opacity-0 modal-content m-4 flex flex-col max-h-[80vh]">
+            <div class="flex justify-between items-center p-8 border-b border-slate-100 dark:border-slate-800">
+                <h3 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><i data-lucide="archive" class="w-6 h-6 text-slate-400"></i> Archived Tasks</h3>
+                <button onclick="Archive.close()" class="text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div id="archive-list" class="p-8 overflow-y-auto space-y-4 flex-grow"></div>
+        </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="task-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm hidden opacity-0 modal">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl transform transition-all scale-95 opacity-0 modal-content m-4 flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center p-6 border-b border-slate-100 dark:border-slate-800">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white">Task Details</h3>
+                <button onclick="Modal.close()" class="text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto">
+                <div id="modal-meta-info" class="mb-6 flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-50 dark:border-slate-800 pb-4">
+                    <span id="display-created-at">Created: ---</span>
+                    <span id="display-updated-at">Updated: ---</span>
+                </div>
+                
+                <form id="edit-task-form" class="space-y-6">
+                    <input type="hidden" id="edit-task-id">
+                    
+                    <!-- Title -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Title</label>
+                        <input type="text" id="edit-task-content" class="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium">
+                    </div>
+
+                    <!-- Priority -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Priority</label>
+                        <div class="flex gap-2" id="priority-options-container"></div>
+                    </div>
+
+                    <!-- Labels -->
+                    <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Labels</label>
+                        <div class="space-y-3 mb-5">
+                            <input type="text" id="new-label-name" placeholder="New Label Name" class="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 shadow-sm">
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="flex gap-3 items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 shadow-sm" id="label-color-picker"></div>
+                                <button id="modal-add-tag-btn" type="button" onclick="LabelManager.create()" class="bg-slate-800 dark:bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-slate-900 dark:hover:bg-blue-700 shadow-sm shrink-0">Add</button>
+                            </div>
+                        </div>
+                        <div id="edit-task-labels" class="flex flex-wrap gap-2"></div>
+                    </div>
+
+                    <!-- Parent Task -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Parent Task</label>
+                        <div class="relative">
+                            <select id="edit-task-parent" class="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none bg-white">
+                                <option value="">(None)</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                        </div>
+                    </div>
+
+                    <!-- Blockers -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Blockers</label>
+                        <div class="space-y-3">
+                            <div class="flex gap-2">
+                                <div class="relative flex-grow">
+                                    <select id="edit-task-blocker-select" class="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none bg-white"></select>
+                                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                                </div>
+                                <button type="button" id="modal-add-blocker-btn" class="bg-slate-800 dark:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-900 dark:hover:bg-blue-700 shadow-sm shrink-0">Add</button>
+                            </div>
+                            <div id="edit-task-blockers-list" class="flex flex-col gap-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Notes</label>
+                        <textarea id="edit-task-desc" rows="3" class="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-600 dark:text-slate-300 resize-none"></textarea>
+                    </div>
+
+                    <!-- Due Date -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Due Date</label>
+                        <input type="date" id="edit-task-date" class="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3 rounded-b-2xl">
+                <button id="modal-cancel-btn" onclick="Modal.close()" class="px-5 py-2.5 text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors">Cancel</button>
+                <button id="modal-save-btn" onclick="Modal.save()" class="bg-blue-600 text-white font-semibold rounded-xl px-6 py-2.5 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all">Save</button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/common.js"></script>
     <script src="js/app.js"></script>
 </body>

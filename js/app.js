@@ -7,7 +7,7 @@ const BoardData = {
         const saved = DataService.load();
         if (saved) { State.data = saved; } else {
             State.data = {
-                tasks: { 't1': { id: 't1', content: Common.t('welcome_title'), description: Common.t('welcome_desc'), dueDate: '', parentId: null, labels: [], priority: 'high', updatedAt: new Date().toISOString(), createdAt: new Date().toISOString(), archived: false } },
+                tasks: { 't1': { id: 't1', content: Common.t('welcome_title'), description: Common.t('welcome_desc'), dueDate: '', parentId: null, labels: [], blockers: [], priority: 'high', updatedAt: new Date().toISOString(), createdAt: new Date().toISOString(), archived: false } },
                 columns: { 'c1': { id: 'c1', title: 'To Do', taskIds: ['t1'] }, 'c2': { id: 'c2', title: 'In Progress', taskIds: [] }, 'c3': { id: 'c3', title: 'Done', taskIds: [] } },
                 columnOrder: ['c1', 'c2', 'c3'],
                 labels: [{ id: 'l1', name: 'Priority', color: 'red' }, { id: 'l2', name: 'Work', color: 'blue' }]
@@ -70,7 +70,10 @@ const Modal = {
         desc: document.getElementById('edit-task-desc'),
         date: document.getElementById('edit-task-date'),
         parent: document.getElementById('edit-task-parent'),
-        labelsContainer: document.getElementById('edit-task-labels')
+        labelsContainer: document.getElementById('edit-task-labels'),
+        blockerSelect: document.getElementById('edit-task-blocker-select'),
+        blockerList: document.getElementById('edit-task-blockers-list'),
+        addBlockerBtn: document.getElementById('modal-add-blocker-btn')
     },
     init: () => {
         const cContainer = document.getElementById('label-color-picker');
@@ -78,7 +81,7 @@ const Modal = {
     },
     renderStaticUI: () => {
         document.querySelector('#task-modal h3').textContent = Common.t('modal_title');
-        Common.setT('display-created-at', 'task_created'); // Placeholder, actual time added in open()
+        Common.setT('display-created-at', 'task_created');
         const addTagBtn = document.getElementById('modal-add-tag-btn'); if (addTagBtn) addTagBtn.textContent = Common.t('modal_btn_add_tag');
         const cancelBtn = document.getElementById('modal-cancel-btn'); if (cancelBtn) cancelBtn.textContent = Common.t('modal_btn_cancel');
         const saveBtn = document.getElementById('modal-save-btn'); if (saveBtn) saveBtn.textContent = Common.t('modal_btn_save');
@@ -88,6 +91,17 @@ const Modal = {
         archBtn.onclick = () => BoardData.archiveTask(Modal.elements.id.value);
         const pContainer = document.getElementById('priority-options-container');
         pContainer.innerHTML = CONSTANTS.PRIORITIES.map(p => `<label class="cursor-pointer"><input type="radio" name="priority" value="${p.value}" class="peer sr-only"><div class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 peer-checked:${p.style} text-sm font-bold flex items-center gap-1 transition-all hover:bg-slate-50">${p.icon ? `<i data-lucide="${p.icon}" class="w-4 h-4"></i>` : ''} ${p.label[State.language]}</div></label>`).join('');
+        
+        const labels = document.querySelectorAll('#task-modal label');
+        if (labels.length > 0) labels[0].textContent = Common.t('modal_label_title');
+        if (labels.length > 1) labels[1].textContent = Common.t('modal_label_priority');
+        if (labels.length > 2) labels[2].textContent = Common.t('modal_label_tags');
+        if (labels.length > 3) labels[3].textContent = Common.t('modal_label_parent');
+        if (labels.length > 4) labels[4].textContent = Common.t('modal_label_blocker');
+        if (labels.length > 5) labels[5].textContent = Common.t('modal_label_desc');
+        if (labels.length > 6) labels[6].textContent = Common.t('modal_label_date');
+        
+        if (Modal.elements.addBlockerBtn) Modal.elements.addBlockerBtn.textContent = Common.t('modal_btn_add_blocker');
         lucide.createIcons();
     },
     open: (taskId) => {
@@ -97,16 +111,26 @@ const Modal = {
         document.getElementById('display-updated-at').textContent = `${Common.t('task_updated')}: ${task.updatedAt ? UI.formatTime(task.updatedAt) : '---'}`;
         const pRadio = Modal.elements.overlay.querySelector(`input[name="priority"][value="${task.priority || 'none'}"]`); if(pRadio) pRadio.checked = true;
         const hasChildren = Object.values(State.data.tasks).some(t => t.parentId === taskId);
-        if (hasChildren) { Modal.elements.parent.disabled = true; Modal.elements.parent.classList.add('bg-slate-50', 'text-slate-400', 'cursor-not-allowed'); Modal.elements.parent.innerHTML = `<option value="" selected>${Common.t('modal_parent_restricted')}</option>`; }
-        else { Modal.elements.parent.disabled = false; Modal.elements.parent.classList.remove('bg-slate-50', 'text-slate-400', 'cursor-not-allowed'); Modal.elements.parent.innerHTML = `<option value="">${Common.t('modal_label_none')}</option>`; Object.values(State.data.tasks).forEach(t => { if (t.id !== taskId && !t.parentId && !t.archived) { const opt = document.createElement('option'); opt.value = t.id; opt.textContent = t.content.substring(0, 30); Modal.elements.parent.appendChild(opt); } }); Modal.elements.parent.value = task.parentId || ''; }
+        if (hasChildren) { Modal.elements.parent.disabled = true; Modal.elements.parent.classList.add('bg-slate-50', 'text-slate-400', 'cursor-not-allowed'); Modal.elements.parent.innerHTML = `<option value="" selected>${Common.t('modal_parent_restricted')}</option>`; } 
+        else { Modal.elements.parent.disabled = false; Modal.elements.parent.classList.remove('bg-slate-50', 'text-slate-400', 'cursor-not-allowed'); Modal.elements.parent.innerHTML = `<option value="">${Common.t('modal_label_none')}</option>`; Object.values(State.data.tasks).forEach(t => { if (t.id !== taskId && !t.parentId && !t.archived) { const opt = document.createElement('option'); opt.value = t.id; opt.textContent = t.content.substring(0, 30); Modal.elements.parent.appendChild(opt); } }); Modal.elements.parent.value = task.parentId || ''; } 
         State.tempLabels = task.labels ? [...task.labels] : []; Modal.renderLabels();
+        
+        State.tempBlockers = task.blockers ? [...task.blockers] : [];
+        Modal.renderBlockers(taskId);
+        Modal.elements.addBlockerBtn.onclick = () => {
+             const val = Modal.elements.blockerSelect.value;
+             if(val && !State.tempBlockers.includes(val)) { State.tempBlockers.push(val); Modal.renderBlockers(taskId); }
+        };
+
         Modal.elements.overlay.classList.remove('hidden'); void Modal.elements.overlay.offsetWidth; Modal.elements.overlay.classList.remove('opacity-0'); Modal.elements.content.classList.remove('scale-95', 'opacity-0'); Modal.elements.content.classList.add('scale-100', 'opacity-100'); document.body.classList.add('modal-open');
     },
     close: () => { Modal.elements.overlay.classList.add('opacity-0'); Modal.elements.content.classList.remove('scale-100', 'opacity-100'); Modal.elements.content.classList.add('scale-95', 'opacity-0'); setTimeout(() => { Modal.elements.overlay.classList.add('hidden'); document.body.classList.remove('modal-open'); }, 250); },
     save: () => {
         const id = Modal.elements.id.value; const content = Modal.elements.title.value.trim();
         if (content && State.data.tasks[id]) {
-            const t = State.data.tasks[id]; t.content = content; t.description = Modal.elements.desc.value; t.dueDate = Modal.elements.date.value; t.labels = State.tempLabels; t.priority = Modal.elements.overlay.querySelector('input[name="priority"]:checked')?.value || 'none'; t.parentId = Modal.elements.parent.value || null; t.updatedAt = new Date().toISOString();
+            const t = State.data.tasks[id]; t.content = content; t.description = Modal.elements.desc.value; t.dueDate = Modal.elements.date.value;
+            t.parentId = Modal.elements.parent.value || null; t.priority = document.querySelector('input[name="priority"]:checked')?.value || 'none';
+            t.labels = [...State.tempLabels]; t.blockers = [...State.tempBlockers]; t.updatedAt = new Date().toISOString();
             if (t.parentId) Object.values(State.data.tasks).forEach(child => { if (child.parentId === id) child.parentId = null; });
             BoardData.save(); App.render(); Modal.close();
         }
@@ -119,6 +143,21 @@ const Modal = {
             el.innerHTML = `<span class="text-xs font-bold mr-1 select-none">${label.name}</span><button type="button" class="hover:text-red-900"><i data-lucide="x" class="w-3 h-3"></i></button>`;
             el.onclick = (e) => { if (e.target.closest('button')) { e.stopPropagation(); LabelManager.delete(label.id); return; } if (isSelected) State.tempLabels = State.tempLabels.filter(id => id !== label.id); else State.tempLabels.push(label.id); Modal.renderLabels(); }; container.appendChild(el);
         });
+        lucide.createIcons();
+    },
+    renderBlockers: (currentTaskId) => {
+        Modal.elements.blockerSelect.innerHTML = `<option value="">${Common.t('modal_label_none')}</option>`;
+        Object.values(State.data.tasks).filter(pt => pt.id !== currentTaskId && !pt.archived && !State.tempBlockers.includes(pt.id)).forEach(pt => {
+             const opt = document.createElement('option'); opt.value = pt.id; opt.textContent = pt.content.substring(0, 40) + (pt.content.length>40?'...':'');
+             Modal.elements.blockerSelect.appendChild(opt);
+        });
+        Modal.elements.blockerList.innerHTML = State.tempBlockers.map(bid => {
+            const b = State.data.tasks[bid]; if (!b) return '';
+            const isDone = State.data.columns[CONSTANTS.DONE_COLUMN_ID].taskIds.includes(bid) || (b.archived && b.completedDate);
+            const statusIcon = isDone ? 'check-circle-2' : 'circle';
+            const statusColor = isDone ? 'text-green-500' : 'text-slate-400';
+            return `<div class="flex items-center justify-between p-2 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-100 dark:border-slate-700"><div class="flex items-center gap-2 overflow-hidden"><i data-lucide="${statusIcon}" class="w-4 h-4 ${statusColor} shrink-0"></i><span class="text-xs font-medium text-slate-700 dark:text-slate-200 truncate">${b.content}</span></div><button type="button" onclick="State.tempBlockers=State.tempBlockers.filter(id=>id!=='${bid}'); Modal.renderBlockers('${currentTaskId}')" class="text-slate-400 hover:text-red-500 p-1"><i data-lucide="x" class="w-3 h-3"></i></button></div>`;
+        }).join('');
         lucide.createIcons();
     }
 };
@@ -134,7 +173,6 @@ const UI = {
         else if (task.priority === 'medium') pBorder = 'border-l-4 border-l-orange-400 border-slate-200 dark:border-slate-700';
         else if (task.priority === 'low') pBorder = 'border-l-4 border-l-blue-400 border-slate-200 dark:border-slate-700';
 
-        // Stale detection
         let staleIcon = '';
         if (columnId === 'c1') {
             const lastActive = Common.parseDate(task.updatedAt || task.createdAt);
@@ -150,8 +188,17 @@ const UI = {
         const lHtml = task.labels && task.labels.length > 0 ? `<div class="flex flex-wrap gap-1.5 mb-2">` + task.labels.map(lid => { const l = State.data.labels.find(x => x.id === lid); return l ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${CONSTANTS.COLORS[l.color] || CONSTANTS.COLORS.blue}">${l.name}</span>` : ''; }).join('') + `</div>` : '';
         let pInd = ''; if (task.parentId) { const p = State.data.tasks[task.parentId]; if (p) pInd = `<div class="text-[10px] text-blue-500 font-semibold mb-1 flex items-center gap-1"><i data-lucide="corner-down-right" class="w-3 h-3"></i>${p.content.substring(0,15)}...</div>`; } 
         let subCounter = ''; const children = Object.values(State.data.tasks).filter(t => t.parentId === task.id && !t.archived);
-        if (children.length > 0) { const dCount = children.filter(c => { for(const cid in State.data.columns) if(State.data.columns[cid].taskIds.includes(c.id) && cid === CONSTANTS.DONE_COLUMN_ID) return true; return false; }).length; const progressPct = Math.round((dCount / children.length) * 100); subCounter = `<div class="mt-3 pt-3 border-t border-slate-50 dark:border-slate-800"><div class="flex justify-between items-center mb-1.5"><div class="flex items-center gap-1 text-[9px] font-black bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700"><i data-lucide="git-merge" class="w-2.5 h-2.5"></i>${dCount}/${children.length}</div><span class="text-[9px] font-bold text-slate-400">${progressPct}%</span></div><div class="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-blue-500 transition-all duration-500" style="width: ${progressPct}%"></div></div></div>`; }
+        if (children.length > 0) { const dCount = children.filter(c => { for(const cid in State.data.columns) if(State.data.columns[cid].taskIds.includes(c.id) && cid === CONSTANTS.DONE_COLUMN_ID) return true; return false; }).length; const progressPct = Math.round((dCount / children.length) * 100); subCounter = `<div class="mt-3 pt-3 border-t border-slate-50 dark:border-slate-800"><div class="flex justify-between items-center mb-1.5"><div class="flex items-center gap-1 text-[9px] font-black bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700"><i data-lucide="git-merge" class="w-2.5 h-2.5"></i>${dCount}/${children.length}</div><span class="text-[9px] font-bold text-slate-400">${progressPct}%</span></div><div class="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-blue-500 transition-all duration-500" style="width: ${progressPct}%"></div></div></div>`; } 
         let metaHtml = `<div class="flex items-center gap-3 mt-3">`;
+        if (task.blockers && task.blockers.length > 0) {
+            const doneCount = task.blockers.filter(bid => {
+                const b = State.data.tasks[bid];
+                return b && (State.data.columns[CONSTANTS.DONE_COLUMN_ID].taskIds.includes(bid) || (b.archived && b.completedDate));
+            }).length;
+            const allDone = doneCount === task.blockers.length;
+            const colorClass = allDone ? 'text-green-600 bg-green-50 border-green-100' : 'text-orange-600 bg-orange-50 border-orange-100';
+            metaHtml += `<div class="flex items-center gap-1 text-[10px] font-bold border px-1.5 py-0.5 rounded-md ${colorClass}" title="${Common.t('modal_label_blocker')}"><i data-lucide="link-2" class="w-3 h-3"></i>${doneCount}/${task.blockers.length}</div>`;
+        }
         if (isDone && task.completedDate) metaHtml += `<div class="flex items-center gap-1 text-[11px] font-bold text-green-600 bg-green-50 border border-green-100 px-2 py-0.5 rounded-md"><i data-lucide="check-circle-2" class="w-3 h-3"></i>${Common.t('task_completed')}: ${UI.formatTime(task.completedDate)}</div>`;
         else if (task.dueDate) { const overdue = new Date(task.dueDate) < new Date().setHours(0,0,0,0); const style = overdue ? 'text-red-600 bg-red-50 border-red-100' : 'text-slate-500 bg-slate-50 border-slate-100'; metaHtml += `<div class="flex items-center gap-1 text-xs font-medium border px-2 py-1 rounded-md w-fit ${style}"><i data-lucide="clock" class="w-3 h-3"></i>${task.dueDate}</div>`; } 
         if (task.description) metaHtml += `<i data-lucide="align-left" class="w-3 h-3 text-slate-400"></i>`;
@@ -228,7 +275,7 @@ const App = {
         e.preventDefault(); const input = document.getElementById('new-task-input'); const content = input.value.trim();
         if (content) {
             const id = `task-${Date.now()}`; const now = new Date().toISOString();
-            State.data.tasks[id] = { id, content, description: '', dueDate: '', parentId: null, labels: [], priority: 'none', createdAt: now, updatedAt: now, archived: false };
+            State.data.tasks[id] = { id, content, description: '', dueDate: '', parentId: null, labels: [], blockers: [], priority: 'none', createdAt: now, updatedAt: now, archived: false };
             State.data.columns['c1'].taskIds.unshift(id); State.lastAddedId = id; setTimeout(() => { State.lastAddedId = null; }, 3000);
             BoardData.save(); App.render(); input.value = '';
         }
@@ -255,7 +302,7 @@ const App = {
             const roots = visible.filter(t => !t.parentId || !visible.some(pt => pt.id === t.parentId));
             roots.forEach(root => {
                 if (processedIds.has(root.id)) return;
-                if (root.parentId) { const pTask = State.data.tasks[root.parentId]; const last = renderItems[renderItems.length - 1]; if (pTask && (!last || last.type !== 'virtual' || last.task.id !== pTask.id)) renderItems.push({ type: 'virtual', task: pTask }); }
+                if (root.parentId) { const pTask = State.data.tasks[root.parentId]; const last = renderItems[renderItems.length - 1]; if (pTask && (!last || last.type !== 'virtual' || last.task.id !== pTask.id)) renderItems.push({ type: 'virtual', task: pTask }); } 
                 renderItems.push({ type: 'real', task: root }); processedIds.add(root.id); visible.filter(c => c.parentId === root.id).forEach(child => { renderItems.push({ type: 'real', task: child }); processedIds.add(child.id); });
                 Object.values(State.data.tasks).filter(t => t.parentId === root.id && !t.archived).forEach(child => { if (!processedIds.has(child.id)) renderItems.push({ type: 'virtual_child', task: child }); });
             });
@@ -271,12 +318,34 @@ const App = {
         document.querySelectorAll('.task-list').forEach(list => {
             new Sortable(list, { group: 'tasks', animation: 200, ghostClass: 'ghost-card', forceFallback: true, fallbackOnBody: true, fallbackTolerance: 5, onEnd: (evt) => {
                 const { item, to, from } = evt; if (item.classList.contains('virtual-parent-card') || item.classList.contains('virtual-child-card')) return;
-                const taskId = item.dataset.taskId; const toCol = to.dataset.columnId; const fromCol = from.dataset.columnId; State.data.columns[fromCol].taskIds = State.data.columns[fromCol].taskIds.filter(id => id !== taskId);
+                const taskId = item.dataset.taskId; const toCol = to.dataset.columnId; const fromCol = from.dataset.columnId;
+                const task = State.data.tasks[taskId];
+
+                // Blocker Check
+                if (toCol === CONSTANTS.DONE_COLUMN_ID && task.blockers && task.blockers.length > 0) {
+                    const incompleteBlockers = task.blockers.filter(bid => {
+                        const b = State.data.tasks[bid];
+                        if (!b) return false;
+                        const isBDone = State.data.columns[CONSTANTS.DONE_COLUMN_ID].taskIds.includes(bid) || (b.archived && b.completedDate);
+                        return !isBDone;
+                    });
+                    if (incompleteBlockers.length > 0) {
+                        const names = incompleteBlockers.map(bid => `- ${State.data.tasks[bid].content}`).join('\n');
+                        const msg = Common.t('warn_blocker_incomplete').replace('{tasks}', names);
+                        if (!confirm(msg)) {
+                            // Revert DOM (Experimental)
+                            evt.from.insertBefore(item, evt.from.children[evt.oldIndex]);
+                            return; 
+                        }
+                    }
+                }
+
+                State.data.columns[fromCol].taskIds = State.data.columns[fromCol].taskIds.filter(id => id !== taskId);
                 const newTaskIds = []; Array.from(to.children).forEach(child => { if (!child.classList.contains('virtual-parent-card') && !child.classList.contains('virtual-child-card') && child.dataset.taskId) newTaskIds.push(child.dataset.taskId); });
-                State.data.columns[toCol].taskIds = newTaskIds; const task = State.data.tasks[taskId];
+                State.data.columns[toCol].taskIds = newTaskIds;
                 if (toCol === CONSTANTS.DONE_COLUMN_ID) { if (!task.completedDate) task.completedDate = new Date().toISOString(); } else task.completedDate = null;
                 task.updatedAt = new Date().toISOString(); BoardData.save(); App.render();
-            }});
+            }}); 
         });
     }
 };
