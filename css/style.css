@@ -5,6 +5,13 @@ body {
     background-size: 20px 20px;
 }
 
+/* Dark Mode Overrides */
+.dark body {
+    background-color: #0f172a;
+    background-image: radial-gradient(#1e293b 0.5px, transparent 0.5px);
+    color: #f1f5f9;
+}
+
 body.modal-open { overflow: hidden; }
 
 /* --- Task Card Enhancements (Compact) --- */
@@ -12,13 +19,24 @@ body.modal-open { overflow: hidden; }
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid rgba(226, 232, 240, 0.8);
     background: rgba(255, 255, 255, 0.95);
-    padding: 0.75rem !important; /* Reduced from default p-4 */
+    padding: 0.75rem !important;
+}
+
+.dark .task-card {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(51, 65, 85, 0.5);
+    color: #f1f5f9;
 }
 
 .task-card:hover {
     transform: translateY(-2px) scale(1.005);
     box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.08);
     border-color: rgba(37, 99, 235, 0.3);
+}
+
+.dark .task-card:hover {
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.3);
+    border-color: rgba(59, 130, 246, 0.5);
 }
 
 .task-card:active { transform: scale(0.99); }
@@ -30,16 +48,36 @@ body.modal-open { overflow: hidden; }
     backdrop-filter: blur(2px);
 }
 
+.dark .task-card.is-done {
+    background-color: rgba(15, 23, 42, 0.6);
+}
+
 .task-card.is-done .task-title {
     text-decoration: line-through;
     color: #94a3b8;
 }
 
 /* Animations */
+@keyframes task-pop-in {
+    0% { transform: scale(0.95) translateY(-10px); opacity: 0; border-color: #3b82f6; background-color: #eff6ff; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
 @keyframes highlight-fade {
     0% { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); background-color: #eff6ff; }
     100% { border-color: rgba(226, 232, 240, 0.8); box-shadow: none; background-color: rgba(255, 255, 255, 0.95); }
 }
+
+.dark @keyframes highlight-fade {
+    0% { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); background-color: #1e293b; }
+    100% { border-color: rgba(51, 65, 85, 0.5); box-shadow: none; background-color: rgba(30, 41, 59, 0.8); }
+}
+
+.task-card.is-new {
+    animation: task-pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+               highlight-fade 2s ease-out 0.5s forwards;
+}
+
 .task-card.is-flash { animation: highlight-fade 2s ease-out forwards; }
 
 /* Virtual Cards - More compact */
@@ -50,11 +88,20 @@ body.modal-open { overflow: hidden; }
     padding: 0.4rem 0.6rem !important;
 }
 
+.dark .virtual-parent-card, .dark .virtual-child-card {
+    border-color: #334155;
+    background: rgba(30, 41, 59, 0.4);
+}
+
 .virtual-parent-card:hover, .virtual-child-card:hover {
     opacity: 1;
     border-color: #3b82f6;
     background: rgba(239, 246, 255, 0.6);
     cursor: pointer;
+}
+
+.dark .virtual-parent-card:hover, .dark .virtual-child-card:hover {
+    background: rgba(30, 41, 59, 0.8);
 }
 
 .virtual-child-card {
@@ -83,7 +130,27 @@ body.modal-open { overflow: hidden; }
     background-color: #cbd5e1;
 }
 
+.dark .child-task::before, .dark .child-task::after {
+    background-color: #334155;
+}
+
+/* --- Settings Menu Dropdown --- */
+#settings-menu {
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(226, 232, 240, 0.5);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.dark #settings-menu {
+    background: rgba(15, 23, 42, 0.9);
+    border-color: rgba(51, 65, 85, 0.5);
+}
+
 /* --- Custom Scrollbar --- */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+.dark ::-webkit-scrollbar-thumb { background: #334155; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
