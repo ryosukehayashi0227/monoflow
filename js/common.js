@@ -144,7 +144,7 @@ const Common = {
             help_m3_h2: '複合フィルタ',
             help_m3_l2: 'ラベルと優先度を組み合わせます。',
             help_m3_extra: '注：フィルタ適用中はドラッグ＆ドロップによる並べ替えが一時的に無効化されます。',
-            help_m4_t: '4. 分析とデータ管理',
+            help_m4_t: '4. 進捗分析とデータ管理',
             help_m4_d: '客観的な数値でパフォーマンスを可視化します。',
             help_m4_h1: 'Metrics',
             help_m4_l1: '<strong>平均完了日数 (Lead Time):</strong> タスク作成から完了までにかかった時間の平均。',
@@ -327,10 +327,8 @@ const Common = {
             about_f3_t: 'Built-in Analytics',
             about_f3_d: 'Evaluate your performance objectively with integrated Metrics and Burndown charts.'
         }
-    }
-};
+    },
 
-const Common = {
     t: (key) => (Common.I18N[State.language] && Common.I18N[State.language][key]) || key,
     
     parseDate: (dateStr) => {
