@@ -133,6 +133,16 @@ const UI = {
         if (task.priority === 'high') pBorder = 'border-l-4 border-l-red-500 border-slate-200 dark:border-slate-700';
         else if (task.priority === 'medium') pBorder = 'border-l-4 border-l-orange-400 border-slate-200 dark:border-slate-700';
         else if (task.priority === 'low') pBorder = 'border-l-4 border-l-blue-400 border-slate-200 dark:border-slate-700';
+
+        // Stale detection
+        let staleIcon = '';
+        if (columnId === 'c1') {
+            const lastActive = Common.parseDate(task.updatedAt || task.createdAt);
+            if (lastActive && (new Date() - lastActive > 7 * 86400000)) {
+                staleIcon = `<div class="absolute -right-1 -top-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-400 border border-slate-200 dark:border-slate-700 shadow-sm animate-pulse z-10" title="${Common.t('stale_task')}"><i data-lucide="wind" class="w-3 h-3"></i></div>`;
+            }
+        }
+
         el.className = `task-card bg-white dark:bg-slate-900 border rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass} ${isDone ? 'is-done' : ''} ${isNewClass} ${pBorder}`;
         el.dataset.taskId = task.id;
         const pConfig = CONSTANTS.PRIORITIES.find(p => p.value === task.priority);
@@ -147,7 +157,7 @@ const UI = {
         if (task.description) metaHtml += `<i data-lucide="align-left" class="w-3 h-3 text-slate-400"></i>`;
         if (task.updatedAt) { metaHtml += `<div class="ml-auto flex flex-col items-end gap-0.5"><div class="text-[9px] text-slate-300 font-medium">${Common.t('task_created')}: ${UI.formatTime(task.createdAt)}</div>`; if (task.updatedAt !== task.createdAt) metaHtml += `<div class="flex items-center gap-1 text-[9px] text-blue-400 font-bold"><i data-lucide="refresh-cw" class="w-2 h-2"></i>${Common.t('task_updated')}: ${UI.formatTime(task.updatedAt)}</div>`; metaHtml += `</div>`; } 
         metaHtml += `</div>`;
-        el.innerHTML = `${pInd}${lHtml}<div class="flex justify-between items-start gap-2"><div class="flex-grow min-w-0"><span class="task-title text-[15px] font-medium text-slate-700 dark:text-slate-200 leading-relaxed block truncate">${task.content}</span>${task.description ? `<div class="text-[11px] text-slate-400 dark:text-slate-500 line-clamp-2 mt-1 leading-relaxed break-words">${task.description}</div>` : ''}</div><div class="flex flex-col gap-1 items-end">${pIcon}<button onclick="event.stopPropagation(); BoardData.deleteTask('${task.id}', '${columnId}')" class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div>${metaHtml}${subCounter}`;
+        el.innerHTML = `${staleIcon}${pInd}${lHtml}<div class="flex justify-between items-start gap-2"><div class="flex-grow min-w-0"><span class="task-title text-[15px] font-medium text-slate-700 dark:text-slate-200 leading-relaxed block truncate">${task.content}</span>${task.description ? `<div class="text-[11px] text-slate-400 dark:text-slate-500 line-clamp-2 mt-1 leading-relaxed break-words">${task.description}</div>` : ''}</div><div class="flex flex-col gap-1 items-end">${pIcon}<button onclick="event.stopPropagation(); BoardData.deleteTask('${task.id}', '${columnId}')" class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div>${metaHtml}${subCounter}`;
         el.addEventListener('click', () => Modal.open(task.id)); return el;
     },
     createVirtualParent: (parentTask) => {
