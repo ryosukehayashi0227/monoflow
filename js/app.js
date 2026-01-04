@@ -425,7 +425,13 @@ const UI = {
             if (task.updatedAt !== task.createdAt) metaHtml += `<div class="flex items-center gap-1 text-[9px] text-blue-400 font-bold"><i data-lucide="refresh-cw" class="w-2 h-2"></i>${App.t('task_updated')}: ${UI.formatTime(task.updatedAt)}</div>`;
             metaHtml += `</div>`; } 
         metaHtml += `</div>`;
-        el.innerHTML = `${pInd}${lHtml}<div class="flex justify-between items-start gap-2"><span class="task-title text-[15px] font-medium text-slate-700 dark:text-slate-200 leading-relaxed flex-grow">${task.content}</span><div class="flex flex-col gap-1 items-end">${pIcon}<button onclick="event.stopPropagation(); DataService.deleteTask('${task.id}', '${columnId}')" class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div>${metaHtml}${subtaskMetaHtml}`;
+        // Description Preview
+        let descPreviewHtml = '';
+        if (task.description) {
+            descPreviewHtml = `<div class="text-[11px] text-slate-400 dark:text-slate-500 line-clamp-2 mt-1 leading-relaxed break-words">${task.description}</div>`;
+        }
+
+        el.innerHTML = `${pInd}${lHtml}<div class="flex justify-between items-start gap-2"><div class="flex-grow min-w-0"><span class="task-title text-[15px] font-medium text-slate-700 dark:text-slate-200 leading-relaxed block truncate">${task.content}</span>${descPreviewHtml}</div><div class="flex flex-col gap-1 items-end">${pIcon}<button onclick="event.stopPropagation(); DataService.deleteTask('${task.id}', '${columnId}')" class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div>${metaHtml}${subtaskMetaHtml}`;
         el.addEventListener('click', () => Modal.open(task.id)); return el;
     },
     createVirtualParent: (parentTask) => {
