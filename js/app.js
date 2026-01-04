@@ -348,10 +348,9 @@ const UI = {
         el.addEventListener('click', () => Modal.open(task.id)); return el;
     },
     createVirtualParent: (parentTask) => {
-        const el = document.createElement('div'); let laneName = '???';
-        for(const cid in State.data.columns) if(State.data.columns[cid].taskIds.includes(parentTask.id)) { const colKey = cid === 'c1' ? 'col_todo' : (cid === 'c2' ? 'col_progress' : 'col_done'); laneName = App.t(colKey); break; }
-        el.className = 'task-card virtual-parent-card rounded-xl p-3 flex flex-col gap-1 cursor-pointer hover:border-blue-400 hover:opacity-100 transition-all';
-        el.innerHTML = `<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1"><i data-lucide="link" class="w-3 h-3"></i> ${State.language === 'ja' ? '実体は' : 'In'}「${laneName}」</div><span class="text-sm font-semibold text-slate-400 truncate">${parentTask.content}</span>`;
+        const el = document.createElement('div');
+        el.className = 'task-card virtual-parent-card rounded-lg flex items-center transition-all';
+        el.innerHTML = `<span class="text-[11px] font-bold text-slate-400 truncate tracking-tight">${parentTask.content}</span>`;
         el.addEventListener('click', () => App.jumpToTask(parentTask.id));
         return el;
     },
@@ -442,8 +441,14 @@ const App = {
 
         State.data.columnOrder.forEach(colId => {
             const col = State.data.columns[colId]; const colTitle = colId === 'c1' ? App.t('col_todo') : (colId === 'c2' ? App.t('col_progress') : App.t('col_done'));
-            const colEl = document.createElement('div'); colEl.className = 'bg-slate-200/40 backdrop-blur-md rounded-[2rem] p-6 flex flex-col border border-white/20 shadow-inner h-full min-h-[500px]';
-            colEl.innerHTML = `<div class="flex justify-between items-center mb-6 px-2"><h2 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">${colTitle}</h2><span class="bg-white/80 text-slate-500 text-[10px] font-black px-3 py-1 rounded-full shadow-sm border border-slate-100">${col.taskIds.length}</span></div>`;
+            const colEl = document.createElement('div'); 
+            colEl.className = 'bg-slate-200/40 backdrop-blur-sm rounded-[1.25rem] p-4 flex flex-col border border-white/20 shadow-inner h-full min-h-[500px]';
+            colEl.innerHTML = `
+                <div class="flex justify-between items-center mb-4 px-1">
+                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">${colTitle}</h2>
+                    <span class="bg-white/60 text-slate-500 text-[9px] font-black px-2 py-0.5 rounded-full border border-slate-100">${col.taskIds.length}</span>
+                </div>
+            `;
             const listEl = document.createElement('div'); listEl.className = 'task-list space-y-3 pb-20 flex-grow min-h-[200px]'; listEl.dataset.columnId = colId;
             const tasks = col.taskIds.map(id => State.data.tasks[id]).filter(Boolean);
             const visible = tasks.filter(t => {
