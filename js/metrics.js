@@ -1,5 +1,5 @@
 /**
- * MonoFlow Metrics Logic - High Accuracy Update
+ * MonoFlow Metrics Logic - Accurate Count Fix
  */
 
 const STORAGE_KEY = 'monoflow-v10-refactored';
@@ -20,10 +20,8 @@ function loadData() {
     return saved ? JSON.parse(saved) : null;
 }
 
-// Robust date parser for all browsers and formats
 function parseDate(dateStr) {
     if (!dateStr) return null;
-    // Replace - with / for Safari compatibility if no T (ISO) is present
     const normalized = dateStr.includes('T') ? dateStr : dateStr.replace(/-/g, '/');
     const d = new Date(normalized);
     return isNaN(d.getTime()) ? null : d;
@@ -46,9 +44,7 @@ function renderLabelList(data) {
     const container = document.getElementById('metrics-label-chips');
     const countDisplay = document.getElementById('selected-label-count');
     if (!data || !data.labels || !container) return;
-
     countDisplay.textContent = selectedLabels.size > 0 ? `${selectedLabels.size}` : Common.t('filter_all');
-
     container.innerHTML = '';
     data.labels.forEach(l => {
         const isActive = selectedLabels.has(l.id);
@@ -103,8 +99,7 @@ function initMetrics() {
     let endDateVal = document.getElementById('end-date').value;
 
     if (!startDateVal) {
-        const d = new Date();
-        d.setDate(d.getDate() - 14);
+        const d = new Date(); d.setDate(d.getDate() - 14);
         startDateVal = d.toISOString().split('T')[0];
         document.getElementById('start-date').value = startDateVal;
     }
@@ -117,13 +112,15 @@ function initMetrics() {
     const endTs = new Date(endDateVal).setHours(23,59,59,999);
 
     const allTasks = Object.values(data.tasks);
+    
+    // 1. Filter Tasks for the period
     const filteredTasks = allTasks.filter(t => {
         if (selectedLabels.size > 0 && (!t.labels || !t.labels.some(lid => selectedLabels.has(lid)))) return false;
         const created = parseDate(t.createdAt);
         const completed = parseDate(t.completedDate);
         if (!created) return false;
         
-        // Task was relevant if it was created before period end AND (was never completed OR completed after period start)
+        // Task is relevant if it was active during this period
         return created.getTime() <= endTs && (!completed || completed.getTime() >= startTs);
     });
 
@@ -136,21 +133,22 @@ function initMetrics() {
         priorityCounts[t.priority || 'none']++;
 
         const completed = parseDate(t.completedDate);
-        // Determine status based on columns OR completed flag
-        let currentStatus = 'todo';
-        if (completed) currentStatus = 'done';
-        else {
-            for (const colId in data.columns) {
-                if (data.columns[colId].taskIds.includes(t.id)) {
-                    if (colId === 'c2') currentStatus = 'progress';
-                    if (colId === 'c3') currentStatus = 'done';
-                    break;
-                }
+        let status = 'todo';
+        
+        // Accurate Status Check (Done column OR archive with completedDate)
+        let isInDoneColumn = false;
+        for (const cid in data.columns) {
+            if (data.columns[cid].taskIds.includes(t.id)) {
+                if (cid === 'c2') status = 'progress';
+                if (cid === 'c3') { status = 'done'; isInDoneColumn = true; }
+                break;
             }
         }
-        statusCounts[currentStatus]++;
+        // If task is archived but has completedDate, it counts as 'done'
+        if (t.archived && completed) status = 'done';
+        statusCounts[status]++;
 
-        // Lead time for tasks COMPLETED in this specific window
+        // Total Done IN THIS PERIOD (This is what the card shows)
         if (completed && completed.getTime() >= startTs && completed.getTime() <= endTs) {
             doneInPeriod++;
             const created = parseDate(t.createdAt);
@@ -185,14 +183,7 @@ function renderStatusChart(counts) {
                 hoverOffset: 10
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '70%',
-            plugins: {
-                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { weight: 'bold', family: 'Inter' }, color: State.theme === 'dark' ? '#cbd5e1' : '#64748b' } }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { weight: 'bold', family: 'Inter' }, color: State.theme === 'dark' ? '#cbd5e1' : '#64748b' } } } }
     });
 }
 
@@ -203,26 +194,8 @@ function renderPriorityChart(counts) {
     const values = CONSTANTS.PRIORITIES.map(p => counts[p.value] || 0);
     priorityChart = new Chart(ctx, {
         type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: Common.t('metrics_total'),
-                data: values,
-                backgroundColor: ['#FEE2E2', '#FFEDD5', '#DBEAFE', '#F1F5F9'],
-                borderColor: ['#EF4444', '#F97316', '#3B82F6', '#94A3B8'],
-                borderWidth: 2,
-                borderRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: { beginAtZero: true, grid: { display: false }, ticks: { stepSize: 1, color: State.theme === 'dark' ? '#94a3b8' : '#64748b' } },
-                x: { grid: { display: false }, ticks: { color: State.theme === 'dark' ? '#94a3b8' : '#64748b' } }
-            },
-            plugins: { legend: { display: false } }
-        }
+        data: { labels: labels, datasets: [{ label: Common.t('metrics_total'), data: values, backgroundColor: ['#FEE2E2', '#FFEDD5', '#DBEAFE', '#F1F5F9'], borderColor: ['#EF4444', '#F97316', '#3B82F6', '#94A3B8'], borderWidth: 2, borderRadius: 8 }] },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { display: false }, ticks: { stepSize: 1, color: State.theme === 'dark' ? '#94a3b8' : '#64748b' } }, x: { grid: { display: false }, ticks: { color: State.theme === 'dark' ? '#94a3b8' : '#64748b' } } }, plugins: { legend: { display: false } } }
     });
 }
 

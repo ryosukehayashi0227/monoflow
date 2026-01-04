@@ -1,5 +1,5 @@
 /**
- * MonoFlow - Common Shared Logic (i18n, Theme, Data)
+ * MonoFlow - Common Shared Logic (i18n, Theme, Data Management)
  */
 
 const CONSTANTS = {
@@ -23,7 +23,7 @@ const CONSTANTS = {
     I18N: {
         ja: {
             app_desc: 'Simple Personal Kanban',
-            back_to_app: 'アプリに戻る',
+            back_to_app: 'ボードに戻る',
             filter_label: 'ラベル',
             filter_all: 'すべてのラベル',
             filter_priority_all: 'すべての優先度',
@@ -68,7 +68,7 @@ const CONSTANTS = {
             import_fail: 'インポートに失敗しました。',
             welcome_title: 'Welcome to MonoFlow',
             welcome_desc: 'これはサンプルタスクです。',
-            // Page Titles
+            // Metrics Page
             metrics_title: 'MonoFlow',
             metrics_subtitle: '分析と進捗',
             metrics_period: '期間',
@@ -163,7 +163,7 @@ const CONSTANTS = {
         },
         en: {
             app_desc: 'Simple Personal Kanban',
-            back_to_app: 'Back to App',
+            back_to_app: 'Back to Board',
             filter_label: 'Label',
             filter_all: 'All Labels',
             filter_priority_all: 'All Priorities',
@@ -324,11 +324,9 @@ const Common = {
         State.theme = localStorage.getItem(CONSTANTS.THEME_KEY) || 'light';
         Common.applyTheme();
         
-        // Use capture phase for global click to close menus properly on iOS
         document.addEventListener('click', (e) => {
             const menu = document.getElementById('settings-menu');
             if (menu && !menu.classList.contains('hidden')) {
-                // If click is outside menu and button, close it
                 if (!e.target.closest('#settings-menu') && !e.target.closest('[onclick*="toggleMenu"]')) {
                     menu.classList.add('hidden');
                 }
@@ -352,10 +350,7 @@ const Common = {
     },
 
     toggleMenu: (e) => {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
+        if (e) { e.preventDefault(); e.stopPropagation(); }
         const menu = document.getElementById('settings-menu');
         if (menu) menu.classList.toggle('hidden');
     },
@@ -367,28 +362,62 @@ const Common = {
     }
 };
 
-// Global Keyboard Shortcuts (Navigation)
+const DataService = {
+    export: () => {
+        const fullState = {
+            data: JSON.parse(localStorage.getItem(CONSTANTS.STORAGE_KEY)),
+            lang: localStorage.getItem(CONSTANTS.LANG_KEY),
+            theme: localStorage.getItem(CONSTANTS.THEME_KEY),
+            version: 'v10-unified'
+        };
+        const a = document.createElement('a');
+        const date = new Date().toISOString().split('T')[0];
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(fullState, null, 2)], { type: "application/json" }));
+        a.download = `monoflow-backup-${date}.json`; a.click();
+    },
+
+    import: (input) => {
+        const file = input.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const imported = JSON.parse(e.target.result);
+                // Handle both unified backup and old data-only backup
+                const data = imported.data || (imported.tasks ? imported : null);
+                if (data) {
+                    localStorage.setItem(CONSTANTS.STORAGE_KEY, JSON.stringify(data));
+                    if (imported.lang) localStorage.setItem(CONSTANTS.LANG_KEY, imported.lang);
+                    if (imported.theme) localStorage.setItem(CONSTANTS.THEME_KEY, imported.theme);
+                    alert(Common.t('import_done'));
+                    location.reload();
+                } else { throw new Error(); }
+            } catch(err) { alert(Common.t('import_fail')); }
+            input.value = '';
+        };
+        reader.readAsText(file);
+    },
+
+    resetAll: () => {
+        if (!confirm(Common.t('confirm_reset_1'))) return;
+        if (!confirm(Common.t('confirm_reset_2'))) return;
+        localStorage.removeItem(CONSTANTS.STORAGE_KEY);
+        location.reload();
+    }
+};
+
+// Global Keyboard Shortcuts
 document.addEventListener('keydown', (e) => {
-    // Avoid shortcuts when typing in inputs
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
         if (e.key === 'Escape') e.target.blur();
         return;
     }
-
-    // Navigation with Alt (Windows) or Option (Mac)
-    // Using e.code to bypass character mapping issues on Mac (e.g., Option+M = µ)
     if (e.altKey) {
         if (e.code === 'KeyM') { e.preventDefault(); window.location.href = 'metrics.html'; }
         if (e.code === 'KeyB') { e.preventDefault(); window.location.href = 'burndown.html'; }
         if (e.code === 'KeyA') { e.preventDefault(); window.location.href = 'about.html'; }
         if (e.code === 'KeyL') { e.preventDefault(); window.location.href = 'index.html'; }
     }
-
-    // Global Help
-    if (e.key === '?') {
-        window.location.href = 'help.html';
-    }
+    if (e.key === '?') { window.location.href = 'help.html'; }
 });
 
-// Auto-init common logic
 Common.init();
