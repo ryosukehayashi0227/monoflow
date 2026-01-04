@@ -190,3 +190,28 @@ body.modal-open { overflow: hidden; }
     color: #60a5fa;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
 }
+
+/* --- SortableJS Drag & Drop Enhancements --- */
+.ghost-card {
+    opacity: 0.2 !important;
+    background: #cbd5e1 !important;
+    border: 2px dashed #94a3b8 !important;
+}
+
+/* Prevent layout shift/jumping during drag */
+.sortable-fallback {
+    opacity: 1 !important;
+    transform: rotate(2deg) scale(1.02) !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15) !important;
+    cursor: grabbing !important;
+    pointer-events: none;
+}
+
+/* Disable card transitions while dragging to prevent afterimages */
+.task-card.sortable-chosen {
+    transition: none !important;
+    background-color: #f8fafc !important;
+}
+.dark .task-card.sortable-chosen {
+    background-color: #1e293b !important;
+}

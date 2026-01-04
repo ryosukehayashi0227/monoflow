@@ -112,7 +112,7 @@ const CONSTANTS = {
             help_m2_h1: '仮想親チケット (Virtual Parent)',
             help_m2_l1: '子タスクが親と別のレーンにあるとき、子の上に親の「残像」が表示されます。',
             help_m2_h2: '仮想子チケット (Virtual Child)',
-            help_m2_l2: '親タスクの下には、他レーンに散らばった子タスクの状況が一覧表示されます。',
+            help_m2_l2: '親タスクの下には、他レーンに散ばった子タスクの状況が一覧表示されます。',
             help_m2_h3: 'ジャンプ機能',
             help_m2_l3: '仮想チケットをクリックすると、実体のある場所まで自動スクロールし、フラッシュして知らせます。',
             help_m2_extra: '親タスクにはサブタスクの消化状況が表示されます。完了数に応じてプログレスバーも伸びていきます。',
@@ -318,11 +318,16 @@ const Common = {
         State.theme = localStorage.getItem(CONSTANTS.THEME_KEY) || 'light';
         Common.applyTheme();
         
-        // Global Click to close menu
-        document.addEventListener('click', () => {
+        // Use capture phase for global click to close menus properly on iOS
+        document.addEventListener('click', (e) => {
             const menu = document.getElementById('settings-menu');
-            if (menu) menu.classList.add('hidden');
-        });
+            if (menu && !menu.classList.contains('hidden')) {
+                // If click is outside menu and button, close it
+                if (!e.target.closest('#settings-menu') && !e.target.closest('[onclick*="toggleMenu"]')) {
+                    menu.classList.add('hidden');
+                }
+            }
+        }, true);
     },
 
     applyTheme: () => {
@@ -341,7 +346,10 @@ const Common = {
     },
 
     toggleMenu: (e) => {
-        e.stopPropagation();
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
         const menu = document.getElementById('settings-menu');
         if (menu) menu.classList.toggle('hidden');
     },

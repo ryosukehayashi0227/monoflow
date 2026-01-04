@@ -160,7 +160,6 @@ const Modal = {
         const saveBtn = document.getElementById('modal-save-btn');
         if (saveBtn) saveBtn.textContent = Common.t('modal_btn_save');
         
-        // Archive button
         let archiveBtn = document.getElementById('modal-archive-btn');
         if (!archiveBtn) {
             archiveBtn = document.createElement('button'); archiveBtn.id = 'modal-archive-btn';
@@ -232,13 +231,11 @@ const UI = {
         const isDone = columnId === CONSTANTS.DONE_COLUMN_ID; const el = document.createElement('div');
         const hasParent = !!task.parentId && !!State.data.tasks[task.parentId]; const indentClass = hasParent ? 'child-task scale-95 origin-left' : '';
         const isNewClass = task.id === State.lastAddedId ? 'is-new' : '';
-        // Priority Based Accents
         let pBorder = 'border-slate-200 dark:border-slate-700';
         if (task.priority === 'high') pBorder = 'border-l-4 border-l-red-500 border-slate-200 dark:border-slate-700';
         else if (task.priority === 'medium') pBorder = 'border-l-4 border-l-orange-400 border-slate-200 dark:border-slate-700';
         else if (task.priority === 'low') pBorder = 'border-l-4 border-l-blue-400 border-slate-200 dark:border-slate-700';
-
-        el.className = `task-card bg-white border rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass} ${isDone ? 'is-done' : ''} ${isNewClass} ${pBorder}`;
+        el.className = `task-card bg-white dark:bg-slate-900 border rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass} ${isDone ? 'is-done' : ''} ${isNewClass} ${pBorder}`;
         el.dataset.taskId = task.id;
         const pConfig = CONSTANTS.PRIORITIES.find(p => p.value === task.priority);
         const pIcon = (pConfig && pConfig.value !== 'none') ? `<div class="flex items-center justify-center w-6 h-6 rounded-md border ${pConfig.style.replace('text-sm font-bold', '')}"><i data-lucide="${pConfig.icon}" class="w-4 h-4"></i></div>` : '';
@@ -307,50 +304,28 @@ const App = {
         document.getElementById('priority-filter').addEventListener('change', (e) => { State.priorityFilter = e.target.value; App.render(); });
         document.getElementById('search-input').addEventListener('input', (e) => { State.searchQuery = e.target.value.toLowerCase().trim(); App.render(); });
         document.getElementById('task-modal').addEventListener('click', (e) => { if (e.target.id === 'task-modal') Modal.close(); });
-        const menu = document.getElementById('settings-menu');
-                window.toggleMenu = (e) => { e.stopPropagation(); menu.classList.toggle('hidden'); };
-                document.addEventListener('click', () => menu.classList.add('hidden'));
         
-                // Keyboard Shortcuts
-                document.addEventListener('keydown', (e) => {
-                    // Don't trigger if user is typing in an input or textarea
-                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                        if (e.key === 'Escape') {
-                            e.target.blur();
-                            Modal.close();
-                            Archive.close();
-                        }
-                        return;
-                    }
-        
-                    switch (e.key) {
-                        case 'n':
-                            e.preventDefault();
-                            document.getElementById('new-task-input').focus();
-                            break;
-                        case '/':
-                            e.preventDefault();
-                            document.getElementById('search-input').focus();
-                            break;
-                        case 'Escape':
-                            Modal.close();
-                            Archive.close();
-                            break;
-                        case '?':
-                            window.location.href = 'help.html';
-                            break;
-                    }
-        
-                    // Navigation with Alt key
-                    if (e.altKey) {
-                        if (e.key === 'm') window.location.href = 'metrics.html';
-                        if (e.key === 'b') window.location.href = 'burndown.html';
-                        if (e.key === 'a') window.location.href = 'about.html';
-                    }
-                });
-        
-                App.render();
-            },
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                if (e.key === 'Escape') { e.target.blur(); Modal.close(); Archive.close(); }
+                return;
+            }
+            switch (e.key) {
+                case 'n': e.preventDefault(); document.getElementById('new-task-input').focus(); break;
+                case '/': e.preventDefault(); document.getElementById('search-input').focus(); break;
+                case 'Escape': Modal.close(); Archive.close(); break;
+                case '?': window.location.href = 'help.html'; break;
+            }
+            if (e.altKey) {
+                if (e.key === 'm') window.location.href = 'metrics.html';
+                if (e.key === 'b') window.location.href = 'burndown.html';
+                if (e.key === 'a') window.location.href = 'about.html';
+            }
+        });
+
+        App.render();
+    },
     handleAddTask: (e) => {
         e.preventDefault(); const input = document.getElementById('new-task-input'); const content = input.value.trim();
         if (content) {
@@ -363,23 +338,34 @@ const App = {
     render: () => {
         const board = document.getElementById('board'); board.innerHTML = '';
         const appDesc = document.querySelector('header p.text-slate-400'); if (appDesc) appDesc.textContent = Common.t('app_desc');
-        const taskInput = document.getElementById('new-task-input');
-        if (taskInput) taskInput.placeholder = Common.t('add_placeholder');
-        
-        const aboutLink = document.getElementById('about-link');
-        if (aboutLink) aboutLink.textContent = Common.t('about_link');
-        
-        const addBtnSpan = document.querySelector('#add-task-form span');
-        if (addBtnSpan) addBtnSpan.textContent = Common.t('add_btn');
+        const taskInput = document.getElementById('new-task-input'); if (taskInput) taskInput.placeholder = Common.t('add_placeholder');
+        const searchInput = document.getElementById('search-input'); if (searchInput) searchInput.placeholder = Common.t('search_placeholder');
+        const addBtnSpan = document.getElementById('add-btn-text'); if (addBtnSpan) addBtnSpan.textContent = Common.t('add_btn');
+        const aboutLink = document.getElementById('about-link'); if (aboutLink) aboutLink.textContent = Common.t('about_link');
         const helpLink = document.querySelector('a[href="help.html"]'); if(helpLink) helpLink.title = Common.t('menu_help');
         App.updateFilterDropdown(); App.updatePriorityFilterDropdown();
         
-        const m = document.getElementById('settings-menu');
-        document.getElementById('menu-export').innerHTML = `<i data-lucide="download" class="w-4 h-4 text-slate-400"></i> ${Common.t('menu_export')}`;
-        document.getElementById('menu-import').innerHTML = `<i data-lucide="upload" class="w-4 h-4 text-slate-400"></i> ${Common.t('menu_import')}`;
-        document.getElementById('menu-archive').innerHTML = `<i data-lucide="archive" class="w-4 h-4 text-slate-400"></i> ${Common.t('menu_archive')}`;
-        document.getElementById('menu-reset').innerHTML = `<i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i> ${Common.t('menu_reset')}`;
-        let lBtn = document.getElementById('lang-switch-btn');
+        // Mobile Menu Items
+        const mItems = {
+            'menu-board-text': Common.t('menu_board'),
+            'menu-metrics-text': Common.t('menu_metrics'),
+            'menu-burndown-text': Common.t('menu_burndown'),
+            'menu-about-text': Common.t('menu_about'),
+            'menu-export': Common.t('menu_export'),
+            'menu-import': Common.t('menu_import'),
+            'menu-archive': Common.t('menu_archive'),
+            'menu-reset': Common.t('menu_reset')
+        };
+        for (const id in mItems) {
+            const el = document.getElementById(id);
+            if (el) {
+                if (el.tagName === 'SPAN') el.textContent = mItems[id];
+                else {
+                    const icon = el.querySelector('i');
+                    el.innerHTML = `${icon ? icon.outerHTML : ''} ${mItems[id]}`;
+                }
+            }
+        }
 
         State.data.columnOrder.forEach(colId => {
             const col = State.data.columns[colId]; const colTitle = colId === 'c1' ? Common.t('col_todo') : (colId === 'c2' ? Common.t('col_progress') : Common.t('col_done'));
@@ -421,7 +407,14 @@ const App = {
     initDragAndDrop: () => {
         if (State.filter !== 'all' || State.priorityFilter !== 'all' || State.searchQuery) return;
         document.querySelectorAll('.task-list').forEach(list => {
-            new Sortable(list, { group: 'tasks', animation: 250, ghostClass: 'ghost-card', onEnd: (evt) => {
+            new Sortable(list, { 
+                group: 'tasks', 
+                animation: 200, 
+                ghostClass: 'ghost-card',
+                forceFallback: true,      // Essential for consistent touch behavior
+                fallbackOnBody: true,     // Fixes position issues in containers
+                fallbackTolerance: 5,     // Improves scroll vs drag detection
+                onEnd: (evt) => {
                 const { item, to, from } = evt; if (item.classList.contains('virtual-parent-card') || item.classList.contains('virtual-child-card')) return;
                 const taskId = item.dataset.taskId; const toCol = to.dataset.columnId; const fromCol = from.dataset.columnId;
                 State.data.columns[fromCol].taskIds = State.data.columns[fromCol].taskIds.filter(id => id !== taskId);
