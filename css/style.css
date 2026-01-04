@@ -29,6 +29,10 @@ body.modal-open { overflow: hidden; }
                highlight-fade 2s ease-out 0.5s forwards;
 }
 
+.task-card.is-flash {
+    animation: highlight-fade 2s ease-out forwards;
+}
+
 .task-card:hover {
     transform: translateY(-4px) scale(1.01);
     box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.1);
@@ -53,13 +57,26 @@ body.modal-open { overflow: hidden; }
     color: #94a3b8;
 }
 
-/* Virtual Parent (Ghost) - Enhanced style */
-.virtual-parent-card {
+/* Virtual Parent & Child (Ghost) - Enhanced style */
+.virtual-parent-card, .virtual-child-card {
     border: 2px dashed #cbd5e1;
     background: rgba(241, 245, 249, 0.4);
     opacity: 0.5;
-    cursor: default !important;
-    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.virtual-parent-card:hover, .virtual-child-card:hover {
+    opacity: 1;
+    border-color: #3b82f6;
+    background: rgba(239, 246, 255, 0.8);
+    cursor: pointer;
+}
+
+.virtual-child-card {
+    margin-left: 1.5rem;
+    width: calc(100% - 1.5rem);
+    margin-top: 0.25rem;
+    padding: 0.5rem 0.75rem;
 }
 
 /* --- Layout Elements --- */

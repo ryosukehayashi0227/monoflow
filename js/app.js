@@ -106,6 +106,7 @@ const CONSTANTS = {
 const State = {
     data: null,
     filter: 'all',
+    priorityFilter: 'all',
     language: 'ja',
     tempLabels: [],
     lastAddedId: null // Track new task for animation
@@ -126,7 +127,7 @@ const DataService = {
                 columns: { 'c1': { id: 'c1', title: 'To Do', taskIds: ['t1'] }, 'c2': { id: 'c2', title: 'In Progress', taskIds: [] }, 'c3': { id: 'c3', title: 'Done', taskIds: [] } },
                 columnOrder: ['c1', 'c2', 'c3'],
                 labels: [{ id: 'l1', name: 'Priority', color: 'red' }, { id: 'l2', name: 'Work', color: 'blue' }]
-            };
+            }
         }
         DataService.ensureIntegrity();
     },
@@ -167,7 +168,8 @@ const DataService = {
         reader.onload = (e) => {
             try {
                 State.data = JSON.parse(e.target.result);
-                DataService.save(); App.render(); alert(App.t('import_done'));
+                DataService.ensureIntegrity();
+                App.render(); alert(App.t('import_done'));
             } catch(err) { alert(App.t('import_fail')); }
             input.value = '';
         };
@@ -180,7 +182,7 @@ const LabelManager = {
     create: () => {
         const nameInput = document.getElementById('new-label-name');
         const name = nameInput.value.trim(); if(!name) return;
-        const colorRadio = document.querySelector('input[name="label-color":checked');
+        const colorRadio = document.querySelector('input[name="label-color"]:checked');
         const color = colorRadio ? colorRadio.value : 'blue';
         State.data.labels.push({ id: `l-${Date.now()}`, name, color });
         DataService.save(); nameInput.value = ''; Modal.renderLabels();
@@ -215,7 +217,6 @@ const Modal = {
     renderStaticUI: () => {
         document.querySelector('#task-modal h3').textContent = App.t('modal_title');
         
-        // Target labels by their following input/select/textarea for precision
         const titleLabel = document.querySelector('input#edit-task-content').previousElementSibling;
         if (titleLabel) titleLabel.textContent = App.t('modal_label_title');
 
@@ -254,7 +255,10 @@ const Modal = {
         Modal.elements.id.value = taskId; Modal.elements.title.value = task.content; Modal.elements.desc.value = task.description || ''; Modal.elements.date.value = task.dueDate || '';
         document.getElementById('display-created-at').textContent = `${App.t('task_created')}: ${task.createdAt ? UI.formatTime(task.createdAt) : '---'}`;
         document.getElementById('display-updated-at').textContent = `${App.t('task_updated')}: ${task.updatedAt ? UI.formatTime(task.updatedAt) : '---'}`;
-        const pRadio = Modal.elements.overlay.querySelector(`input[name="priority"][value="${task.priority || 'none'}"]`); if(pRadio) pRadio.checked = true;
+        
+        const pRadio = Modal.elements.overlay.querySelector(`input[name="priority"][value="${task.priority || 'none'}"]`);
+        if(pRadio) pRadio.checked = true;
+
         Modal.elements.parent.innerHTML = `<option value="">${App.t('modal_label_none')}</option>`;
         Object.values(State.data.tasks).forEach(t => { if (t.id !== taskId && !t.parentId) { const opt = document.createElement('option'); opt.value = t.id; opt.textContent = t.content.substring(0, 30); Modal.elements.parent.appendChild(opt); } });
         Modal.elements.parent.value = task.parentId || '';
@@ -273,7 +277,7 @@ const Modal = {
         if (content && State.data.tasks[id]) {
             const t = State.data.tasks[id]; t.content = content; t.description = Modal.elements.desc.value; t.dueDate = Modal.elements.date.value;
             t.labels = State.tempLabels; 
-            const pRadio = Modal.elements.overlay.querySelector('input[name="priority":checked');
+            const pRadio = Modal.elements.overlay.querySelector('input[name="priority"]:checked');
             t.priority = pRadio ? pRadio.value : 'none'; 
             t.parentId = Modal.elements.parent.value || null;
             t.updatedAt = new Date().toISOString();
@@ -306,7 +310,12 @@ const UI = {
         const hasParent = !!task.parentId && !!State.data.tasks[task.parentId]; const indentClass = hasParent ? 'child-task scale-95 origin-left' : '';
         const isNewClass = task.id === State.lastAddedId ? 'is-new' : '';
         
-        el.className = `task-card bg-white border border-slate-200 rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass} ${isDone ? 'is-done' : ''} ${isNewClass}`;
+        let priorityBorderClass = 'border-slate-200';
+        if (task.priority === 'high') priorityBorderClass = 'border-l-4 border-l-red-500 border-slate-200';
+        else if (task.priority === 'medium') priorityBorderClass = 'border-l-4 border-l-orange-400 border-slate-200';
+        else if (task.priority === 'low') priorityBorderClass = 'border-l-4 border-l-blue-400 border-slate-200';
+
+        el.className = `task-card bg-white border rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass} ${isDone ? 'is-done' : ''} ${isNewClass} ${priorityBorderClass}`;
         el.dataset.taskId = task.id;
         const pConfig = CONSTANTS.PRIORITIES.find(p => p.value === task.priority);
         const priorityHtml = (pConfig && pConfig.value !== 'none') ? `<div class="flex items-center justify-center w-6 h-6 rounded-md border ${pConfig.style.replace('text-sm font-bold', '')}"><i data-lucide="${pConfig.icon}" class="w-4 h-4"></i></div>` : '';
@@ -315,22 +324,43 @@ const UI = {
         }).join('') + `</div>` : '';
         let parentIndicator = '';
         if (task.parentId) { const p = State.data.tasks[task.parentId]; if (p) parentIndicator = `<div class="text-[10px] text-blue-500 font-semibold mb-1 flex items-center gap-1"><i data-lucide="corner-down-right" class="w-3 h-3"></i>${p.content.substring(0,15)}...</div>`; } 
+        
+        // Subtask Progress Counter
+        let subtaskCounterHtml = '';
+        const children = Object.values(State.data.tasks).filter(t => t.parentId === task.id);
+        if (children.length > 0) {
+            const doneCount = children.filter(c => { for(const cid in State.data.columns) { if(State.data.columns[cid].taskIds.includes(c.id) && cid === CONSTANTS.DONE_COLUMN_ID) return true; } return false; }).length;
+            subtaskCounterHtml = `<div class="flex items-center gap-1 text-[9px] font-black bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md border border-slate-200"><i data-lucide="git-merge" class="w-2.5 h-2.5"></i>${doneCount}/${children.length}</div>`;
+        }
+
         let metaHtml = `<div class="flex items-center gap-3 mt-3">`;
         if (isDone && task.completedDate) metaHtml += `<div class="flex items-center gap-1 text-[11px] font-bold text-green-600 bg-green-50 border border-green-100 px-2 py-0.5 rounded-md"><i data-lucide="check-circle-2" class="w-3 h-3"></i>${App.t('task_completed')}: ${task.completedDate}</div>`;
         else if (task.dueDate) { const overdue = new Date(task.dueDate) < new Date().setHours(0,0,0,0); const style = overdue ? 'text-red-600 bg-red-50 border-red-100' : 'text-slate-500 bg-slate-50 border-slate-100'; metaHtml += `<div class="flex items-center gap-1 text-xs font-medium border px-2 py-1 rounded-md w-fit ${style}"><i data-lucide="clock" class="w-3 h-3"></i>${task.dueDate}</div>`; } 
         if (task.description) metaHtml += `<i data-lucide="align-left" class="w-3 h-3 text-slate-400"></i>`;
+        
+        metaHtml += subtaskCounterHtml;
+
         if (task.updatedAt) { metaHtml += `<div class="ml-auto flex flex-col items-end gap-0.5"><div class="text-[9px] text-slate-300 font-medium">${App.t('task_created')}: ${UI.formatTime(task.createdAt)}</div>`;
             if (task.updatedAt !== task.createdAt) metaHtml += `<div class="flex items-center gap-1 text-[9px] text-blue-400 font-bold"><i data-lucide="refresh-cw" class="w-2 h-2"></i>${App.t('task_updated')}: ${UI.formatTime(task.updatedAt)}</div>`;
             metaHtml += `</div>`; } 
         metaHtml += `</div>`;
         el.innerHTML = `${parentIndicator}${labelsHtml}<div class="flex justify-between items-start gap-2"><span class="task-title text-[15px] font-medium text-slate-700 leading-relaxed flex-grow">${task.content}</span><div class="flex flex-col gap-1 items-end">${priorityHtml}<button onclick="event.stopPropagation(); DataService.deleteTask('${task.id}', '${columnId}')" class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div>${metaHtml}`;
-        el.onclick = () => Modal.open(task.id); return el;
+        el.addEventListener('click', () => Modal.open(task.id)); return el;
     },
     createVirtualParent: (parentTask) => {
         const el = document.createElement('div'); let laneName = '???';
         for(const cid in State.data.columns) if(State.data.columns[cid].taskIds.includes(parentTask.id)) { const colKey = cid === 'c1' ? 'col_todo' : (cid === 'c2' ? 'col_progress' : 'col_done'); laneName = App.t(colKey); break; }
-        el.className = 'task-card virtual-parent-card rounded-xl p-3 flex flex-col gap-1';
+        el.className = 'task-card virtual-parent-card rounded-xl p-3 flex flex-col gap-1 cursor-pointer hover:border-blue-400 hover:opacity-100 transition-all';
         el.innerHTML = `<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1"><i data-lucide="link" class="w-3 h-3"></i> ${State.language === 'ja' ? '実体は' : 'In'}「${laneName}」</div><span class="text-sm font-semibold text-slate-400 truncate">${parentTask.content}</span>`;
+        el.addEventListener('click', () => App.jumpToTask(parentTask.id));
+        return el;
+    },
+    createVirtualChild: (childTask) => {
+        const el = document.createElement('div'); let laneName = '???';
+        for(const cid in State.data.columns) if(State.data.columns[cid].taskIds.includes(childTask.id)) { const colKey = cid === 'c1' ? 'col_todo' : (cid === 'c2' ? 'col_progress' : 'col_done'); laneName = App.t(colKey); break; }
+        el.className = 'task-card virtual-child-card rounded-lg p-2 flex items-center gap-2 justify-between cursor-pointer hover:border-blue-400 hover:opacity-100 transition-all';
+        el.innerHTML = `<span class="text-[11px] font-medium text-slate-400 truncate flex-grow">${childTask.content}</span><div class="text-[9px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1 shrink-0 bg-slate-50/50 px-1.5 py-0.5 rounded border border-slate-100"><i data-lucide="external-link" class="w-2.5 h-2.5"></i> ${laneName}</div>`;
+        el.addEventListener('click', () => App.jumpToTask(childTask.id));
         return el;
     }
 };
@@ -338,10 +368,44 @@ const UI = {
 // --- 7. Main Controller ---
 const App = {
     t: (key) => (CONSTANTS.I18N[State.language] && CONSTANTS.I18N[State.language][key]) || key,
+
+    jumpToTask: (taskId) => {
+        const performJump = () => {
+            const target = document.querySelector(`.task-card[data-task-id="${taskId}"]`);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Apply flash highlight
+                target.classList.add('is-flash');
+                setTimeout(() => {
+                    target.classList.remove('is-flash');
+                }, 3000);
+            }
+        };
+
+        // Check if target is currently visible
+        let target = document.querySelector(`.task-card[data-task-id="${taskId}"]`);
+        
+        if (!target) {
+            // Target might be filtered out or in a different state. Reset all filters.
+            State.filter = 'all';
+            State.priorityFilter = 'all';
+            App.render();
+            
+            // Wait for render to complete and browser to layout
+            requestAnimationFrame(() => {
+                setTimeout(performJump, 100);
+            });
+        } else {
+            performJump();
+        }
+    },
+
     init: () => {
         DataService.init(); Modal.init();
         document.getElementById('add-task-form').addEventListener('submit', App.handleAddTask);
         document.getElementById('label-filter').addEventListener('change', (e) => { State.filter = e.target.value; App.render(); });
+        document.getElementById('priority-filter').addEventListener('change', (e) => { State.priorityFilter = e.target.value; App.render(); });
         document.getElementById('task-modal').addEventListener('click', (e) => { if (e.target.id === 'task-modal') Modal.close(); });
         const menu = document.getElementById('settings-menu');
         window.toggleMenu = (e) => { e.stopPropagation(); menu.classList.toggle('hidden'); };
@@ -354,28 +418,16 @@ const App = {
             const id = `task-${Date.now()}`; const now = new Date().toISOString();
             State.data.tasks[id] = { id, content, description: '', dueDate: '', parentId: null, labels: [], priority: 'none', createdAt: now, updatedAt: now };
             State.data.columns['c1'].taskIds.unshift(id);
-            
-            // Highlight effect
-            State.lastAddedId = id;
-            setTimeout(() => { State.lastAddedId = null; }, 3000);
-
+            State.lastAddedId = id; setTimeout(() => { State.lastAddedId = null; }, 3000);
             DataService.save(); App.render(); input.value = '';
         }
     },
     render: () => {
         const board = document.getElementById('board'); board.innerHTML = '';
-        
-        // Update Static UI elements based on language
-        const appDesc = document.querySelector('header p.text-slate-400');
-        if (appDesc) appDesc.textContent = App.t('app_desc');
-        
-        const taskInput = document.getElementById('new-task-input');
-        if (taskInput) taskInput.placeholder = App.t('add_placeholder');
-        
-        const addBtnSpan = document.querySelector('#add-task-form span');
-        if (addBtnSpan) addBtnSpan.textContent = App.t('add_btn');
-        
-        App.updateFilterDropdown();
+        const appDesc = document.querySelector('header p.text-slate-400'); if (appDesc) appDesc.textContent = App.t('app_desc');
+        const taskInput = document.getElementById('new-task-input'); if (taskInput) taskInput.placeholder = App.t('add_placeholder');
+        const addBtnSpan = document.querySelector('#add-task-form span'); if (addBtnSpan) addBtnSpan.textContent = App.t('add_btn');
+        App.updateFilterDropdown(); App.updatePriorityFilterDropdown();
         const m = document.getElementById('settings-menu');
         m.children[0].innerHTML = `<i data-lucide="download" class="w-4 h-4 text-slate-400"></i> ${App.t('menu_export')}`;
         m.children[1].innerHTML = `<i data-lucide="upload" class="w-4 h-4 text-slate-400"></i> ${App.t('menu_import')}`;
@@ -386,40 +438,62 @@ const App = {
         if (!lBtn) { lBtn = document.createElement('button'); lBtn.id = 'lang-switch-btn'; lBtn.className = 'w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-bold text-blue-600 flex items-center gap-2 border-t border-slate-100 transition-colors'; m.insertBefore(lBtn, m.querySelector('.text-red-600')); }
         lBtn.innerHTML = `<i data-lucide="languages" class="w-4 h-4"></i> ${State.language === 'ja' ? 'English' : '日本語'}`;
         lBtn.onclick = () => DataService.setLanguage(State.language === 'ja' ? 'en' : 'ja');
-        m.querySelector('.text-red-600').innerHTML = `<i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i> ${App.t('menu_reset')}`;
+        const rBtn = m.querySelector('.text-red-600'); if(rBtn) rBtn.innerHTML = `<i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i> ${App.t('menu_reset')}`;
 
         State.data.columnOrder.forEach(colId => {
             const col = State.data.columns[colId]; const colTitle = colId === 'c1' ? App.t('col_todo') : (colId === 'c2' ? App.t('col_progress') : App.t('col_done'));
             const colEl = document.createElement('div'); colEl.className = 'bg-slate-200/40 backdrop-blur-md rounded-[2rem] p-6 flex flex-col border border-white/20 shadow-inner h-full min-h-[500px]';
             colEl.innerHTML = `<div class="flex justify-between items-center mb-6 px-2"><h2 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">${colTitle}</h2><span class="bg-white/80 text-slate-500 text-[10px] font-black px-3 py-1 rounded-full shadow-sm border border-slate-100">${col.taskIds.length}</span></div>`;
             const listEl = document.createElement('div'); listEl.className = 'task-list space-y-3 pb-20 flex-grow min-h-[200px]'; listEl.dataset.columnId = colId;
-            const visible = col.taskIds.map(id => State.data.tasks[id]).filter(Boolean).filter(t => State.filter === 'all' || (t.labels && t.labels.includes(State.filter)));
-            const renderItems = []; const processed = new Set();
+            const tasks = col.taskIds.map(id => State.data.tasks[id]).filter(Boolean);
+            const visible = tasks.filter(t => {
+                const labelMatch = State.filter === 'all' || (t.labels && t.labels.includes(State.filter));
+                const priorityMatch = State.priorityFilter === 'all' || (t.priority === State.priorityFilter);
+                return labelMatch && priorityMatch;
+            });
+            const renderItems = []; const processedIds = new Set();
             const roots = visible.filter(t => !t.parentId || !visible.some(pt => pt.id === t.parentId));
             roots.forEach(root => {
-                if (processed.has(root.id)) return;
-                if (root.parentId) { const pTask = State.data.tasks[root.parentId]; if (pTask && (!renderItems.length || renderItems[renderItems.length-1].task?.id !== pTask.id)) renderItems.push({ type: 'virtual', task: pTask }); } 
-                renderItems.push({ type: 'real', task: root }); processed.add(root.id);
-                visible.filter(c => c.parentId === root.id).forEach(child => { renderItems.push({ type: 'real', task: child }); processed.add(child.id); });
+                if (processedIds.has(root.id)) return;
+                if (root.parentId) { const pTask = State.data.tasks[root.parentId]; const last = renderItems[renderItems.length-1]; if (pTask && (!last || last.type !== 'virtual' || last.task.id !== pTask.id)) renderItems.push({ type: 'virtual', task: pTask }); }
+                renderItems.push({ type: 'real', task: root }); processedIds.add(root.id);
+                // 1. Add real children
+                const realChildren = visible.filter(c => c.parentId === root.id);
+                realChildren.forEach(child => { renderItems.push({ type: 'real', task: child }); processedIds.add(child.id); });
+                // 2. Add virtual children
+                const allChildren = Object.values(State.data.tasks).filter(t => t.parentId === root.id);
+                allChildren.forEach(child => { if (!processedIds.has(child.id)) renderItems.push({ type: 'virtual_child', task: child }); });
             });
-            visible.forEach(t => { if (!processed.has(t.id)) renderItems.push({ type: 'real', task: t }); });
-            renderItems.forEach(item => listEl.appendChild(item.type === 'virtual' ? UI.createVirtualParent(item.task) : UI.createTaskCard(item.task, colId, visible)));
+            visible.forEach(t => { if (!processedIds.has(t.id)) renderItems.push({ type: 'real', task: t }); });
+            renderItems.forEach(item => {
+                let el;
+                if (item.type === 'virtual') el = UI.createVirtualParent(item.task);
+                else if (item.type === 'virtual_child') el = UI.createVirtualChild(item.task);
+                else el = UI.createTaskCard(item.task, colId, visible);
+                listEl.appendChild(el);
+            });
             colEl.appendChild(listEl); board.appendChild(colEl);
         });
         lucide.createIcons(); App.initDragAndDrop();
     },
     updateFilterDropdown: () => {
-        const s = document.getElementById('label-filter'); s.innerHTML = `<option value="all">${App.t('filter_all')}</option>`;
+        const s = document.getElementById('label-filter'); if(!s) return;
+        s.innerHTML = `<option value="all">${App.t('filter_all')}</option>`;
         State.data.labels.forEach(l => { const opt = document.createElement('option'); opt.value = l.id; opt.textContent = l.name; if(l.id === State.filter) opt.selected = true; s.appendChild(opt); });
     },
+    updatePriorityFilterDropdown: () => {
+        const s = document.getElementById('priority-filter'); if (!s) return;
+        s.innerHTML = `<option value="all">${State.language === 'ja' ? 'すべての優先度' : 'All Priorities'}</option>`;
+        CONSTANTS.PRIORITIES.forEach(p => { const opt = document.createElement('option'); opt.value = p.value; opt.textContent = p.label[State.language]; if (p.value === State.priorityFilter) opt.selected = true; s.appendChild(opt); });
+    },
     initDragAndDrop: () => {
-        if (State.filter !== 'all') return;
+        if (State.filter !== 'all' || State.priorityFilter !== 'all') return;
         document.querySelectorAll('.task-list').forEach(list => {
             new Sortable(list, { group: 'tasks', animation: 250, ghostClass: 'ghost-card', onEnd: (evt) => {
-                const { item, to, from } = evt; if (item.classList.contains('virtual-parent-card')) return;
+                const { item, to, from } = evt; if (item.classList.contains('virtual-parent-card') || item.classList.contains('virtual-child-card')) return;
                 const taskId = item.dataset.taskId; const toCol = to.dataset.columnId; const fromCol = from.dataset.columnId;
                 State.data.columns[fromCol].taskIds = State.data.columns[fromCol].taskIds.filter(id => id !== taskId);
-                const newTaskIds = []; Array.from(to.children).forEach(child => { if (!child.classList.contains('virtual-parent-card') && child.dataset.taskId) newTaskIds.push(child.dataset.taskId); });
+                const newTaskIds = []; Array.from(to.children).forEach(child => { if (!child.classList.contains('virtual-parent-card') && !child.classList.contains('virtual-child-card') && child.dataset.taskId) newTaskIds.push(child.dataset.taskId); });
                 State.data.columns[toCol].taskIds = newTaskIds;
                 const task = State.data.tasks[taskId];
                 if (toCol === CONSTANTS.DONE_COLUMN_ID) { if (!task.completedDate) { const now = new Date(); task.completedDate = `${now.toLocaleDateString(State.language === 'ja' ? 'ja-JP' : 'en-US', {year:'numeric',month:'2-digit',day:'2-digit'}).replaceAll('/','-')} ${now.toLocaleTimeString(State.language === 'ja' ? 'ja-JP' : 'en-US', {hour:'2-digit',minute:'2-digit'})}`; } } else task.completedDate = null;
