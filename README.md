@@ -1,37 +1,52 @@
 # MonoFlow
 
-**MonoFlow** is a professional, minimalist, and entirely private Kanban tool that lives in your browser. Designed for high-performance productivity and deep work, it requires no servers, no sign-ups, and guarantees that your data never leaves your device.
+**MonoFlow** is a professional, high-performance personal Kanban application designed for those who value **total privacy** and **zero-config portability**.
+
+Unlike cloud-based tools, MonoFlow lives entirely in your browser. It requires no servers, no accounts, and no internet connection to operate. Every task, note, and metric stays on your machine, ensuring your data is 100% private and under your control.
+
+## 🛡️ Privacy & Local-First Philosophy
+
+- **100% Local Data:** All information is stored exclusively in your browser's `localStorage`. No data ever leaves your device.
+- **Offline Operation:** Fully functional without an internet connection. Ideal for secure environments or focus-heavy offline sessions.
+- **Zero Tracking:** No telemetry, no cookies, no analytics scripts. Pure productivity without the prying eyes.
+- **Instant Portability:** The entire system is a collection of static files. Move it to a USB drive, a private server, or just keep it on your desktop.
 
 ## ✨ Core Features
 
-- **Zero Configuration:** No installation or build steps. Open `index.html` and you're ready to go.
-- **Total Privacy:** 100% of your data is stored locally via the browser's `Web Storage API`.
 - **Advanced Task Engine:**
-  - **2-Level Hierarchy:** Manage projects with subtasks, visual progress bars, and strict parent-child logic.
-  - **Context Ghosts (Virtual Tickets):** Maintain project context across lanes with placeholders and immediate "Jump & Flash" navigation.
-  - **Precise Metadata:** Automatic tracking of creation, update, and completion timestamps.
-- **Intelligent Analytics:**
-  - **Notification Center:** Real-time bell alerts for overdue and due-today tasks with one-click navigation.
-  - **Metrics Dashboard:** Analyze throughput trends, average lead times, and precise cycle times (down to the hour).
-  - **Pro Burndown Chart:** Dual-axis visualization showing remaining work alongside daily scope changes (additions vs. completions).
-  - **Velocity Forecasting:** Predictive completion dates based on your recent 14-day performance.
-- **Modern Workflow:**
-  - **Full-text Quick Search:** Instant filtering across titles and detailed notes.
-  - **Global Shortcuts:** Move at the speed of thought with physical key-based navigation (e.g., `Alt/Option + M`).
-  - **Responsive & Touch-Ready:** Optimized for mobile and tablets (iPad/iPhone) with specialized drag-and-drop logic.
-  - **Multilingual & Themed:** Seamless switching between Japanese and English, with a focus-optimized Dark Mode.
-- **Data Portability:** Export and import comprehensive JSON backups that include your tasks, labels, and UI preferences.
+  - **Smart 2-Level Hierarchy:** Powerful parent-child task management with automatic progress tracking and subtask previews.
+  - **Context Ghosts (Virtual Tickets):** Maintain project visibility across lanes with placeholders and "Jump & Flash" navigation.
+  - **Notification Center:** Centralized alerts for overdue and due-today tasks, ensuring you never miss a deadline.
+- **Deep Analytics:**
+  - **Metrics Dashboard:** High-precision tracking of Throughput, Lead Time, and Cycle Time (down to the hour).
+  - **Burndown Dynamics:** Pro-grade progress visualization with ideal trend lines and scope change tracking.
+  - **Velocity Forecasting:** Predictive algorithms that estimate completion dates based on your actual performance.
+- **Professional Workflow:**
+  - **Masterful Keyboard Navigation:** Navigate instantly with global shortcuts (e.g., `Alt/Option + M/B/L/A`) and `?` for help.
+  - **Full-text Real-time Search:** Instant filtering across titles and detailed notes as you type.
+  - **Touch-Optimized:** Seamless drag-and-drop experience on iPad, iPhone, and Android devices.
+- **Highly Customizable:**
+  - **Unified Dark Mode:** A sleek, high-contrast dark theme designed to reduce eye strain during late-night sessions.
+  - **Bilingual Support:** Full, native localization for both Japanese and English.
+  - **Comprehensive Backups:** Export/Import entire system states (tasks, labels, settings) via JSON files.
 
 ## 🚀 Getting Started
 
-1.  Download or clone the repository.
-2.  Open `index.html` in any modern web browser.
-3.  Check out the built-in **User Guide** (click the `?` icon) for a deep dive into the professional methodology behind MonoFlow.
+1.  **Download/Clone** this repository.
+2.  **Open `index.html`** in any modern web browser.
+3.  **Start Working.** No setup, no installation, just flow.
 
-## 🛠️ Tech Stack
+*For a detailed operating manual, click the **Help (?)** icon within the application.*
 
-- **Core:** HTML5, Vanilla JavaScript (ES6+), CSS3
-- **Styling:** Tailwind CSS (via Play CDN)
-- **Visualization:** Chart.js v4
-- **Interactivity:** SortableJS (Drag & Drop), Lucide Icons
-- **Data:** Local Storage
+## 🛠️ Architecture & Tech Stack
+
+MonoFlow is built with a focus on simplicity, speed, and standard web technologies:
+
+- **Logic:** Vanilla JavaScript (ES6+) with a modular, refactored Data Service architecture.
+- **Styling:** Tailwind CSS (Modern, utility-first design).
+- **Charts:** Chart.js v4 (High-performance data visualization).
+- **Icons:** Lucide Icons (Clean, consistent vector iconography).
+- **Drag & Drop:** SortableJS (Reliable, touch-compatible reordering).
+
+---
+**MonoFlow** - Built for High-Performance Personal Productivity.
