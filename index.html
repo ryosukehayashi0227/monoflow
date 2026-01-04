@@ -64,14 +64,16 @@
                             <i data-lucide="more-horizontal" class="w-5 h-5"></i>
                         </button>
                         <div id="settings-menu" class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 hidden z-20 overflow-hidden">
-                            <button onclick="DataService.export()" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 transition-colors">
-                                <i data-lucide="download" class="w-4 h-4 text-slate-400"></i> エクスポート (JSON)
-                            </button>
-                            <button onclick="document.getElementById('import-file').click()" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 border-t border-slate-100 transition-colors">
-                                <i data-lucide="upload" class="w-4 h-4 text-slate-400"></i> インポート
-                            </button>
-                            <input type="file" id="import-file" class="hidden" accept=".json" onchange="DataService.import(this)">
-                        </div>
+                                                    <button onclick="DataService.export()" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 transition-colors">
+                                                        <i data-lucide="download" class="w-4 h-4 text-slate-400"></i> エクスポート (JSON)
+                                                    </button>
+                                                    <button onclick="document.getElementById('import-file').click()" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 border-t border-slate-100 transition-colors">
+                                                        <i data-lucide="upload" class="w-4 h-4 text-slate-400"></i> インポート
+                                                    </button>
+                                                    <a href="help.html" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 border-t border-slate-100 transition-colors">
+                                                        <i data-lucide="help-circle" class="w-4 h-4 text-slate-400"></i> 使い方
+                                                    </a>
+                                                    <input type="file" id="import-file" class="hidden" accept=".json" onchange="DataService.import(this)">                        </div>
                     </div>
                 </div>
             </div>
