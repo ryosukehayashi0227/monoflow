@@ -32,7 +32,7 @@
                     </div>
                 </a>
 
-                <!-- Tabs Navigation (Desktop) -->
+                <!-- Tabs Navigation -->
                 <nav class="flex items-center gap-3 ml-8 hidden md:flex">
                     <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
                         <a href="index.html" class="tab-item active px-4 py-1.5 rounded-lg text-xs font-bold transition-all">Board</a>
@@ -44,28 +44,39 @@
 
                 <!-- Global Toolbar -->
                 <div class="flex items-center gap-2 ml-auto">
-                    <a href="help.html" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center" title="User Guide"><i data-lucide="help-circle" class="w-4 h-4"></i></a>
-                    <button onclick="Common.setLanguage(State.language === 'ja' ? 'en' : 'ja')" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center" title="Switch Language"><i data-lucide="languages" class="w-4 h-4"></i></button>
-                    <button onclick="Common.toggleTheme()" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center"><i data-lucide="sun" id="theme-icon-light" class="w-4 h-4 hidden"></i><i data-lucide="moon" id="theme-icon-dark" class="w-4 h-4"></i></button>
+                    <!-- Notifications -->
+                    <div class="relative">
+                        <button onclick="NotificationService.toggleNotifications(event)" class="p-2.5 rounded-2xl bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center relative">
+                            <i data-lucide="bell" class="w-4 h-4"></i>
+                            <span id="notify-badge" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center hidden border-2 border-white dark:border-slate-900">0</span>
+                        </button>
+                        <div id="notify-menu" class="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-slate-900 rounded-[1.5rem] shadow-2xl border border-slate-100 dark:border-slate-800 hidden z-50 overflow-hidden text-left">
+                            <div class="p-4 border-b border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
+                                <h3 id="notify-title" class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><i data-lucide="bell" class="w-3 h-3"></i> Notification Center</h3>
+                            </div>
+                            <div id="notify-list" class="max-h-80 overflow-y-auto">
+                                <!-- Notifications injected here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="help.html" class="p-2.5 rounded-2xl bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center" title="User Guide"><i data-lucide="help-circle" class="w-4 h-4"></i></a>
+                    <button onclick="Common.setLanguage(State.language === 'ja' ? 'en' : 'ja')" class="p-2.5 rounded-2xl bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center" title="Switch Language"><i data-lucide="languages" class="w-4 h-4"></i></button>
+                    <button onclick="Common.toggleTheme()" class="p-2.5 rounded-2xl bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center"><i data-lucide="sun" id="theme-icon-light" class="w-4 h-4 hidden"></i><i data-lucide="moon" id="theme-icon-dark" class="w-4 h-4"></i></button>
                 </div>
             </div>
 
             <!-- Toolbar (Search & Add) -->
             <div class="flex flex-col md:flex-row justify-between gap-3 w-full items-start md:items-center">
                 <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
-                    <!-- Search Bar -->
                     <div class="relative w-full md:w-auto">
                         <input type="text" id="search-input" placeholder="Search..." class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 pl-10 shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm font-medium dark:text-white w-full md:w-48">
                         <div class="absolute inset-y-0 left-0 flex items-center px-3 pointer-events-none text-slate-400"><i data-lucide="search" class="w-3.5 h-3.5"></i></div>
                     </div>
-
-                    <!-- Label Filter -->
                     <div class="relative w-full md:w-auto">
                         <select id="label-filter" class="appearance-none bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 pr-10 shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-600 dark:text-slate-300 font-bold text-xs cursor-pointer hover:bg-white dark:hover:bg-slate-800 hover:border-slate-300 w-full md:w-40"><option value="all">すべてのラベル</option></select>
                         <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400"><i data-lucide="filter" class="w-3.5 h-3.5"></i></div>
                     </div>
-
-                    <!-- Priority Filter -->
                     <div class="relative w-full md:w-auto">
                         <select id="priority-filter" class="appearance-none bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 pr-10 shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-600 dark:text-slate-300 font-bold text-xs cursor-pointer hover:bg-white dark:hover:bg-slate-800 hover:border-slate-300 w-full md:w-40"></select>
                         <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400"><i data-lucide="alert-circle" class="w-3.5 h-3.5"></i></div>
@@ -95,7 +106,6 @@
         </header>
         <main id="board" class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start"></main>
     </div>
-    <!-- Modals omitted for brevity, keeping same as before -->
     <div id="archive-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm hidden opacity-0 modal"><div class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[2.5rem] shadow-2xl transform transition-all scale-95 opacity-0 modal-content m-4 flex flex-col max-h-[80vh]"><div class="flex justify-between items-center p-8 border-b border-slate-100 dark:border-slate-800"><h3 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><i data-lucide="archive" class="w-6 h-6 text-slate-400"></i> Archived Tasks</h3><button onclick="Archive.close()" class="text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div><div id="archive-list" class="p-8 overflow-y-auto space-y-4 flex-grow"></div></div></div>
     <div id="task-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm hidden opacity-0 modal"><div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl transform transition-all scale-95 opacity-0 modal-content m-4 flex flex-col max-h-[90vh]"><div class="flex justify-between items-center p-6 border-b border-slate-100 dark:border-slate-800"><h3 class="text-lg font-bold text-slate-800 dark:text-white">タスク詳細</h3><button onclick="Modal.close()" class="text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button></div><div class="p-6 overflow-y-auto"><div id="modal-meta-info" class="mb-6 flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-50 dark:border-slate-800 pb-4"><span id="display-created-at">作成: ---</span><span id="display-updated-at">更新: ---</span></div><form id="edit-task-form" class="space-y-6"><input type="hidden" id="edit-task-id"><div><label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">タイトル</label><input type="text" id="edit-task-content" class="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"></div><div><label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">優先度</label><div class="flex gap-2" id="priority-options-container"></div></div><div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700"><label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">ラベル</label><div class="space-y-3 mb-5"><input type="text" id="new-label-name" placeholder="新しいラベル名" class="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 shadow-sm"><div class="flex items-center justify-between gap-2"><div class="flex gap-3 items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 shadow-sm" id="label-color-picker"></div><button id="modal-add-tag-btn" type="button" onclick="LabelManager.create()" class="bg-slate-800 dark:bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-slate-900 dark:hover:bg-blue-700 shadow-sm shrink-0">追加</button></div></div><div id="edit-task-labels" class="flex flex-wrap gap-2"></div></div><div><label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">親タスク</label><div class="relative"><select id="edit-task-parent" class="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none bg-white"><option value="">(なし)</option></select><div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></div></div></div><div><label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">詳細メモ</label><textarea id="edit-task-desc" rows="3" class="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-600 dark:text-slate-300 resize-none"></textarea></div><div><label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">期限</label><input type="date" id="edit-task-date" class="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"></div></form></div><div class="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3 rounded-b-2xl"><button id="modal-cancel-btn" onclick="Modal.close()" class="px-5 py-2.5 text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors">キャンセル</button><button id="modal-save-btn" onclick="Modal.save()" class="bg-blue-600 text-white font-semibold rounded-xl px-6 py-2.5 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all">保存</button></div></div></div>
     <script src="js/common.js"></script>

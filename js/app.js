@@ -211,6 +211,16 @@ const App = {
             switch (e.code) { case 'KeyN': e.preventDefault(); document.getElementById('new-task-input').focus(); break; case 'Slash': e.preventDefault(); document.getElementById('search-input').focus(); break; case 'Escape': Modal.close(); Archive.close(); break; }
         });
         App.render();
+
+        // Check for URL parameters (Jump from Notification)
+        const urlParams = new URLSearchParams(window.location.search);
+        const jumpId = urlParams.get('jumpTaskId');
+        if (jumpId) {
+            // Wait for render to finish
+            setTimeout(() => App.jumpToTask(jumpId), 500);
+            // Clean up URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
     },
     handleAddTask: (e) => {
         e.preventDefault(); const input = document.getElementById('new-task-input'); const content = input.value.trim();
