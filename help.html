@@ -15,23 +15,22 @@
     </script>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .feature-card { @apply bg-white dark:bg-slate-900 p-10 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-sm mb-12; }
-        .step-num { @apply flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white font-black text-sm shrink-0 shadow-lg shadow-blue-500/30; }
-        h2 { @apply text-3xl font-black text-slate-900 dark:text-white mb-12 flex items-center gap-4 border-l-8 border-l-blue-600 pl-6 tracking-tighter; }
-        h3 { @apply text-2xl font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-3; }
-        h4 { @apply text-lg font-bold text-slate-700 dark:text-slate-300 mb-3 mt-8 flex items-center gap-2; }
-        p { @apply text-slate-500 dark:text-slate-400 leading-relaxed mb-4 text-sm; }
-        ul { @apply space-y-2 mb-6; }
-        li { @apply text-slate-500 dark:text-slate-400 text-sm flex gap-2; }
-        li::before { content: "•"; @apply text-blue-500 font-bold; }
-        .screenshot { @apply w-full rounded-2xl border border-slate-100 dark:border-slate-800 shadow-inner my-8 bg-slate-50 dark:bg-slate-800/50; }
-        .kbd { @apply px-2 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-mono text-slate-600 dark:text-slate-400 shadow-sm; }
+        .screenshot { width: 100%; border-radius: 2rem; border-width: 4px; border-color: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); background-color: white; transition: all 0.3s; }
+        .screenshot:hover { transform: scale(1.03) rotate(1deg); }
+        .dark .screenshot { border-color: #334155; background-color: #1e293b; }
+        
+        .kbd { display: inline-block; padding: 0.25rem 0.5rem; background-color: #f1f5f9; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 900; color: #334155; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-family: monospace; }
+        .dark .kbd { background-color: #1e293b; border-color: #334155; color: #cbd5e1; }
+        
+        li { display: flex; gap: 0.75rem; align-items: start; font-size: 0.875rem; color: #475569; }
+        .dark li { color: #94a3b8; }
+        li::before { content: "→"; color: #3b82f6; font-weight: 900; }
     </style>
 </head>
 <body class="antialiased bg-[#f8fafc] dark:bg-[#0f172a]">
-    <div class="max-w-[1600px] mx-auto px-4 md:px-8 py-4">
-        <!-- Header Section (Unified) -->
-        <header class="flex flex-col gap-4 mb-6">
+    <div class="w-full">
+        <!-- Header Section -->
+        <header class="flex flex-col gap-4 mb-6 max-w-[1600px] mx-auto px-4 md:px-8 py-4">
             <div class="flex items-center gap-4 pb-4 border-b border-slate-200 dark:border-slate-800 relative">
                 <a href="index.html" class="flex items-center gap-4 group">
                     <div class="w-10 h-10 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-xl flex items-center justify-center shadow-lg shrink-0 transform transition-all group-hover:rotate-3 group-hover:scale-110 duration-500">
@@ -58,125 +57,211 @@
             </div>
         </header>
 
-        <main class="mt-12 max-w-[1200px] mx-auto">
-            <section class="mb-32">
-                <h2 id="help-quick-header">Quick Start</h2>
-                <div class="grid md:grid-cols-3 gap-8">
-                    <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
-                        <div class="step-num mb-6">01</div>
-                        <h3 id="help-q1-title">タスクの作成</h3>
-                        <p id="help-q1-desc">上部の大きな入力欄に内容を書き込み Enter を押すだけ。瞬時にチケットが発行されます。</p>
-                        <div class="absolute -bottom-4 -right-4 opacity-5 group-hover:opacity-10 transition-opacity"><i data-lucide="plus-circle" class="w-32 h-32 text-blue-600"></i></div>
+        <main class="mt-12 w-full">
+            <!-- Quick Start -->
+            <section class="max-w-[1000px] mx-auto px-4 mb-32">
+                <h2 id="help-quick-header" class="text-4xl font-black text-slate-900 dark:text-white mb-16 flex items-center gap-4 tracking-tighter">Quick Start</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black mb-4">1</div>
+                        <h3 id="help-q1-title" class="text-lg font-bold text-slate-800 dark:text-white mb-2">Create</h3>
+                        <p id="help-q1-desc" class="text-xs text-slate-500 dark:text-slate-400">Type and Enter.</p>
                     </div>
-                    <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
-                        <div class="step-num mb-6">02</div>
-                        <h3 id="help-q2-title">進捗の管理</h3>
-                        <p id="help-q2-desc">カードをドラッグしてレーン間を移動。Doneへ移動させると「完了スタンプ」が自動で押されます。</p>
-                        <div class="absolute -bottom-4 -right-4 opacity-5 group-hover:opacity-10 transition-opacity"><i data-lucide="move" class="w-32 h-32 text-blue-600"></i></div>
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black mb-4">2</div>
+                        <h3 id="help-q2-title" class="text-lg font-bold text-slate-800 dark:text-white mb-2">Move</h3>
+                        <p id="help-q2-desc" class="text-xs text-slate-500 dark:text-slate-400">Drag to Done.</p>
                     </div>
-                    <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
-                        <div class="step-num mb-6">03</div>
-                        <h3 id="help-q3-title">情報の詳細化</h3>
-                        <p id="help-q3-desc">カードをクリックして詳細パネルへ。優先度の設定、メモの追記、ラベルでの分類が行えます。</p>
-                        <div class="absolute -bottom-4 -right-4 opacity-5 group-hover:opacity-10 transition-opacity"><i data-lucide="edit-3" class="w-32 h-32 text-blue-600"></i></div>
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black mb-4">3</div>
+                        <h3 id="help-q3-title" class="text-lg font-bold text-slate-800 dark:text-white mb-2">Detail</h3>
+                        <p id="help-q3-desc" class="text-xs text-slate-500 dark:text-slate-400">Click to Edit.</p>
                     </div>
                 </div>
             </section>
 
-            <section>
-                <h2 id="help-manual-header">Detailed Manual</h2>
-                
-                <!-- 1. Structure -->
-                <div class="feature-card">
-                    <h3 id="help-m1-title">1. タスクカードの構造</h3>
-                    <p id="help-m1-desc">MonoFlowのタスクカードは、情報の優先順位を整理し、一目で状況を把握できるように設計されています。</p>
-                    <div class="grid lg:grid-cols-2 gap-12 mt-10">
-                        <div class="space-y-2">
-                            <h4 id="help-m1-h1">視覚的要素の詳細</h4>
-                            <ul id="help-m1-list1">
-                                <li><span id="help-m1-l1">優先度アクセント: 左端のライン色は重要度を直感的に伝えます。</span></li>
-                                <li><span id="help-m1-l2">動的なタイムスタンプ: 作成と更新日時が自動追跡されます。</span></li>
-                                <li><span id="help-m1-l3">メモプレビュー: 詳細メモの冒頭2行を表示。</span></li>
-                                <li><span id="help-m1-l4">期限バッジ: 期限切れは強調されます。</span></li>
-                            </ul>
-                        </div>
-                        <div class="space-y-2">
-                            <h4 id="help-m1-h2">ステータス管理</h4>
-                            <ul id="help-m1-list2">
-                                <li><span id="help-m1-l5">完了済みタスクの減光処理。</span></li>
-                                <li><span id="help-m1-l6">タイトルの打ち消し線表示。</span></li>
-                                <li><span id="help-m1-l7">ISO形式での精密な完了記録。</span></li>
-                            </ul>
-                        </div>
+            <!-- New Features -->
+            <section class="max-w-[1000px] mx-auto px-4 mb-32">
+                <h2 id="help-new-features-header" class="text-4xl font-black text-slate-900 dark:text-white mb-16 flex items-center gap-4 tracking-tighter">Dependencies & Optimization</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border-l-8 border-l-orange-400 border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <h3 id="help-nf-blocker-title" class="text-xl font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2"><i data-lucide="link-2" class="w-5 h-5 text-orange-500"></i> Blockers</h3>
+                        <p id="help-nf-blocker-desc" class="text-slate-500 dark:text-slate-400">Dependency management.</p>
                     </div>
-                    <img src="img/screenshot-add.svg" alt="Screenshot" class="screenshot">
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border-l-8 border-l-slate-400 border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <h3 id="help-nf-stale-title" class="text-xl font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2"><i data-lucide="wind" class="w-5 h-5 text-slate-500"></i> Stale Tasks</h3>
+                        <p id="help-nf-stale-desc" class="text-slate-500 dark:text-slate-400">Auto-detection of inactive tasks.</p>
+                    </div>
                 </div>
+            </section>
 
-                <!-- 2. Hierarchy -->
-                <div class="feature-card">
-                    <h3 id="help-m2-title">2. 高度な親子関係と階層化</h3>
-                    <p id="help-m2-desc">2階層構造を厳格に維持することで、強力な整理機能を提供します。</p>
-                    <div class="grid lg:grid-cols-2 gap-12 mt-10">
-                        <div class="space-y-6">
-                            <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800"><h4 id="help-m2-h1" class="mt-0 text-blue-600">仮想親チケット</h4><p id="help-m2-l1" class="mb-0">カラムを跨いでも文脈を維持します。</p></div>
-                            <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800"><h4 id="help-m2-h2" class="mt-0 text-indigo-600">仮想子チケット</h4><p id="help-m2-l2" class="mb-0">他カラムの子タスクを一覧表示します。</p></div>
-                            <div class="p-6 bg-blue-600 text-white rounded-2xl shadow-lg"><h4 id="help-m2-h3" class="mt-0 text-white"><i data-lucide="mouse-pointer-click" class="inline w-5 h-5 mr-1"></i> ジャンプ機能</h4><p id="help-m2-l3" class="text-blue-100 mb-0">一瞬でターゲットへ移動します。</p></div>
+            <!-- Data Privacy Highlight (NEW POSITION) -->
+            <section class="w-full bg-slate-900 dark:bg-blue-900/20 py-24 mb-32 -mx-4 md:-mx-8 px-4 md:px-8 border-y border-white/5">
+                <div class="max-w-[1000px] mx-auto text-center">
+                    <div class="w-20 h-20 bg-blue-600 text-white rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-blue-500/40">
+                        <i data-lucide="shield-check" class="w-10 h-10"></i>
+                    </div>
+                    <h2 id="help-m4-privacy-title" class="text-white text-4xl font-black mb-6 justify-center">Data Privacy</h2>
+                    <p id="help-m4-privacy-desc" class="text-blue-100 text-xl font-medium max-w-2xl mx-auto opacity-90 leading-relaxed">Your data is 100% private. It lives exclusively in your browser's local storage and never touches a server.</p>
+                    <div class="mt-10 flex flex-wrap justify-center gap-4">
+                        <div class="bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10 flex items-center gap-3">
+                            <i data-lucide="server-off" class="w-5 h-5 text-blue-400"></i>
+                            <span class="text-white text-sm font-bold uppercase tracking-wider">No Servers</span>
                         </div>
-                        <div>
-                            <img src="img/screenshot-nest.svg" alt="Screenshot" class="screenshot !mt-0 shadow-xl">
-                            <h4 id="help-m2-extra-title">進捗バー</h4>
-                            <p id="help-m2-extra-desc">サブタスク全体の消化率を可視化します。</p>
-                            <p id="help-m2-l4" class="text-[11px] text-slate-400 dark:text-slate-500 mt-4 border-t border-slate-100 dark:border-slate-800 pt-4">階層制限について</p>
+                        <div class="bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10 flex items-center gap-3">
+                            <i data-lucide="user-minus" class="w-5 h-5 text-blue-400"></i>
+                            <span class="text-white text-sm font-bold uppercase tracking-wider">No Accounts</span>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10 flex items-center gap-3">
+                            <i data-lucide="wifi-off" class="w-5 h-5 text-blue-400"></i>
+                            <span class="text-white text-sm font-bold uppercase tracking-wider">Offline First</span>
                         </div>
                     </div>
                 </div>
+            </section>
 
-                <!-- 3. Search -->
-                <div class="feature-card">
-                    <h3 id="help-m3-title">3. 検索と動防フィルタリング</h3>
-                    <p id="help-m3-desc">目的の情報だけを瞬時に抽出できます。</p>
-                    <div class="grid md:grid-cols-2 gap-10 mt-8">
-                        <div class="p-8 border border-slate-100 dark:border-slate-800 rounded-3xl"><h4 id="help-m3-h1" class="mt-0 flex items-center gap-2 text-slate-800 dark:text-white"><i data-lucide="search" class="w-5 h-5"></i> 全文検索</h4><p id="help-m3-l1">メモの内容も検索対象です。</p></div>
-                        <div class="p-8 border border-slate-100 dark:border-slate-800 rounded-3xl"><h4 id="help-m3-h2" class="mt-0 flex items-center gap-2 text-slate-800 dark:text-white"><i data-lucide="filter" class="w-5 h-5"></i> 複合フィルタ</h4><p id="help-m3-l2">ラベルと優先度を組み合わせます。</p></div>
+            <div class="max-w-[1000px] mx-auto px-4"><h2 id="help-manual-header" class="text-4xl font-black text-slate-900 dark:text-white mb-8 pb-4 border-b border-slate-200 dark:border-slate-800 tracking-tighter">Detailed Manual</h2></div>
+
+            <!-- Manual Section 1: Structure (White) -->
+            <div class="w-full bg-white dark:bg-slate-900 py-24 border-y border-slate-100 dark:border-slate-800">
+                <div class="max-w-[1000px] mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <span class="inline-flex items-center justify-center px-6 py-2 rounded-2xl bg-blue-600 text-white text-sm font-black uppercase tracking-[0.2em] mb-6 shadow-lg shadow-blue-500/40 transform -rotate-2">Step 01</span>
+                        <h3 id="help-m1-title" class="text-3xl font-black text-slate-800 dark:text-white mb-6 leading-tight">Task Card Structure</h3>
+                        <p id="help-m1-desc" class="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">Understanding the visual hierarchy.</p>
+                        <h4 id="help-m1-h1" class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2 mt-8">Visual Indicators</h4>
+                        <ul class="mb-6 space-y-3">
+                            <li><span id="help-m1-l1">Priority Accents</span></li>
+                            <li><span id="help-m1-l2">Dynamic Timestamps</span></li>
+                            <li><span id="help-m1-l3">Note Preview</span></li>
+                            <li><span id="help-m1-l4">Status Badges</span></li>
+                        </ul>
+                        <h4 id="help-m1-h2" class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2 mt-8">Status Management</h4>
+                        <ul class="space-y-3">
+                            <li><span id="help-m1-l5">Dimmed Done Tasks</span></li>
+                            <li><span id="help-m1-l6">Strike-through Titles</span></li>
+                        </ul>
                     </div>
-                    <p id="help-m3-extra" class="text-[11px] text-slate-400 mt-6 italic">Drag & Dropの制限事項</p>
+                    <div><img src="img/screenshot-add.svg" alt="Card Structure" class="screenshot"></div>
                 </div>
+            </div>
 
-                <!-- 4. Analytics -->
-                <div class="feature-card">
-                    <h3 id="help-m4-title">4. 進捗分析とデータサイエンス</h3>
-                    <p id="help-m4-desc">客観的な数値でパフォーマンスを可視化します。</p>
-                    <div class="grid md:grid-cols-2 gap-10 mt-10">
-                        <div class="space-y-6">
-                            <div><h4 id="help-m4-h1" class="dark:text-white">Metrics</h4><ul><li id="help-m4-l1">平均完了日数の定義。</li></ul></div>
-                            <div><h4 id="help-m4-h2" class="dark:text-white">Burndown</h4><p id="help-m4-l2">理想線との比較について。</p></div>
+            <!-- Manual Section 2: Hierarchy (Gray) -->
+            <div class="w-full bg-slate-100/50 dark:bg-black/20 py-24 border-b border-slate-100 dark:border-slate-800">
+                <div class="max-w-[1000px] mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
+                    <div class="order-last lg:order-first"><img src="img/screenshot-nest.svg" alt="Hierarchy" class="screenshot"></div>
+                    <div>
+                        <span class="inline-flex items-center justify-center px-6 py-2 rounded-2xl bg-blue-600 text-white text-sm font-black uppercase tracking-[0.2em] mb-6 shadow-lg shadow-blue-500/40 transform -rotate-2">Step 02</span>
+                        <h3 id="help-m2-title" class="text-3xl font-black text-slate-800 dark:text-white mb-6 leading-tight">Advanced Hierarchy</h3>
+                        <p id="help-m2-desc" class="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">Smart Parent-Child relationships.</p>
+                        
+                        <div class="space-y-4">
+                            <div class="p-6 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <h4 id="help-m2-h1" class="mt-0 text-base font-bold text-slate-800 dark:text-white">Virtual Parent</h4>
+                                <p id="help-m2-l1" class="mb-0 text-sm text-slate-500 dark:text-slate-400">Context across lanes.</p>
+                            </div>
+                            <div class="p-6 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <h4 id="help-m2-h2" class="mt-0 text-base font-bold text-slate-800 dark:text-white">Virtual Child</h4>
+                                <p id="help-m2-l2" class="mb-0 text-sm text-slate-500 dark:text-slate-400">Aggregated subtasks.</p>
+                            </div>
                         </div>
-                        <div class="space-y-6">
-                            <div><h4 id="help-m4-h3" class="dark:text-white">アーカイブと整理</h4><p id="help-m4-l3">削除との違いについて。</p></div>
-                            <div class="p-6 bg-slate-900 dark:bg-slate-800 rounded-3xl shadow-xl"><h4 id="help-m4-privacy-title" class="mt-0 text-white text-sm">Data Privacy</h4><p id="help-m4-privacy-desc" class="text-slate-400 text-xs leading-relaxed mb-0">ローカル保存の安全性。</p></div>
+                        
+                        <h4 id="help-m2-h3" class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2 mt-8">Jump & Flash</h4>
+                        <p id="help-m2-l3" class="text-slate-500 dark:text-slate-400">Instant navigation.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manual Section 3: Search (White) -->
+            <div class="w-full bg-white dark:bg-slate-900 py-24 border-b border-slate-100 dark:border-slate-800">
+                <div class="max-w-[1000px] mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <span class="inline-flex items-center justify-center px-6 py-2 rounded-2xl bg-blue-600 text-white text-sm font-black uppercase tracking-[0.2em] mb-6 shadow-lg shadow-blue-500/40 transform -rotate-2">Step 03</span>
+                        <h3 id="help-m3-title" class="text-3xl font-black text-slate-800 dark:text-white mb-6 leading-tight">Search & Filter</h3>
+                        <p id="help-m3-desc" class="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">Find what you need instantly.</p>
+                        
+                        <h4 id="help-m3-h1" class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2 mt-8">Real-time Search</h4>
+                        <p id="help-m3-l1" class="text-slate-500 dark:text-slate-400">Titles and Notes.</p>
+                        
+                        <h4 id="help-m3-h2" class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2 mt-8">Multi-layer Filter</h4>
+                        <p id="help-m3-l2" class="text-slate-500 dark:text-slate-400">Combine labels and priority.</p>
+                        
+                        <p id="help-m3-extra" class="text-sm text-slate-400 mt-6 bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 inline-block shadow-sm">Drag & Drop limitation note.</p>
+                    </div>
+                    <div>
+                        <!-- Placeholder -->
+                        <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl rotate-1">
+                            <div class="flex gap-2 mb-6">
+                                <div class="h-10 flex-grow bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700"></div>
+                                <div class="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center text-white"><i data-lucide="search" class="w-5 h-5"></i></div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="h-20 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border-l-8 border-red-500 shadow-sm"></div>
+                                <div class="h-20 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border-l-8 border-blue-500 opacity-20"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- 5. Shortcuts & More -->
-                <div class="feature-card border-blue-100 dark:border-blue-900/30 bg-blue-50/20 dark:bg-blue-900/10">
-                    <h3 id="help-shortcuts-title" class="dark:text-white"><i data-lucide="keyboard" class="w-6 h-6 text-blue-600"></i> Keyboard Shortcuts</h3>
-                    <div class="grid md:grid-cols-2 gap-x-12 gap-y-4 mt-6">
-                        <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-n" class="text-sm text-slate-600 dark:text-slate-400">Focus New Task Input</span><kbd class="kbd">N</kbd></div>
-                        <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-search" class="text-sm text-slate-600 dark:text-slate-400">Focus Search Bar</span><kbd class="kbd">/</kbd></div>
-                        <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-esc" class="text-sm text-slate-600 dark:text-slate-400">Close / Blur Input</span><kbd class="kbd">Esc</kbd></div>
-                        <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-help" class="text-sm text-slate-600 dark:text-slate-400">Show Help Page</span><kbd class="kbd">?</kbd></div>
-                        <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-board" class="text-sm text-slate-600 dark:text-slate-400">Go to Board</span><div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">L</kbd></div></div>
-                        <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-metrics" class="text-sm text-slate-600 dark:text-slate-400">Go to Metrics Page</span><div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">M</kbd></div></div>
-                        <div class="flex justify-between items-center py-2 border-b border-blue-100/50 dark:border-blue-900/20"><span id="help-shortcuts-burndown" class="text-sm text-slate-600 dark:text-slate-400">Go to Burndown Page</span><div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">B</kbd></div></div>
+            <!-- Manual Section 4: Analytics (Gray) -->
+            <div class="w-full bg-slate-100/50 dark:bg-black/20 py-24 border-b border-slate-100 dark:border-slate-800">
+                <div class="max-w-[1000px] mx-auto px-4">
+                    <div class="text-center max-w-3xl mx-auto mb-16">
+                        <span class="inline-flex items-center justify-center px-6 py-2 rounded-2xl bg-blue-600 text-white text-sm font-black uppercase tracking-[0.2em] mb-6 shadow-lg shadow-blue-500/40 transform -rotate-2">Step 04</span>
+                        <h3 id="help-m4-title" class="text-3xl font-black text-slate-800 dark:text-white mb-6 leading-tight">Analytics & Science</h3>
+                        <p id="help-m4-desc" class="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">Visualize your performance with precision.</p>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-3 gap-8 mb-16">
+                        <div class="bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 shadow-lg text-center hover:-translate-y-2 transition-transform">
+                            <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6"><i data-lucide="bar-chart-2" class="w-8 h-8"></i></div>
+                            <h4 id="help-m4-h1" class="mt-0 justify-center text-xl font-bold text-slate-800 dark:text-white">Metrics</h4>
+                            <p id="help-m4-l1" class="text-sm mb-0 text-slate-500">Lead time & Cycle time.</p>
+                        </div>
+                        <div class="bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 shadow-lg text-center hover:-translate-y-2 transition-transform">
+                            <div class="w-16 h-16 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6"><i data-lucide="trending-down" class="w-8 h-8"></i></div>
+                            <h4 id="help-m4-h2" class="mt-0 justify-center text-xl font-bold text-slate-800 dark:text-white">Burndown</h4>
+                            <p id="help-m4-l2" class="text-sm mb-0 text-slate-500">Ideal vs Actual.</p>
+                        </div>
+                        <div class="bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 shadow-lg text-center hover:-translate-y-2 transition-transform">
+                            <div class="w-16 h-16 bg-purple-50 dark:bg-purple-900/30 text-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6"><i data-lucide="archive" class="w-8 h-8"></i></div>
+                            <h4 id="help-m4-h3" class="mt-0 justify-center text-xl font-bold text-slate-800 dark:text-white">Archive</h4>
+                            <p id="help-m4-l3" class="text-sm mb-0 text-slate-500">Storage shelf concept.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shortcuts -->
+            <section class="max-w-[1000px] mx-auto px-4 py-32">
+                <h3 id="help-shortcuts-title" class="text-center mb-10 text-3xl font-black text-slate-800 dark:text-white">Keyboard Shortcuts</h3>
+                <div class="max-w-2xl mx-auto bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+                    <div class="grid grid-cols-[1fr_auto] gap-4 p-4 border-b border-slate-100 dark:border-slate-800 items-center">
+                        <span id="help-shortcuts-n" class="text-sm font-medium text-slate-700 dark:text-slate-300">New Task</span><kbd class="kbd">N</kbd>
+                    </div>
+                    <div class="grid grid-cols-[1fr_auto] gap-4 p-4 border-b border-slate-100 dark:border-slate-800 items-center">
+                        <span id="help-shortcuts-search" class="text-sm font-medium text-slate-700 dark:text-slate-300">Search</span><kbd class="kbd">/</kbd>
+                    </div>
+                    <div class="grid grid-cols-[1fr_auto] gap-4 p-4 border-b border-slate-100 dark:border-slate-800 items-center">
+                        <span id="help-shortcuts-esc" class="text-sm font-medium text-slate-700 dark:text-slate-300">Close</span><kbd class="kbd">Esc</kbd>
+                    </div>
+                    <div class="grid grid-cols-[1fr_auto] gap-4 p-4 border-b border-slate-100 dark:border-slate-800 items-center">
+                        <span id="help-shortcuts-board" class="text-sm font-medium text-slate-700 dark:text-slate-300">Go to Board</span><div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">L</kbd></div>
+                    </div>
+                    <div class="grid grid-cols-[1fr_auto] gap-4 p-4 border-b border-slate-100 dark:border-slate-800 items-center">
+                        <span id="help-shortcuts-metrics" class="text-sm font-medium text-slate-700 dark:text-slate-300">Go to Metrics</span><div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">M</kbd></div>
+                    </div>
+                    <div class="grid grid-cols-[1fr_auto] gap-4 p-4 items-center">
+                        <span id="help-shortcuts-burndown" class="text-sm font-medium text-slate-700 dark:text-slate-300">Go to Burndown</span><div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">B</kbd></div>
                     </div>
                 </div>
             </section>
         </main>
 
-        <footer class="mt-32 pt-16 border-t border-slate-200 dark:border-slate-800 text-center">
-            <p id="footer-text" class="text-slate-400 text-xs font-black uppercase tracking-[0.4em] mb-2">MonoFlow Productivity System</p>
-            <p class="text-slate-300 dark:text-slate-600 text-[10px] font-medium">Built for High-Performance Personal Kanban &copy; 2026</p>
+        <footer class="mt-10 pt-16 border-t border-slate-200 dark:border-slate-800 text-center max-w-[1600px] mx-auto">
+            <p id="footer-text" class="text-slate-400 text-[10px] font-black uppercase tracking-[0.4em] mb-2">MonoFlow Productivity System</p>
+            <p class="text-slate-300 dark:text-slate-600 text-[10px] font-medium tracking-widest uppercase">Built for High-Performance Personal Kanban &copy; 2026</p>
         </footer>
     </div>
     <script src="js/common.js"></script>

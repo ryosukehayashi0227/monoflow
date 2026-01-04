@@ -13,13 +13,22 @@ function translateUI() {
     a('lang-btn', 'title', 'switch_lang');
     a('theme-btn', 'title', 'toggle_theme');
     
-    const h2s = document.querySelectorAll('h2');
-    if(h2s[0]) h2s[0].innerHTML = `<i data-lucide="zap" class="w-8 h-8 text-blue-600 fill-blue-600/20"></i> ${Common.t('help_quick')}`;
-    if(h2s[1]) h2s[1].innerHTML = `<i data-lucide="book-open" class="w-8 h-8 text-blue-600 fill-blue-600/20"></i> ${Common.t('help_manual')}`;
+    const h2Quick = document.getElementById('help-quick-header');
+    if (h2Quick) h2Quick.innerHTML = `<i data-lucide="zap" class="w-8 h-8 text-blue-600 fill-blue-600/20"></i> ${Common.t('help_quick')}`;
+    
+    const h2Manual = document.getElementById('help-manual-header');
+    if (h2Manual) h2Manual.innerHTML = `<i data-lucide="book-open" class="w-8 h-8 text-blue-600 fill-blue-600/20"></i> ${Common.t('help_manual')}`;
 
     t('help-q1-title', 'help_q1_t'); t('help-q1-desc', 'help_q1_d');
     t('help-q2-title', 'help_q2_t'); t('help-q2-desc', 'help_q2_d');
     t('help-q3-title', 'help_q3_t'); t('help-q3-desc', 'help_q3_d');
+    
+    // New Features
+    const nfHeader = document.getElementById('help-new-features-header');
+    if (nfHeader) nfHeader.innerHTML = `<i data-lucide="sparkles" class="w-8 h-8 text-yellow-500 fill-yellow-500/20"></i> ${Common.t('help_new_features_t')}`;
+    t('help-nf-blocker-title', 'help_nf_blocker_h'); t('help-nf-blocker-desc', 'help_nf_blocker_d');
+    t('help-nf-stale-title', 'help_nf_stale_h'); t('help-nf-stale-desc', 'help_nf_stale_d');
+
     t('help-m1-title', 'help_m1_t'); t('help-m1-desc', 'help_m1_d');
     t('help-m1-h1', 'help_m1_h1'); t('help-m1-h2', 'help_m1_h2');
     t('help-m1-l1', 'help_m1_l1'); t('help-m1-l2', 'help_m1_l2'); t('help-m1-l3', 'help_m1_l3');
