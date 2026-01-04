@@ -1,7 +1,6 @@
 /**
  * ==========================================================================================
  *  Monoflow - Core Application Logic
- *  Organized into Modules: Constants, State, DataService, UI, LabelManager, Modal, Main
  * ==========================================================================================
  */
 
@@ -28,7 +27,7 @@ const CONSTANTS = {
 const State = {
     data: null,
     filter: 'all',
-    tempLabels: [] // Labels selected in modal
+    tempLabels: []
 };
 
 // --- 3. Data Service ---
@@ -36,7 +35,7 @@ const DataService = {
     init: () => {
         const initialData = {
             tasks: {
-                't1': { id: 't1', content: 'Monoflowへようこそ', description: 'これはサンプルタスクです。', dueDate: '', parentId: null, labels: [], priority: 'high' },
+                't1': { id: 't1', content: 'Monoflowへようこそ', description: 'これはサンプルタスクです。', dueDate: '', parentId: null, labels: [], priority: 'high', updatedAt: new Date().toISOString() },
             },
             columns: {
                 'c1': { id: 'c1', title: 'To Do', taskIds: ['t1'] },
@@ -59,10 +58,9 @@ const DataService = {
     },
 
     ensureIntegrity: () => {
-        // Recover orphans
-        const allTaskIds = new Set(Object.values(State.data.columns).flatMap(c => c.taskIds));
+        const allTaskIdsInColumns = new Set(Object.values(State.data.columns).flatMap(c => c.taskIds));
         Object.keys(State.data.tasks).forEach(id => {
-            if (!allTaskIds.has(id)) {
+            if (!allTaskIdsInColumns.has(id)) {
                 State.data.columns['c1'].taskIds.push(id);
             }
         });
@@ -73,7 +71,6 @@ const DataService = {
         if(!confirm('タスクを削除しますか？')) return;
         State.data.columns[colId].taskIds = State.data.columns[colId].taskIds.filter(id => id !== taskId);
         delete State.data.tasks[taskId];
-        // Reset parentId for children
         Object.values(State.data.tasks).forEach(t => { if(t.parentId === taskId) t.parentId = null; });
         DataService.save();
         App.render();
@@ -99,7 +96,7 @@ const DataService = {
                     DataService.save();
                     App.render();
                 }
-            } catch(err) { alert("ファイルの読み込みに失敗しました。"); }
+            } catch(err) { alert("インポートに失敗しました。"); }
             input.value = '';
         };
         reader.readAsText(file);
@@ -145,7 +142,6 @@ const Modal = {
     },
 
     init: () => {
-        // Generate Priority Options
         const pContainer = document.getElementById('priority-options-container');
         pContainer.innerHTML = CONSTANTS.PRIORITIES.map(p => `
             <label class="cursor-pointer">
@@ -156,7 +152,6 @@ const Modal = {
             </label>
         `).join('');
 
-        // Generate Color Picker
         const cContainer = document.getElementById('label-color-picker');
         const colors = ['red', 'blue', 'green', 'yellow', 'purple'];
         cContainer.innerHTML = colors.map((c, i) => `
@@ -169,35 +164,37 @@ const Modal = {
         const task = State.data.tasks[taskId];
         if (!task) return;
 
-        const { elements } = Modal;
-        elements.id.value = task.id;
-        elements.title.value = task.content;
-        elements.desc.value = task.description || '';
-        elements.date.value = task.dueDate || '';
+        Modal.elements.id.value = task.id;
+        Modal.elements.title.value = task.content;
+        Modal.elements.desc.value = task.description || '';
+        Modal.elements.date.value = task.dueDate || '';
         
-        // Priority
+        // Meta Display
+        const createdEl = document.getElementById('display-created-at');
+        const updatedEl = document.getElementById('display-updated-at');
+        createdEl.textContent = `作成: ${task.createdAt ? UI.formatTime(task.createdAt) : '---'}`;
+        updatedEl.textContent = `最終更新: ${task.updatedAt ? UI.formatTime(task.updatedAt) : '---'}`;
+
         const pVal = task.priority || 'none';
         const pRadio = document.querySelector(`input[name="priority"][value="${pVal}"]`);
         if(pRadio) pRadio.checked = true;
 
-        // Parent Options
-        elements.parent.innerHTML = '<option value="">(なし)</option>';
+        Modal.elements.parent.innerHTML = '<option value="">(なし)</option>';
         Object.values(State.data.tasks).forEach(t => {
             if (t.id !== taskId && !t.parentId) {
                 const opt = document.createElement('option');
                 opt.value = t.id;
                 opt.textContent = t.content.substring(0, 30);
-                elements.parent.appendChild(opt);
+                Modal.elements.parent.appendChild(opt);
             }
         });
-        elements.parent.value = task.parentId || '';
+        Modal.elements.parent.value = task.parentId || '';
 
-        // Labels
         State.tempLabels = task.labels ? [...task.labels] : [];
         Modal.renderLabels();
 
         Modal.elements.overlay.classList.remove('hidden');
-        void Modal.elements.overlay.offsetWidth; // trigger reflow
+        void Modal.elements.overlay.offsetWidth;
         Modal.elements.overlay.classList.remove('opacity-0');
         Modal.elements.content.classList.remove('scale-95', 'opacity-0');
         Modal.elements.content.classList.add('scale-100', 'opacity-100');
@@ -226,8 +223,8 @@ const Modal = {
             t.labels = State.tempLabels;
             t.priority = document.querySelector('input[name="priority"]:checked')?.value || 'none';
             t.parentId = Modal.elements.parent.value || null;
+            t.updatedAt = new Date().toISOString();
 
-            // If became child, reset own children
             if (t.parentId) {
                 Object.values(State.data.tasks).forEach(child => {
                     if (child.parentId === id) child.parentId = null;
@@ -246,28 +243,19 @@ const Modal = {
         State.data.labels.forEach(label => {
             const isSelected = State.tempLabels.includes(label.id);
             const colorClass = CONSTANTS.COLORS[label.color] || CONSTANTS.COLORS.blue;
-            
             const el = document.createElement('div');
-            el.className = `flex items-center gap-1 px-2 py-1 rounded-full border cursor-pointer transition-all ${colorClass} ${isSelected ? 'ring-2 ring-slate-400' : 'opacity-60 hover:opacity-100'}`;
-            el.innerHTML = `
-                <span class="text-xs font-bold mr-1 select-none">${label.name}</span>
-                <button type="button" class="hover:text-red-900"><i data-lucide="x" class="w-3 h-3"></i></button>
-            `;
-            
-            // Click handlers
+            el.className = `flex items-center gap-1 px-2 py-1 rounded-full border cursor-pointer transition-all ${colorClass} ${isSelected ? 'ring-2 ring-offset-1 ring-slate-400' : 'opacity-60 hover:opacity-100'}`;
+            el.innerHTML = `<span class="text-xs font-bold mr-1 select-none">${label.name}</span><button type="button" class="hover:text-red-900"><i data-lucide="x" class="w-3 h-3"></i></button>`;
             el.onclick = (e) => {
-                // Delete button click
                 if (e.target.closest('button')) {
                     e.stopPropagation();
                     LabelManager.delete(label.id);
                     return;
                 }
-                // Toggle Selection
                 if (isSelected) State.tempLabels = State.tempLabels.filter(id => id !== label.id);
                 else State.tempLabels.push(label.id);
                 Modal.renderLabels();
             };
-            
             container.appendChild(el);
         });
         lucide.createIcons();
@@ -276,27 +264,27 @@ const Modal = {
 
 // --- 6. UI Generator ---
 const UI = {
+    formatTime: (iso) => {
+        if (!iso) return '';
+        const d = new Date(iso);
+        return d.toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    },
+
     createTaskCard: (task, columnId, visibleTasksContext) => {
         const isDone = columnId === CONSTANTS.DONE_COLUMN_ID;
         const el = document.createElement('div');
         
-        // Indent Check: 
-        // If it has a parentId, it is a child. 
-        // Logic: It should be indented if it's under a Real Parent OR a Virtual Parent.
-        // Since we insert Virtual Parents for orphans, ANY task with a valid parentId should be indented.
         const hasParent = !!task.parentId && !!State.data.tasks[task.parentId];
         const indentClass = hasParent ? 'child-task scale-95 origin-left' : '';
         
         el.className = `task-card bg-white border border-slate-200 rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass} ${isDone ? 'is-done' : ''}`;
         el.dataset.taskId = task.id;
 
-        // Priority Icon
         const pConfig = CONSTANTS.PRIORITIES.find(p => p.value === task.priority);
         const priorityHtml = (pConfig && pConfig.value !== 'none') 
             ? `<div class="flex items-center justify-center w-6 h-6 rounded-md border ${pConfig.style.replace('text-sm font-bold', '')}"><i data-lucide="${pConfig.icon}" class="w-4 h-4"></i></div>` 
             : '';
 
-        // Labels
         const labelsHtml = task.labels && task.labels.length > 0
             ? `<div class="flex flex-wrap gap-1.5 mb-2">` + task.labels.map(lid => {
                 const l = State.data.labels.find(x => x.id === lid);
@@ -304,14 +292,12 @@ const UI = {
               }).join('') + `</div>`
             : '';
 
-        // Parent Indicator
         let parentIndicator = '';
         if (task.parentId) {
             const p = State.data.tasks[task.parentId];
             if (p) parentIndicator = `<div class="text-[10px] text-blue-500 font-semibold mb-1 flex items-center gap-1"><i data-lucide="corner-down-right" class="w-3 h-3"></i>${p.content.substring(0,15)}...</div>`;
         }
 
-        // Meta (Date/Time)
         let metaHtml = `<div class="flex items-center gap-3 mt-3">`;
         if (isDone && task.completedDate) {
             metaHtml += `<div class="flex items-center gap-1 text-[11px] font-bold text-green-600 bg-green-50 border border-green-100 px-2 py-0.5 rounded-md"><i data-lucide="check-circle-2" class="w-3 h-3"></i>完了: ${task.completedDate}</div>`;
@@ -321,7 +307,18 @@ const UI = {
             metaHtml += `<div class="flex items-center gap-1 text-xs font-medium border px-2 py-1 rounded-md w-fit ${style}"><i data-lucide="clock" class="w-3 h-3"></i>${task.dueDate}</div>`;
         }
         if (task.description) metaHtml += `<i data-lucide="align-left" class="w-3 h-3 text-slate-400"></i>`;
-        metaHtml += `</div>`;
+        
+        // Timestamps (Created & Updated)
+        let timestampsHtml = `<div class="ml-auto flex flex-col items-end gap-0.5">`;
+        if (task.createdAt) {
+            timestampsHtml += `<div class="text-[9px] text-slate-300 font-medium">作成: ${UI.formatTime(task.createdAt)}</div>`;
+        }
+        if (task.updatedAt && task.updatedAt !== task.createdAt) {
+            timestampsHtml += `<div class="flex items-center gap-1 text-[9px] text-blue-400 font-bold"><i data-lucide="refresh-cw" class="w-2 h-2"></i>更新: ${UI.formatTime(task.updatedAt)}</div>`;
+        }
+        timestampsHtml += `</div>`;
+        
+        metaHtml += timestampsHtml + `</div>`;
 
         el.innerHTML = `
             ${parentIndicator}
@@ -363,19 +360,16 @@ const App = {
         DataService.init();
         Modal.init();
         
-        // Event Listeners
         document.getElementById('add-task-form').addEventListener('submit', App.handleAddTask);
         document.getElementById('label-filter').addEventListener('change', (e) => {
             State.filter = e.target.value;
             App.render();
         });
         
-        // Close modal listener
         document.getElementById('task-modal').addEventListener('click', (e) => {
             if (e.target.id === 'task-modal') Modal.close();
         });
 
-        // Global Settings Toggle
         const menu = document.getElementById('settings-menu');
         window.toggleMenu = (e) => { e.stopPropagation(); menu.classList.toggle('hidden'); };
         document.addEventListener('click', () => menu.classList.add('hidden'));
@@ -389,9 +383,12 @@ const App = {
         const content = input.value.trim();
         if (content) {
             const id = `task-${Date.now()}`;
+            const now = new Date().toISOString();
             State.data.tasks[id] = { 
                 id, content, description: '', dueDate: '', 
-                parentId: null, labels: [], priority: 'none' 
+                parentId: null, labels: [], priority: 'none',
+                createdAt: now,
+                updatedAt: now
             };
             State.data.columns['c1'].taskIds.unshift(id);
             DataService.save();
@@ -411,75 +408,53 @@ const App = {
             colEl.className = 'bg-slate-200/40 backdrop-blur-md rounded-[2rem] p-6 flex flex-col border border-white/20 shadow-inner h-full min-h-[500px]';
             colEl.innerHTML = `
                 <div class="flex justify-between items-center mb-6 px-2">
-                    <h2 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                        ${column.title}
-                    </h2>
-                    <span class="bg-white/80 text-slate-500 text-[10px] font-black px-3 py-1 rounded-full shadow-sm border border-slate-100">
-                        ${column.taskIds.length}
-                    </span>
+                    <h2 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">${column.title}</h2>
+                    <span class="bg-white/80 text-slate-500 text-[10px] font-black px-3 py-1 rounded-full shadow-sm border border-slate-100">${column.taskIds.length}</span>
                 </div>
             `;
 
             const listEl = document.createElement('div');
-            listEl.className = 'task-list space-y-3 min-h-[100px] pb-4';
+            listEl.className = 'task-list space-y-3 pb-20 flex-grow min-h-[200px]'; // Added flex-grow and large padding bottom
             listEl.dataset.columnId = colId;
 
-            // --- Filtering & Grouping Logic ---
             const tasks = column.taskIds.map(id => State.data.tasks[id]).filter(Boolean);
             const visible = tasks.filter(t => State.filter === 'all' || (t.labels && t.labels.includes(State.filter)));
 
-            const renderItems = []; // { type: 'real'|'virtual', task }
-            const processed = new Set();
+            const renderItems = []; 
+            const processedIds = new Set();
 
-            // 1. Identify Roots & Orphans
-            // A task is a "Root in this column" if:
-            // - It has no parent
-            // - OR its parent is NOT in the visible list of THIS column (meaning parent is elsewhere)
-            const roots = visible.filter(t => !t.parentId || !visible.some(pt => pt.id === t.parentId));
-            
+            const roots = visible.filter(t => {
+                if (!t.parentId) return true;
+                const parentInCol = visible.some(pt => pt.id === t.parentId);
+                return !parentInCol;
+            });
+
             roots.forEach(root => {
-                // If this root actually HAS a parent (but parent is absent/elsewhere),
-                // we must show a Virtual Parent first.
+                if (processedIds.has(root.id)) return;
                 if (root.parentId) {
                     const pTask = State.data.tasks[root.parentId];
-                    // Add virtual parent if it exists and we haven't rendered it yet in this loop context
-                    // (Actually, each orphan child needs its own context, or grouped under one virtual?
-                    //  Simplest: Just show virtual parent above the child to indicate context.)
-                    if (pTask) {
-                        // Check if we just added this virtual parent for the previous sibling? 
-                        // To avoid duplicating "Virtual Parent A" "Child 1", "Virtual Parent A" "Child 2"...
-                        // let's check the last added item.
-                        const lastItem = renderItems[renderItems.length - 1];
-                        if (!lastItem || lastItem.type !== 'virtual' || lastItem.task.id !== pTask.id) {
-                             renderItems.push({ type: 'virtual', task: pTask });
-                        }
+                    const last = renderItems[renderItems.length - 1];
+                    if (pTask && (!last || last.type !== 'virtual' || last.task.id !== pTask.id)) {
+                        renderItems.push({ type: 'virtual', task: pTask });
                     }
                 }
-                
                 renderItems.push({ type: 'real', task: root });
-                processed.add(root.id);
-
-                // 2. Render Children of this root (that ARE in this column)
-                // Since 'root' is now here (real or orphan-as-root), its children should follow.
+                processedIds.add(root.id);
                 const children = visible.filter(c => c.parentId === root.id);
                 children.forEach(child => {
-                    renderItems.push({ type: 'real', task: child });
-                    processed.add(child.id);
+                    if (!processedIds.has(child.id)) {
+                        renderItems.push({ type: 'real', task: child });
+                        processedIds.add(child.id);
+                    }
                 });
             });
 
-            // 3. Fallback for any tasks missed by the above logic (safety net)
-            visible.forEach(t => { 
-                if(!processed.has(t.id)) {
-                    // Treat as root if missed
-                    renderItems.push({ type: 'real', task: t }); 
-                }
-            });
+            visible.forEach(t => { if (!processedIds.has(t.id)) renderItems.push({ type: 'real', task: t }); });
 
             renderItems.forEach(item => {
                 const el = item.type === 'virtual' 
                     ? UI.createVirtualParent(item.task) 
-                    : UI.createTaskCard(item.task, colId, visible); // Pass 'visible' as context for indentation check
+                    : UI.createTaskCard(item.task, colId, visible);
                 listEl.appendChild(el);
             });
 
@@ -508,45 +483,23 @@ const App = {
             new Sortable(list, {
                 group: 'tasks', animation: 250, ghostClass: 'ghost-card',
                 onEnd: (evt) => {
-                    const { item, to, from, newIndex, oldIndex } = evt;
-                    
-                    // Check if Virtual Card (ignore drag, though usually filtered by class)
+                    const { item, to, from } = evt;
                     if (item.classList.contains('virtual-parent-card')) return;
 
                     const taskId = item.dataset.taskId;
                     const toCol = to.dataset.columnId;
                     const fromCol = from.dataset.columnId;
 
-                    // Correctly calculate new index in DATA array by ignoring virtual elements in DOM
-                    const getRealIndex = (container, domIndex) => {
-                        const children = Array.from(container.children);
-                        let realIdx = 0;
-                        for (let i = 0; i < domIndex; i++) {
-                            if (!children[i].classList.contains('virtual-parent-card')) {
-                                realIdx++;
-                            }
-                        }
-                        return realIdx;
-                    };
-
-                    // 1. Remove from Source Data
                     State.data.columns[fromCol].taskIds = State.data.columns[fromCol].taskIds.filter(id => id !== taskId);
-
-                    // 2. Insert into Target Data based on new DOM order
-                    // Iterate target DOM children, extract task IDs, ignore virtuals.
                     const newTaskIds = [];
                     Array.from(to.children).forEach(child => {
                         if (!child.classList.contains('virtual-parent-card') && child.dataset.taskId) {
                             newTaskIds.push(child.dataset.taskId);
                         }
                     });
-                    
                     State.data.columns[toCol].taskIds = newTaskIds;
 
-                    // 3. Update Task Metadata
                     const task = State.data.tasks[taskId];
-                    
-                    // Completed Logic
                     if (toCol === CONSTANTS.DONE_COLUMN_ID) {
                         if (!task.completedDate) {
                             const now = new Date();
@@ -557,7 +510,7 @@ const App = {
                     } else {
                         task.completedDate = null;
                     }
-
+                    task.updatedAt = new Date().toISOString();
                     DataService.save();
                     App.render();
                 }

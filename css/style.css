@@ -50,6 +50,7 @@ body.modal-open { overflow: hidden; }
 /* --- Layout Elements --- */
 .task-list {
     transition: background-color 0.2s ease;
+    height: 100%;
 }
 
 /* Column background subtle accent */
