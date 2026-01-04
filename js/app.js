@@ -1,16 +1,11 @@
 /**
- * ==========================================================================================
- *  MonoFlow - Core Application Logic
- * ==========================================================================================
+ * MonoFlow - Core Application Logic
  */
 
-// --- 1. Board Data Controller ---
 const BoardData = {
     init: () => {
-        const saved = localStorage.getItem(CONSTANTS.STORAGE_KEY);
-        if (saved) {
-            State.data = JSON.parse(saved);
-        } else {
+        const saved = DataService.load();
+        if (saved) { State.data = saved; } else {
             State.data = {
                 tasks: { 't1': { id: 't1', content: Common.t('welcome_title'), description: Common.t('welcome_desc'), dueDate: '', parentId: null, labels: [], priority: 'high', updatedAt: new Date().toISOString(), createdAt: new Date().toISOString(), archived: false } },
                 columns: { 'c1': { id: 'c1', title: 'To Do', taskIds: ['t1'] }, 'c2': { id: 'c2', title: 'In Progress', taskIds: [] }, 'c3': { id: 'c3', title: 'Done', taskIds: [] } },
@@ -20,7 +15,7 @@ const BoardData = {
         }
         BoardData.ensureIntegrity();
     },
-    save: () => localStorage.setItem(CONSTANTS.STORAGE_KEY, JSON.stringify(State.data)),
+    save: () => DataService.save(State.data),
     ensureIntegrity: () => {
         const allInCols = new Set(Object.values(State.data.columns).flatMap(c => c.taskIds));
         Object.keys(State.data.tasks).forEach(id => { if (!State.data.tasks[id].archived && !allInCols.has(id)) State.data.columns['c1'].taskIds.push(id); });
@@ -32,7 +27,6 @@ const BoardData = {
         delete State.data.tasks[taskId];
         Object.values(State.data.tasks).forEach(t => { if(t.parentId === taskId) t.parentId = null; });
         BoardData.save(); App.render();
-        if (document.getElementById('archive-modal').classList.contains('opacity-100')) Archive.render();
     },
     archiveTask: (taskId) => {
         const t = State.data.tasks[taskId];
@@ -50,7 +44,6 @@ const BoardData = {
     }
 };
 
-// --- 2. Label Manager ---
 const LabelManager = {
     create: () => {
         const nameInput = document.getElementById('new-label-name');
@@ -68,7 +61,6 @@ const LabelManager = {
     }
 };
 
-// --- 3. Modal Logic ---
 const Modal = {
     elements: {
         overlay: document.getElementById('task-modal'),
@@ -86,12 +78,7 @@ const Modal = {
     },
     renderStaticUI: () => {
         document.querySelector('#task-modal h3').textContent = Common.t('modal_title');
-        const titleLabel = Modal.elements.title.previousElementSibling; if (titleLabel) titleLabel.textContent = Common.t('modal_label_title');
-        const priorityLabel = document.getElementById('priority-options-container').previousElementSibling; if (priorityLabel) priorityLabel.textContent = Common.t('modal_label_priority');
-        const tagsLabel = Modal.elements.labelsContainer.parentElement.querySelector('label'); if (tagsLabel) tagsLabel.textContent = Common.t('modal_label_tags');
-        const parentLabel = Modal.elements.parent.parentElement.previousElementSibling; if (parentLabel) parentLabel.textContent = Common.t('modal_label_parent');
-        const notesLabel = Modal.elements.desc.previousElementSibling; if (notesLabel) notesLabel.textContent = Common.t('modal_label_desc');
-        const dateLabel = Modal.elements.date.previousElementSibling; if (dateLabel) dateLabel.textContent = Common.t('modal_label_date');
+        Common.setT('display-created-at', 'task_created'); // Placeholder, actual time added in open()
         const addTagBtn = document.getElementById('modal-add-tag-btn'); if (addTagBtn) addTagBtn.textContent = Common.t('modal_btn_add_tag');
         const cancelBtn = document.getElementById('modal-cancel-btn'); if (cancelBtn) cancelBtn.textContent = Common.t('modal_btn_cancel');
         const saveBtn = document.getElementById('modal-save-btn'); if (saveBtn) saveBtn.textContent = Common.t('modal_btn_save');
@@ -136,9 +123,8 @@ const Modal = {
     }
 };
 
-// --- 4. UI Generator ---
 const UI = {
-    formatTime: (iso) => { if (!iso) return ''; const d = new Date(iso.includes('T') ? iso : iso.replace(/-/g, '/')); return d.toLocaleString(State.language === 'ja' ? 'ja-JP' : 'en-US', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }); },
+    formatTime: (iso) => { if (!iso) return ''; const d = Common.parseDate(iso); return d.toLocaleString(State.language === 'ja' ? 'ja-JP' : 'en-US', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }); },
     createTaskCard: (task, columnId, visibleTasksContext) => {
         const isDone = columnId === CONSTANTS.DONE_COLUMN_ID; const el = document.createElement('div');
         const hasParent = !!task.parentId && !!State.data.tasks[task.parentId]; const indentClass = hasParent ? 'child-task scale-95 origin-left' : '';
@@ -178,7 +164,6 @@ const UI = {
     }
 };
 
-// --- 5. Archive Logic ---
 const Archive = {
     open: () => { Archive.render(); const m = document.getElementById('archive-modal'); m.classList.remove('hidden'); void m.offsetWidth; m.classList.remove('opacity-0'); m.querySelector('.modal-content').classList.add('scale-100', 'opacity-100'); document.body.classList.add('modal-open'); },
     close: () => { const m = document.getElementById('archive-modal'); m.classList.add('opacity-0'); m.querySelector('.modal-content').classList.remove('scale-100', 'opacity-100'); setTimeout(() => { m.classList.add('hidden'); document.body.classList.remove('modal-open'); }, 250); },
@@ -193,34 +178,41 @@ const Archive = {
     }
 };
 
-// --- 6. Main Controller ---
 const App = {
     jumpToTask: (id) => {
         const j = () => { const t = document.querySelector(`.task-card[data-task-id="${id}"]`); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'center' }); t.classList.add('is-flash'); setTimeout(() => t.classList.remove('is-flash'), 3000); } };
         if (!document.querySelector(`.task-card[data-task-id="${id}"]`)) { State.filter = 'all'; State.priorityFilter = 'all'; State.searchQuery = ''; document.getElementById('search-input').value = ''; App.render(); setTimeout(j, 200); } else j();
     },
     init: () => {
-        BoardData.init(); Modal.init();
+        BoardData.init();
+        Modal.renderStaticUI();
+        App.translateUI();
         document.getElementById('add-task-form').addEventListener('submit', App.handleAddTask);
         document.getElementById('label-filter').addEventListener('change', (e) => { State.filter = e.target.value; App.render(); });
         document.getElementById('priority-filter').addEventListener('change', (e) => { State.priorityFilter = e.target.value; App.render(); });
         document.getElementById('search-input').addEventListener('input', (e) => { State.searchQuery = e.target.value.toLowerCase().trim(); App.render(); });
         document.getElementById('task-modal').addEventListener('click', (e) => { if (e.target.id === 'task-modal') Modal.close(); });
-        document.addEventListener('keydown', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') { if (e.key === 'Escape') { e.target.blur(); Modal.close(); Archive.close(); } return; }
-            switch (e.code) { case 'KeyN': e.preventDefault(); document.getElementById('new-task-input').focus(); break; case 'Slash': e.preventDefault(); document.getElementById('search-input').focus(); break; case 'Escape': Modal.close(); Archive.close(); break; }
-        });
         App.render();
-
-        // Check for URL parameters (Jump from Notification)
         const urlParams = new URLSearchParams(window.location.search);
         const jumpId = urlParams.get('jumpTaskId');
-        if (jumpId) {
-            // Wait for render to finish
-            setTimeout(() => App.jumpToTask(jumpId), 500);
-            // Clean up URL
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
+        if (jumpId) { setTimeout(() => App.jumpToTask(jumpId), 500); window.history.replaceState({}, document.title, window.location.pathname); }
+    },
+    translateUI: () => {
+        const t = (id, key) => Common.setT(id, key);
+        const a = (id, attr, key) => Common.setAttr(id, attr, key);
+        t('brand-title', 'about_title'); t('brand-subtitle', 'app_desc');
+        t('nav-board', 'menu_board'); t('nav-metrics', 'menu_metrics'); t('nav-burndown', 'menu_burndown');
+        t('about-link', 'about_link');
+        t('notify-title', 'notify_title');
+        t('add-btn-text', 'add_btn');
+        t('menu-board-text', 'menu_board'); t('menu-metrics-text', 'menu_metrics'); t('menu-burndown-text', 'menu_burndown'); t('menu-about-text', 'menu_about');
+        t('menu-export', 'menu_export'); t('menu-import', 'menu_import'); t('menu-archive', 'menu_archive'); t('menu-reset', 'menu_reset');
+        t('footer-text', 'help_footer');
+        a('search-input', 'placeholder', 'search_placeholder');
+        a('new-task-input', 'placeholder', 'add_placeholder');
+        a('help-btn', 'title', 'menu_help');
+        a('lang-btn', 'title', 'switch_lang');
+        a('theme-btn', 'title', 'toggle_theme');
     },
     handleAddTask: (e) => {
         e.preventDefault(); const input = document.getElementById('new-task-input'); const content = input.value.trim();

@@ -1,5 +1,5 @@
 /**
- * MonoFlow - Common Shared Logic (i18n, Theme, Data Management, Notifications)
+ * MonoFlow - Unified Shared Logic (i18n, Theme, Data Management, Notifications)
  */
 
 const CONSTANTS = {
@@ -53,6 +53,8 @@ const Common = {
             menu_about: 'About',
             menu_help: 'User Guide',
             menu_reset: 'ボードのリセット',
+            switch_lang: '言語を切り替える',
+            toggle_theme: 'テーマを切り替える',
             modal_title: 'タスク詳細',
             modal_label_title: 'タイトル',
             modal_label_priority: '優先度',
@@ -111,7 +113,7 @@ const Common = {
             help_quick: 'クイックスタート',
             help_manual: '詳細マニュアル',
             help_q1_t: 'タスクの作成',
-            help_q1_d: '上部の入力欄に内容を書き込み Enter を押すだけ。瞬時にチケットが発行されます。',
+            help_q1_d: '上部の大きな入力欄に内容を書き込み Enter を押すだけ。瞬時にチケットが発行されます。',
             help_q2_t: '進捗の管理',
             help_q2_d: 'カードをドラッグしてレーン間を移動。Doneへ移動させると完了時刻が自動記録されます。',
             help_q3_t: '情報の詳細化',
@@ -125,14 +127,14 @@ const Common = {
             help_m1_l4: '<strong>期限バッジ:</strong> 期限が今日または過去の場合、赤く強調され見落としを防ぎます。',
             help_m1_h2: 'ステータス管理',
             help_m1_l5: 'Doneレーンにあるタスクは、新しい未完了タスクへの集中を助けるため、自動的に「減光」処理されます。',
-            help_m1_l6: '完了済みチケットのタイトルには打ち消し線が適用され、心理的な達成感を高めます。',
+            help_m1_l6: 'タイトルには打ち消し線が適用され、心理的な達成感を高めます。',
             help_m1_l7: '完了データはISO形式で厳密に管理され、メトリクス画面での正確な分析ソースとなります。',
             help_m2_t: '2. 高度な親子関係と階層化',
             help_m2_d: 'MonoFlowは「Parent-Child」の2階層構造を厳格に維持することで、強力な整理機能を提供します。',
             help_m2_h1: '仮想親チケット (Context Ghost)',
             help_m2_l1: '子タスクが親と異なるカラムにある場合、親の「残像」が表示されます。これにより、作業中に「この作業は何のプロジェクトの一部か」という文脈を失わずに済みます。',
             help_m2_h2: '仮想子チケット (Subtask Preview)',
-            help_m2_l2: '親タスクの下には、他カラムに散らばっている全子タスクの状況がコンパクトなリストとして集約されます。',
+            help_m2_l2: '親タスクの下には、他レーンに散らばっている全子タスクの状況がコンパクトなリストとして集約されます。',
             help_m2_h3: 'ジャンプ＆フラッシュ',
             help_m2_l3: '仮想チケットをクリックすると、実体のある場所まで一瞬でスクロールし、青く「フラッシュ」して強調します。',
             help_m2_extra: '親タスクにはサブタスク全体の消化率とプログレスバーが表示され、プロジェクト全体の健康状態を可視化します。',
@@ -168,6 +170,10 @@ const Common = {
             help_shortcuts_burndown: 'Burndown ページへ移動 (Alt / ⌥)',
             help_shortcuts_board: 'ボード画面へ移動 (Alt / ⌥)',
             help_footer: 'MonoFlow Productivity System - Built for High-Performance Personal Kanban',
+            notify_title: '通知センター',
+            notify_overdue: '期限切れ',
+            notify_due_today: '今日の期限',
+            notify_none: '緊急のタスクはありません',
             about_title: 'MonoFlow',
             about_link: 'What is MonoFlow?',
             about_subtitle: 'ミニマルで強力な個人用カンバン',
@@ -199,6 +205,8 @@ const Common = {
             menu_about: 'About',
             menu_help: 'User Guide',
             menu_reset: 'Reset Board',
+            switch_lang: 'Switch Language',
+            toggle_theme: 'Toggle Theme',
             modal_title: 'Task Details',
             modal_label_title: 'Title',
             modal_label_priority: 'Priority',
@@ -266,17 +274,17 @@ const Common = {
             help_m1_d: 'MonoFlow task cards are designed to prioritize information and provide an immediate overview.',
             help_m1_h1: 'Visual Indicators',
             help_m1_l1: '<strong>Priority Accents:</strong> Border colors represent High (Red), Med (Orange), and Low (Blue) importance.',
-            help_m1_l2: '<strong>Dynamic Timestamps:</strong> Both created and last-updated times are automatically tracked and displayed.',
+            help_m1_l2: '<strong>Dynamic Timestamps:</strong> Both created and last-updated times are automatically tracked.',
             help_m1_l3: '<strong>Note Preview:</strong> Shows the first two lines of your notes, providing context without cluttering.',
             help_m1_l4: '<strong>Status Badges:</strong> Overdue deadlines are highlighted in red to ensure visibility.',
             help_m1_h2: 'Completion Behavior',
             help_m1_l5: 'Tasks in the Done lane are dimmed. This intentional "gray-out" helps you focus on active, incomplete tasks.',
             help_m1_l6: 'Titles are struck through to provide a psychological sense of accomplishment.',
-            help_m1_l7: 'Completion times are strictly recorded in ISO format for accurate reporting in the Metrics dashboard.',
+            help_m1_l7: 'Completion times are recorded in ISO format for accurate reporting in the Metrics dashboard.',
             help_m2_t: '2. Hierarchy & Smart Nesting',
             help_m2_d: 'MonoFlow uses a strict Parent-Child structure to keep your workflow simple yet effective.',
             help_m2_h1: 'Virtual Parent (Context Ghost)',
-            help_m2_l1: 'If a subtask is in a different column than its parent, a placeholder of the parent is shown to maintain context.',
+            help_m2_l1: 'If a subtask is moved to a different column than its parent, a placeholder of the parent is shown to maintain context.',
             help_m2_h2: 'Virtual Child (Subtask Preview)',
             help_m2_l2: 'Under a parent task, all subtasks located in other lanes are shown as a compact, aggregated list.',
             help_m2_h3: 'Jump & Flash Navigation',
@@ -285,25 +293,25 @@ const Common = {
             help_m2_l4: '<strong>Hierarchy Limit:</strong> To prevent over-complication, tasks are limited to 2 levels. Tasks with children cannot be assigned a parent.',
             help_m3_t: '3. Search & Advanced Filtering',
             help_m3_d: 'Quickly find what you need, even when managing thousands of tasks.',
-            help_m3_h1: 'Real-time Full-text Search',
+            help_m3_h1: 'Full-text Search',
             help_m3_l1: 'Search queries check both "Titles" and "Notes" simultaneously as you type.',
             help_m3_h2: 'Multi-layer Filtering',
             help_m3_l2: 'Combine label selections and priority filters for focused work sessions.',
             help_m3_extra: 'Note: Drag & Drop is temporarily disabled while filters are active to prevent data corruption.',
             help_m4_t: '4. Analytics & Productivity Science',
-            help_m4_d: 'MonoFlow turns your activity history into actionable data to help you evaluate performance.',
-            help_m4_h1: 'Metrics Dashboard',
-            help_m4_l1: '<strong>Average Lead Time:</strong> The average time from task creation to completion. Essential for capacity planning.',
+            help_m4_d: 'MonoFlow turns your task history into actionable data to help you evaluate performance.',
+            help_m4_h1: 'Key Metrics',
+            help_m4_l1: '<strong>Average Lead Time:</strong> The average time from creation to completion. Essential for capacity planning.',
             help_m4_h2: 'Burndown Dynamics',
-            help_m4_l2: '<strong>Ideal vs. Actual:</strong> Compare your actual progress line against the ideal trend to detect delays early.',
+            help_m4_l2: 'Compare Actual work against the Ideal Line to detect project delays early.',
             help_m4_h3: 'Archive Logic',
-            help_m4_l3: 'Archiving is a "storage shelf" rather than deletion. It hides tasks from view but preserves data for metrics. Restoring accurately returns them to original lanes.',
+            help_m4_l3: 'Archiving is a "storage shelf" rather than deletion. It hides tasks but preserves data for historical metrics.',
             help_m4_privacy_t: 'Data Privacy',
-            help_m4_privacy_d: 'All data stays in your browser\'s LocalStorage. With no central server, your data privacy is physically guaranteed.',
+            help_m4_privacy_d: 'All data stays in your browser\'s LocalStorage. Privacy is guaranteed.',
             help_m5_t: '5. Customization & Efficiency',
             help_m5_h1: 'Dark Mode',
-            help_m5_l1: 'Switch via the moon icon. Reduces eye strain during late-night focus sessions.',
-            help_m5_h2: 'Comprehensive Backups',
+            help_m5_l1: 'Integrated support for a sleek dark theme, reducing eye strain.',
+            help_m5_h2: 'Full Backups',
             help_m5_l2: 'Exports generate a JSON including tasks, labels, language settings, and theme preferences.',
             help_shortcuts_t: 'Keyboard Shortcuts',
             help_shortcuts_n: 'Focus New Task Input',
@@ -314,6 +322,10 @@ const Common = {
             help_shortcuts_burndown: 'Go to Burndown Page (Alt / ⌥)',
             help_shortcuts_board: 'Go to Board (Alt / ⌥)',
             help_footer: 'MonoFlow Productivity System - Built for High-Performance Personal Kanban',
+            notify_title: 'Notification Center',
+            notify_overdue: 'Overdue',
+            notify_due_today: 'Due Today',
+            notify_none: 'No urgent tasks found',
             about_title: 'About MonoFlow',
             about_link: 'What is MonoFlow?',
             about_subtitle: 'Minimal yet Powerful Personal Kanban',
@@ -353,63 +365,51 @@ const Common = {
         document.addEventListener('click', (e) => {
             const settingsMenu = document.getElementById('settings-menu');
             const notifyMenu = document.getElementById('notify-menu');
-            
             if (settingsMenu && !settingsMenu.classList.contains('hidden')) {
-                if (!e.target.closest('#settings-menu') && !e.target.closest('[onclick*="toggleMenu"]')) {
-                    settingsMenu.classList.add('hidden');
-                }
+                if (!e.target.closest('#settings-menu') && !e.target.closest('[onclick*="toggleMenu"]')) { settingsMenu.classList.add('hidden'); }
             }
             if (notifyMenu && !notifyMenu.classList.contains('hidden')) {
-                if (!e.target.closest('#notify-menu') && !e.target.closest('[onclick*="toggleNotifications"]')) {
-                    notifyMenu.classList.add('hidden');
-                }
+                if (!e.target.closest('#notify-menu') && !e.target.closest('[onclick*="toggleNotifications"]')) { notifyMenu.classList.add('hidden'); }
             }
         });
-
         NotificationService.updateBadge();
     },
 
     applyTheme: () => {
         const dark = State.theme === 'dark';
         document.documentElement.classList.toggle('dark', dark);
-        const lightIcon = document.getElementById('theme-icon-light');
-        const darkIcon = document.getElementById('theme-icon-dark');
-        if (lightIcon) lightIcon.classList.toggle('hidden', !dark);
-        if (darkIcon) darkIcon.classList.toggle('hidden', dark);
+        const lIcon = document.getElementById('theme-icon-light');
+        const dIcon = document.getElementById('theme-icon-dark');
+        if (lIcon) lIcon.classList.toggle('hidden', !dark);
+        if (dIcon) dIcon.classList.toggle('hidden', dark);
     },
 
-    toggleTheme: () => {
-        State.theme = State.theme === 'light' ? 'dark' : 'light';
-        localStorage.setItem(CONSTANTS.THEME_KEY, State.theme);
-        Common.applyTheme();
-    },
-
-    toggleMenu: (e) => {
-        if (e) { e.preventDefault(); e.stopPropagation(); }
-        const menu = document.getElementById('settings-menu');
-        if (menu) menu.classList.toggle('hidden');
-    },
-
-    setLanguage: (lang) => {
-        State.language = lang;
-        localStorage.setItem(CONSTANTS.LANG_KEY, lang);
-        location.reload(); 
-    }
+    toggleTheme: () => { State.theme = State.theme === 'light' ? 'dark' : 'light'; localStorage.setItem(CONSTANTS.THEME_KEY, State.theme); Common.applyTheme(); },
+    toggleMenu: (e) => { if (e) { e.preventDefault(); e.stopPropagation(); } const menu = document.getElementById('settings-menu'); if (menu) menu.classList.toggle('hidden'); },
+    setLanguage: (lang) => { State.language = lang; localStorage.setItem(CONSTANTS.LANG_KEY, lang); location.reload(); },
+    
+    // Shared Trans Helper
+    setT: (id, key) => { const el = document.getElementById(id); if (el) el.innerHTML = Common.t(key); },
+    setAttr: (id, attr, key) => { const el = document.getElementById(id); if (el) el.setAttribute(attr, Common.t(key)); }
 };
 
 const DataService = {
+    load: () => {
+        const saved = localStorage.getItem(CONSTANTS.STORAGE_KEY);
+        return saved ? JSON.parse(saved) : null;
+    },
+    save: (data) => localStorage.setItem(CONSTANTS.STORAGE_KEY, JSON.stringify(data)),
+    
     export: () => {
-        const rawData = localStorage.getItem(CONSTANTS.STORAGE_KEY);
         const fullState = {
-            data: rawData ? JSON.parse(rawData) : null,
+            data: DataService.load(),
             lang: localStorage.getItem(CONSTANTS.LANG_KEY),
             theme: localStorage.getItem(CONSTANTS.THEME_KEY),
             version: 'v10-unified'
         };
         const a = document.createElement('a');
-        const date = new Date().toISOString().split('T')[0];
         a.href = URL.createObjectURL(new Blob([JSON.stringify(fullState, null, 2)], { type: "application/json" }));
-        a.download = `monoflow-backup-${date}.json`; a.click();
+        a.download = `monoflow-backup-${new Date().toISOString().split('T')[0]}.json`; a.click();
     },
 
     import: (input) => {
@@ -420,21 +420,19 @@ const DataService = {
                 const imported = JSON.parse(e.target.result);
                 const data = imported.data || (imported.tasks ? imported : null);
                 if (data) {
-                    localStorage.setItem(CONSTANTS.STORAGE_KEY, JSON.stringify(data));
+                    DataService.save(data);
                     if (imported.lang) localStorage.setItem(CONSTANTS.LANG_KEY, imported.lang);
                     if (imported.theme) localStorage.setItem(CONSTANTS.THEME_KEY, imported.theme);
-                    alert(Common.t('import_done'));
                     location.reload();
                 } else { throw new Error(); }
-            } catch(err) { alert(Common.t('import_fail')); } 
+            } catch(err) { alert(Common.t('import_fail')); }
             input.value = '';
         };
         reader.readAsText(file);
     },
 
     resetAll: () => {
-        if (!confirm(Common.t('confirm_reset_1'))) return;
-        if (!confirm(Common.t('confirm_reset_2'))) return;
+        if (!confirm(Common.t('confirm_reset_1')) || !confirm(Common.t('confirm_reset_2'))) return;
         localStorage.removeItem(CONSTANTS.STORAGE_KEY);
         location.reload();
     }
@@ -442,58 +440,40 @@ const DataService = {
 
 const NotificationService = {
     getUrgentTasks: () => {
-        const raw = localStorage.getItem(CONSTANTS.STORAGE_KEY);
-        if (!raw) return { overdue: [], dueToday: [] };
-        const data = JSON.parse(raw);
+        const data = DataService.load();
+        if (!data) return { overdue: [], dueToday: [] };
         const tasks = Object.values(data.tasks);
-        const now = new Date();
-        const todayStr = Common.toDateKey(now);
+        const todayStr = Common.toDateKey(new Date());
         const doneIds = new Set(data.columns[CONSTANTS.DONE_COLUMN_ID]?.taskIds || []);
-
         return {
             overdue: tasks.filter(t => !t.archived && !doneIds.has(t.id) && t.dueDate && t.dueDate < todayStr),
             dueToday: tasks.filter(t => !t.archived && !doneIds.has(t.id) && t.dueDate === todayStr)
         };
     },
-
     updateBadge: () => {
         const { overdue, dueToday } = NotificationService.getUrgentTasks();
         const total = overdue.length + dueToday.length;
         const badge = document.getElementById('notify-badge');
-        if (badge) {
-            badge.textContent = total;
-            badge.classList.toggle('hidden', total === 0);
-        }
+        if (badge) { badge.textContent = total; badge.classList.toggle('hidden', total === 0); }
     },
-
     toggleNotifications: (e) => {
         if (e) { e.preventDefault(); e.stopPropagation(); }
-        const menu = document.getElementById('notify-menu');
-        if (!menu) return;
-        if (menu.classList.contains('hidden')) {
-            NotificationService.renderList();
-            menu.classList.remove('hidden');
-        } else { menu.classList.add('hidden'); }
+        const menu = document.getElementById('notify-menu'); if (!menu) return;
+        if (menu.classList.contains('hidden')) { NotificationService.renderList(); menu.classList.remove('hidden'); } else { menu.classList.add('hidden'); }
     },
-
     renderList: () => {
         const { overdue, dueToday } = NotificationService.getUrgentTasks();
-        const container = document.getElementById('notify-list');
-        if (!container) return;
-        if (overdue.length === 0 && dueToday.length === 0) {
-            container.innerHTML = `<p class="text-center text-slate-400 py-8 text-sm">${Common.t('notify_none')}</p>`;
-            return;
-        }
+        const container = document.getElementById('notify-list'); if (!container) return;
+        if (!overdue.length && !dueToday.length) { container.innerHTML = `<p class="text-center text-slate-400 py-8 text-sm">${Common.t('notify_none')}</p>`; return; }
         let html = '';
         const renderItem = (t, labelClass, labelText) => `<div onclick="NotificationService.jumpTo('${t.id}')" class="p-3 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors border-b border-slate-50 dark:border-slate-800 last:border-0 group"><div class="flex items-center gap-2 mb-1"><span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase ${labelClass}">${Common.t(labelText)}</span><span class="text-[10px] font-bold text-slate-400">${t.dueDate}</span></div><div class="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover:text-blue-600 transition-colors truncate">${t.content}</div></div>`;
         overdue.forEach(t => html += renderItem(t, 'bg-red-100 text-red-600 dark:bg-red-900/30', 'notify_overdue'));
         dueToday.forEach(t => html += renderItem(t, 'bg-orange-100 text-orange-600 dark:bg-orange-900/30', 'notify_due_today'));
         container.innerHTML = html;
     },
-
     jumpTo: (taskId) => {
         const isBoard = window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/');
-        if (isBoard && typeof App !== 'undefined' && App.jumpToTask) { App.jumpToTask(taskId); const m = document.getElementById('notify-menu'); if(m) m.classList.add('hidden'); } 
+        if (isBoard && typeof App !== 'undefined' && App.jumpToTask) { App.jumpToTask(taskId); const m = document.getElementById('notify-menu'); if(m) m.classList.add('hidden'); }
         else { window.location.href = `index.html?jumpTaskId=${taskId}`; }
     }
 };
@@ -503,9 +483,9 @@ document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') { if (e.key === 'Escape') e.target.blur(); return; }
     if (e.altKey) {
         if (e.code === 'KeyM') { e.preventDefault(); window.location.href = 'metrics.html'; }
-        if (e.code === 'KeyB') { e.preventDefault(); window.location.href = 'burndown.html'; }
-        if (e.code === 'KeyA') { e.preventDefault(); window.location.href = 'about.html'; }
-        if (e.code === 'KeyL') { e.preventDefault(); window.location.href = 'index.html'; }
+        else if (e.code === 'KeyB') { e.preventDefault(); window.location.href = 'burndown.html'; }
+        else if (e.code === 'KeyA') { e.preventDefault(); window.location.href = 'about.html'; }
+        else if (e.code === 'KeyL') { e.preventDefault(); window.location.href = 'index.html'; }
     }
     if (e.key === '?') { window.location.href = 'help.html'; }
 });

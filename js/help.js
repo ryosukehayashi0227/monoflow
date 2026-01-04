@@ -3,108 +3,55 @@
  */
 
 function translateUI() {
-    const setT = (id, key) => {
-        const el = document.getElementById(id);
-        if (el) el.innerHTML = Common.t(key); // Use innerHTML to support <strong> etc.
-    };
-
-    // 1. Header
-    setT('help-page-title', 'help_title');
-    setT('help-page-subtitle', 'help_subtitle');
-    setT('back-to-app-text', 'back_to_app');
+    const t = (id, key) => Common.setT(id, key);
+    const a = (id, attr, key) => Common.setAttr(id, attr, key);
+    t('brand-title', 'help_title'); t('brand-subtitle', 'help_subtitle');
+    t('nav-board', 'menu_board'); t('nav-metrics', 'menu_metrics'); t('nav-burndown', 'menu_burndown');
+    t('about-link', 'about_link');
+    t('footer-text', 'help_footer');
+    a('help-btn', 'title', 'menu_help');
+    a('lang-btn', 'title', 'switch_lang');
+    a('theme-btn', 'title', 'toggle_theme');
     
     const h2s = document.querySelectorAll('h2');
     if(h2s[0]) h2s[0].innerHTML = `<i data-lucide="zap" class="w-8 h-8 text-blue-600 fill-blue-600/20"></i> ${Common.t('help_quick')}`;
     if(h2s[1]) h2s[1].innerHTML = `<i data-lucide="book-open" class="w-8 h-8 text-blue-600 fill-blue-600/20"></i> ${Common.t('help_manual')}`;
 
-    // 2. Quick Start
-    setT('help-q1-title', 'help_q1_t');
-    setT('help-q1-desc', 'help_q1_d');
-    setT('help-q2-title', 'help_q2_t');
-    setT('help-q2-desc', 'help_q2_d');
-    setT('help-q3-title', 'help_q3_t');
-    setT('help-q3-desc', 'help_q3_d');
+    t('help-q1-title', 'help_q1_t'); t('help-q1-desc', 'help_q1_d');
+    t('help-q2-title', 'help_q2_t'); t('help-q2-desc', 'help_q2_d');
+    t('help-q3-title', 'help_q3_t'); t('help-q3-desc', 'help_q3_d');
+    t('help-m1-title', 'help_m1_t'); t('help-m1-desc', 'help_m1_d');
+    t('help-m1-h1', 'help_m1_h1'); t('help-m1-h2', 'help_m1_h2');
+    t('help-m1-l1', 'help_m1_l1'); t('help-m1-l2', 'help_m1_l2'); t('help-m1-l3', 'help_m1_l3');
+    t('help-m1-l4', 'help_m1_l4'); t('help-m1-l5', 'help_m1_l5'); t('help-m1-l6', 'help_m1_l6'); t('help-m1-l7', 'help_m1_l7');
+    t('help-m2-title', 'help_m2_t'); t('help-m2-desc', 'help_m2_d');
+    t('help-m2-h1', 'help_m2_h1'); t('help-m2-l1', 'help_m2_l1');
+    t('help-m2-h2', 'help_m2_h2'); t('help-m2-l2', 'help_m2_l2');
+    t('help-m2-h3', 'help_m2_h3'); t('help-m2-l3', 'help_m2_l3');
+    t('help-m2-extra-title', 'metrics_rate'); t('help-m2-extra-desc', 'help_m2_extra');
+    t('help-m2-l4', 'help_m2_l4');
+    t('help-m3-title', 'help_m3_t'); t('help-m3-desc', 'help_m3_d');
+    const m3h1 = document.getElementById('help-m3-h1'); if(m3h1) m3h1.innerHTML = `<i data-lucide="search" class="w-5 h-5"></i> ${Common.t('help_m3_h1')}`;
+    const m3h2 = document.getElementById('help-m3-h2'); if(m3h2) m3h2.innerHTML = `<i data-lucide="filter" class="w-5 h-5"></i> ${Common.t('help_m3_h2')}`;
+    t('help-m3-l1', 'help_m3_l1'); t('help-m3-l2', 'help_m3_l2'); t('help-m3-extra', 'help_m3_extra');
+    t('help-m4-title', 'help_m4_t'); t('help-m4-desc', 'help_m4_d');
+    t('help-m4-h1', 'help_m4_h1'); t('help-m4-l1', 'help_m4_l1');
+    t('help-m4-h2', 'help_m4_h2'); t('help-m4-l2', 'help_m4_l2');
+    t('help-m4-h3', 'help_m4_h3'); t('help-m4-l3', 'help_m4_l3');
+    t('help-m4-privacy-title', 'help_m4_privacy_t'); t('help-m4-privacy-desc', 'help_m4_privacy_d');
+    t('help-shortcuts-title', 'help_shortcuts_t');
+    t('help-shortcuts-n', 'help_shortcuts_n'); t('help-shortcuts-search', 'help_shortcuts_search');
+    t('help-shortcuts-esc', 'help_shortcuts_esc'); t('help-shortcuts-help', 'help_shortcuts_help');
+    t('help-shortcuts-board', 'help_shortcuts_board'); t('help-shortcuts-metrics', 'help_shortcuts_metrics'); t('help-shortcuts-burndown', 'help_shortcuts_burndown');
 
-    // 3. Detailed Manual - Structure
-    setT('help-m1-title', 'help_m1_t');
-    setT('help-m1-desc', 'help_m1_d');
-    setT('help-m1-h1', 'help_m1_h1');
-    setT('help-m1-h2', 'help_m1_h2');
-    setT('help-m1-l1', 'help_m1_l1');
-    setT('help-m1-l2', 'help_m1_l2');
-    setT('help-m1-l3', 'help_m1_l3');
-    setT('help-m1-l4', 'help_m1_l4');
-    setT('help-m1-l5', 'help_m1_l5');
-    setT('help-m1-l6', 'help_m1_l6');
-    setT('help-m1-l7', 'help_m1_l7');
-
-    // 4. Detailed Manual - Hierarchy
-    setT('help-m2-title', 'help_m2_t');
-    setT('help-m2-desc', 'help_m2_d');
-    setT('help-m2-h1', 'help_m2_h1');
-    setT('help-m2-l1', 'help_m2_l1');
-    setT('help-m2-h2', 'help_m2_h2');
-    setT('help-m2-l2', 'help_m2_l2');
-    setT('help-m2-h3', 'help_m2_h3');
-    setT('help-m2-l3', 'help_m2_l3');
-    setT('help-m2-extra-title', 'metrics_rate'); 
-    setT('help-m2-extra-desc', 'help_m2_extra');
-    setT('help-m2-l4', 'help_m2_l4');
-
-    // 5. Detailed Manual - Search
-    setT('help-m3-title', 'help_m3_t');
-    setT('help-m3-desc', 'help_m3_d');
-    const m3h1 = document.getElementById('help-m3-h1');
-    if(m3h1) m3h1.innerHTML = `<i data-lucide="search" class="w-5 h-5"></i> ${Common.t('help_m3_h1')}`;
-    const m3h2 = document.getElementById('help-m3-h2');
-    if(m3h2) m3h2.innerHTML = `<i data-lucide="filter" class="w-5 h-5"></i> ${Common.t('help_m3_h2')}`;
-    setT('help-m3-l1', 'help_m3_l1');
-    setT('help-m3-l2', 'help_m3_l2');
-    setT('help-m3-extra', 'help_m3_extra');
-
-    // 6. Detailed Manual - Analytics
-    setT('help-m4-title', 'help_m4_t');
-    setT('help-m4-desc', 'help_m4_d');
-    setT('help-m4-h1', 'help_m4_h1');
-    setT('help-m4-l1', 'help_m4_l1');
-    setT('help-m4-h2', 'help_m4_h2');
-    setT('help-m4-l2', 'help_m4_l2');
-    setT('help-m4-h3', 'help_m4_h3');
-    setT('help-m4-l3', 'help_m4_l3');
-    setT('help-m4-privacy-title', 'help_m4_privacy_t');
-    setT('help-m4-privacy-desc', 'help_m4_privacy_d');
-
-    // 7. Keyboard Shortcuts
-    setT('help-shortcuts-title', 'help_shortcuts_t');
-    setT('help-shortcuts-n', 'help_shortcuts_n');
-    setT('help-shortcuts-search', 'help_shortcuts_search');
-    setT('help-shortcuts-esc', 'help_shortcuts_esc');
-    setT('help-shortcuts-help', 'help_shortcuts_help');
-    setT('help-shortcuts-board', 'help_shortcuts_board');
-    setT('help-shortcuts-metrics', 'help_shortcuts_metrics');
-    setT('help-shortcuts-burndown', 'help_shortcuts_burndown');
-
-    // Footer
-    setT('help-footer-text', 'help_footer');
-
-    // 8. Mac OS Modifier Key Support
-    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-    if (isMac) {
-        document.querySelectorAll('.kbd').forEach(kbd => {
-            if (kbd.textContent === 'Alt') kbd.textContent = '⌥ Option';
-        });
+    if (navigator.platform.toUpperCase().indexOf('MAC') >= 0) {
+        document.querySelectorAll('.kbd').forEach(k => { if (k.textContent === 'Alt') k.textContent = '⌥ Option'; });
     }
-
-    // 9. Image Switcher
     const suffix = State.language === 'en' ? '-en' : '';
     document.querySelectorAll('img.screenshot').forEach(img => {
         const src = img.getAttribute('src');
-        const base = src.replace('-en.svg', '').replace('.svg', '');
-        img.setAttribute('src', `${base}${suffix}.svg`);
+        img.setAttribute('src', `${src.replace('-en.svg', '').replace('.svg', '')}${suffix}.svg`);
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    translateUI();
-    lucide.createIcons();
-});
+document.addEventListener('DOMContentLoaded', () => { translateUI(); lucide.createIcons(); });
