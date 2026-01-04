@@ -78,9 +78,13 @@
                         <a href="burndown.html" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 border-t border-slate-100 transition-colors">
                             <i data-lucide="trending-down" class="w-4 h-4 text-slate-400"></i> Burndown
                         </a>
-                        <a href="help.html" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 border-t border-slate-100 transition-colors">
-                            <i data-lucide="help-circle" class="w-4 h-4 text-slate-400"></i> User Guide
-                        </a>                                                    <input type="file" id="import-file" class="hidden" accept=".json" onchange="DataService.import(this)">                        </div>
+                                                <a href="help.html" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 border-t border-slate-100 transition-colors">
+                                                    <i data-lucide="help-circle" class="w-4 h-4 text-slate-400"></i> User Guide
+                                                </a>
+                                                <button onclick="DataService.resetAll()" class="w-full text-left px-4 py-3 hover:bg-red-50 text-sm font-bold text-red-600 flex items-center gap-2 border-t border-red-100 transition-colors">
+                                                    <i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i> ボードのリセット
+                                                </button>
+                                                <input type="file" id="import-file" class="hidden" accept=".json" onchange="DataService.import(this)">                        </div>
                     </div>
                 </div>
             </div>

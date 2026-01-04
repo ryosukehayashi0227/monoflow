@@ -76,6 +76,24 @@ const DataService = {
         App.render();
     },
 
+    resetAll: () => {
+        const firstCheck = confirm('【警告】すべてのタスクを完全に削除しますか？\nこの操作は取り消せません。');
+        if (!firstCheck) return;
+
+        const secondCheck = confirm('本当によろしいですか？\n削除前に「エクスポート」してバックアップを取っておくことを強くお勧めします。\n\n「OK」を押すと、すべてのデータが消去されます。');
+        if (!secondCheck) return;
+
+        // Reset tasks and column lists, keep labels and column definitions
+        State.data.tasks = {};
+        for (const colId in State.data.columns) {
+            State.data.columns[colId].taskIds = [];
+        }
+        
+        DataService.save();
+        App.render();
+        alert('ボードをリセットしました。');
+    },
+
     export: () => {
         const blob = new Blob([JSON.stringify(State.data, null, 2)], { type: "application/json" });
         const url = URL.createObjectURL(blob);
