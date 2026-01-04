@@ -80,10 +80,19 @@ function translateUI() {
     setT('help-m5-h2', 'help_m5_h2');
     setT('help-m5-l2', 'help_m5_l2');
 
+    // 8. Keyboard Shortcuts
+    setT('help-shortcuts-title', 'help_shortcuts_t');
+    setT('help-shortcuts-n', 'help_shortcuts_n');
+    setT('help-shortcuts-search', 'help_shortcuts_search');
+    setT('help-shortcuts-esc', 'help_shortcuts_esc');
+    setT('help-shortcuts-help', 'help_shortcuts_help');
+    setT('help-shortcuts-metrics', 'help_shortcuts_metrics');
+    setT('help-shortcuts-burndown', 'help_shortcuts_burndown');
+
     // Footer
     setT('help-footer-text', 'help_footer');
 
-    // 8. Image Switcher
+    // 9. Image Switcher
     const suffix = State.language === 'en' ? '-en' : '';
     document.querySelectorAll('img.screenshot').forEach(img => {
         const src = img.getAttribute('src');

@@ -308,10 +308,49 @@ const App = {
         document.getElementById('search-input').addEventListener('input', (e) => { State.searchQuery = e.target.value.toLowerCase().trim(); App.render(); });
         document.getElementById('task-modal').addEventListener('click', (e) => { if (e.target.id === 'task-modal') Modal.close(); });
         const menu = document.getElementById('settings-menu');
-        window.toggleMenu = (e) => { e.stopPropagation(); menu.classList.toggle('hidden'); };
-        document.addEventListener('click', () => menu.classList.add('hidden'));
-        App.render();
-    },
+                window.toggleMenu = (e) => { e.stopPropagation(); menu.classList.toggle('hidden'); };
+                document.addEventListener('click', () => menu.classList.add('hidden'));
+        
+                // Keyboard Shortcuts
+                document.addEventListener('keydown', (e) => {
+                    // Don't trigger if user is typing in an input or textarea
+                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                        if (e.key === 'Escape') {
+                            e.target.blur();
+                            Modal.close();
+                            Archive.close();
+                        }
+                        return;
+                    }
+        
+                    switch (e.key) {
+                        case 'n':
+                            e.preventDefault();
+                            document.getElementById('new-task-input').focus();
+                            break;
+                        case '/':
+                            e.preventDefault();
+                            document.getElementById('search-input').focus();
+                            break;
+                        case 'Escape':
+                            Modal.close();
+                            Archive.close();
+                            break;
+                        case '?':
+                            window.location.href = 'help.html';
+                            break;
+                    }
+        
+                    // Navigation with Alt key
+                    if (e.altKey) {
+                        if (e.key === 'm') window.location.href = 'metrics.html';
+                        if (e.key === 'b') window.location.href = 'burndown.html';
+                        if (e.key === 'a') window.location.href = 'about.html';
+                    }
+                });
+        
+                App.render();
+            },
     handleAddTask: (e) => {
         e.preventDefault(); const input = document.getElementById('new-task-input'); const content = input.value.trim();
         if (content) {
