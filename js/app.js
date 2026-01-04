@@ -35,7 +35,7 @@ const DataService = {
     init: () => {
         const initialData = {
             tasks: {
-                't1': { id: 't1', content: 'Monoflowへようこそ', description: 'これはサンプルタスクです。', dueDate: '', parentId: null, labels: [], priority: 'high', updatedAt: new Date().toISOString() },
+                't1': { id: 't1', content: 'MonoFlowへようこそ', description: 'これはサンプルタスクです。', dueDate: '', parentId: null, labels: [], priority: 'high', updatedAt: new Date().toISOString() },
             },
             columns: {
                 'c1': { id: 'c1', title: 'To Do', taskIds: ['t1'] },

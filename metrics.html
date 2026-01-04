@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MonoFlow - Metrics</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232563eb'/%3E%3Cpath d='M30 30 L 30 70 L 50 50 L 70 70 L 70 30' fill='none' stroke='white' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" type="image/svg+xml">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
+    </script>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .stat-card { @apply bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm flex flex-col justify-center; }
+        .stat-value { @apply text-4xl font-black tracking-tighter text-slate-900 mb-1; }
+        .stat-label { @apply text-[10px] font-black uppercase tracking-[0.2em] text-slate-400; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="max-w-6xl mx-auto px-6 py-16">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 border-b border-slate-200 pb-12 gap-8">
+            <div class="flex items-center gap-6">
+                <div class="w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-800 rounded-[1.5rem] flex items-center justify-center shadow-2xl shadow-indigo-500/40">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-4xl font-black text-slate-900 tracking-tighter leading-none">Metrics</h1>
+                    <p class="text-slate-400 mt-2 font-bold uppercase tracking-widest text-xs">Analytics & Progress</p>
+                </div>
+            </div>
+
+            <!-- Filter Toolbar -->
+            <div class="flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
+                <!-- Date Range -->
+                <div class="flex items-center gap-3 bg-white p-2 pl-5 rounded-2xl border border-slate-200 shadow-sm flex-grow">
+                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider">期間</div>
+                    <div class="flex items-center gap-2">
+                        <input type="date" id="start-date" class="text-sm font-bold text-slate-600 focus:outline-none bg-transparent">
+                        <span class="text-slate-300">→</span>
+                        <input type="date" id="end-date" class="text-sm font-bold text-slate-600 focus:outline-none bg-transparent">
+                    </div>
+                </div>
+
+                <!-- Label Popover Filter -->
+                <div class="relative group">
+                    <button onclick="toggleLabelMenu(event)" class="flex items-center gap-3 bg-white p-2 pl-5 pr-4 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-300 transition-all min-w-[180px]">
+                        <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider shrink-0">ラベル</div>
+                        <div id="selected-label-count" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg ml-auto">すべて</div>
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+                    </button>
+                    
+                    <!-- Floating Label Menu -->
+                    <div id="metrics-label-menu" class="absolute left-0 top-full mt-2 w-64 bg-white/95 backdrop-blur-md rounded-[1.5rem] shadow-2xl border border-slate-100 hidden z-30 p-4 max-h-80 overflow-y-auto">
+                        <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-50">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">ラベルを選択</span>
+                            <button onclick="clearLabels()" class="text-[10px] font-bold text-blue-500 hover:text-blue-700">クリア</button>
+                        </div>
+                        <div id="metrics-label-chips" class="flex flex-col gap-1">
+                            <!-- Label items injected by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="initMetrics()" class="bg-slate-900 text-white p-3 rounded-2xl hover:bg-slate-800 transition-all active:scale-90 shadow-lg shadow-slate-900/20">
+                    <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <a href="index.html" class="flex items-center gap-3 px-8 py-4 bg-white border border-slate-200 rounded-2xl text-slate-700 hover:bg-slate-50 transition-all font-black shadow-sm active:scale-95">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                アプリに戻る
+            </a>
+        </header>
+
+        <!-- Stats Overview Row -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+            <div class="stat-card">
+                <div id="total-tasks" class="stat-value">0</div>
+                <div class="stat-label">全タスク数</div>
+            </div>
+            <div class="stat-card">
+                <div id="completion-rate" class="stat-value">0%</div>
+                <div class="stat-label">完了率</div>
+            </div>
+            <div class="stat-card">
+                <div id="avg-days" class="stat-value">0.0</div>
+                <div class="stat-label">平均完了日数</div>
+            </div>
+            <div class="stat-card border-green-200 bg-green-50/30">
+                <div id="done-tasks" class="stat-value text-green-600">0</div>
+                <div class="stat-label text-green-500/70">合計完了数</div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Status Distribution -->
+            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                <h2 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                    <i data-lucide="pie-chart" class="w-4 h-4"></i> ステータス分布
+                </h2>
+                <div class="h-64 relative flex items-center justify-center">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Priority Distribution -->
+            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                <h2 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4"></i> 優先度別の分布
+                </h2>
+                <div class="h-64 relative flex items-center justify-center">
+                    <canvas id="priorityChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-32 pt-16 border-t border-slate-200 text-center">
+            <p class="text-slate-400 text-xs font-black uppercase tracking-[0.3em]">&copy; 2026 MonoFlow Metrics</p>
+        </footer>
+    </div>
+
+    <!-- Application Logic -->
+    <script src="js/metrics.js"></script>
+</body>
+</html>

@@ -1,7 +1,7 @@
-# Monoflow Project Context
+# MonoFlow Project Context
 
 ## Overview
-**Monoflow** is a lightweight, professional, browser-based personal Kanban board application.
+**MonoFlow** is a lightweight, professional, browser-based personal Kanban board application.
 It is designed to be fully self-contained in a single HTML file (`index.html`) without requiring a build process or a backend server.
 
 ## Architecture

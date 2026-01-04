@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monoflow - Professional Kanban</title>
+    <title>MonoFlow - Professional Kanban</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232563eb'/%3E%3Cpath d='M30 30 L 30 70 L 50 50 L 70 70 L 70 30' fill='none' stroke='white' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" type="image/svg+xml">
     
     <!-- Fonts & Icons -->
@@ -37,7 +37,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-9 h-9 text-white transform group-hover:scale-110 transition-transform duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="6" y2="18"></line><line x1="12" y1="6" x2="12" y2="14"></line><line x1="18" y1="6" x2="18" y2="10"></line></svg>
                 </div>
                 <div>
-                    <h1 class="text-5xl font-black tracking-tighter text-slate-900 leading-tight">Monoflow</h1>
+                    <h1 class="text-5xl font-black tracking-tighter text-slate-900 leading-tight">MonoFlow</h1>
                     <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-1 ml-1 opacity-80">Simple Personal Kanban</p>
                 </div>
                 <!-- Subtle background accent -->
@@ -69,13 +69,15 @@
                                                     <button onclick="DataService.export()" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 transition-colors">
                                                         <i data-lucide="download" class="w-4 h-4 text-slate-400"></i> エクスポート (JSON)
                                                     </button>
-                                                    <button onclick="document.getElementById('import-file').click()" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 border-t border-slate-100 transition-colors">
-                                                        <i data-lucide="upload" class="w-4 h-4 text-slate-400"></i> インポート
-                                                    </button>
-                                                    <a href="help.html" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 border-t border-slate-100 transition-colors">
-                                                        <i data-lucide="help-circle" class="w-4 h-4 text-slate-400"></i> 使い方
-                                                    </a>
-                                                    <input type="file" id="import-file" class="hidden" accept=".json" onchange="DataService.import(this)">                        </div>
+                                                                            <button onclick="document.getElementById('import-file').click()" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 border-t border-slate-100 transition-colors">
+                                                                                <i data-lucide="upload" class="w-4 h-4 text-slate-400"></i> インポート
+                                                                            </button>
+                                                                            <a href="metrics.html" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 border-t border-slate-100 transition-colors">
+                                                                                <i data-lucide="bar-chart-2" class="w-4 h-4 text-slate-400"></i> メトリクス
+                                                                            </a>
+                                                                            <a href="help.html" class="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-2 border-t border-slate-100 transition-colors">
+                                                                                <i data-lucide="help-circle" class="w-4 h-4 text-slate-400"></i> 使い方
+                                                                            </a>                                                    <input type="file" id="import-file" class="hidden" accept=".json" onchange="DataService.import(this)">                        </div>
                     </div>
                 </div>
             </div>
