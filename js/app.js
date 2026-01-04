@@ -280,9 +280,12 @@ const UI = {
         const isDone = columnId === CONSTANTS.DONE_COLUMN_ID;
         const el = document.createElement('div');
         
-        // Indent Check
-        const parentExists = task.parentId && visibleTasksContext.some(t => t.id === task.parentId);
-        const indentClass = parentExists ? 'child-task scale-95 origin-left' : '';
+        // Indent Check: 
+        // If it has a parentId, it is a child. 
+        // Logic: It should be indented if it's under a Real Parent OR a Virtual Parent.
+        // Since we insert Virtual Parents for orphans, ANY task with a valid parentId should be indented.
+        const hasParent = !!task.parentId && !!State.data.tasks[task.parentId];
+        const indentClass = hasParent ? 'child-task scale-95 origin-left' : '';
         
         el.className = `task-card bg-white border border-slate-200 rounded-xl p-4 shadow-sm group relative cursor-pointer ${indentClass} ${isDone ? 'is-done' : ''}`;
         el.dataset.taskId = task.id;
@@ -426,35 +429,55 @@ const App = {
             const renderItems = []; // { type: 'real'|'virtual', task }
             const processed = new Set();
 
-            // 1. Roots (parent not in visible list or parent is null)
+            // 1. Identify Roots & Orphans
+            // A task is a "Root in this column" if:
+            // - It has no parent
+            // - OR its parent is NOT in the visible list of THIS column (meaning parent is elsewhere)
             const roots = visible.filter(t => !t.parentId || !visible.some(pt => pt.id === t.parentId));
             
             roots.forEach(root => {
-                // If root has a parent (meaning parent is in another column), add virtual parent
+                // If this root actually HAS a parent (but parent is absent/elsewhere),
+                // we must show a Virtual Parent first.
                 if (root.parentId) {
                     const pTask = State.data.tasks[root.parentId];
-                    if (pTask && !renderItems.some(i => i.type === 'virtual' && i.task.id === pTask.id)) {
-                        renderItems.push({ type: 'virtual', task: pTask });
+                    // Add virtual parent if it exists and we haven't rendered it yet in this loop context
+                    // (Actually, each orphan child needs its own context, or grouped under one virtual?
+                    //  Simplest: Just show virtual parent above the child to indicate context.)
+                    if (pTask) {
+                        // Check if we just added this virtual parent for the previous sibling? 
+                        // To avoid duplicating "Virtual Parent A" "Child 1", "Virtual Parent A" "Child 2"...
+                        // let's check the last added item.
+                        const lastItem = renderItems[renderItems.length - 1];
+                        if (!lastItem || lastItem.type !== 'virtual' || lastItem.task.id !== pTask.id) {
+                             renderItems.push({ type: 'virtual', task: pTask });
+                        }
                     }
                 }
                 
                 renderItems.push({ type: 'real', task: root });
                 processed.add(root.id);
 
-                // Children (if in same column)
-                visible.filter(c => c.parentId === root.id).forEach(child => {
+                // 2. Render Children of this root (that ARE in this column)
+                // Since 'root' is now here (real or orphan-as-root), its children should follow.
+                const children = visible.filter(c => c.parentId === root.id);
+                children.forEach(child => {
                     renderItems.push({ type: 'real', task: child });
                     processed.add(child.id);
                 });
             });
 
-            // Fallback
-            visible.forEach(t => { if(!processed.has(t.id)) renderItems.push({ type: 'real', task: t }); });
+            // 3. Fallback for any tasks missed by the above logic (safety net)
+            visible.forEach(t => { 
+                if(!processed.has(t.id)) {
+                    // Treat as root if missed
+                    renderItems.push({ type: 'real', task: t }); 
+                }
+            });
 
             renderItems.forEach(item => {
                 const el = item.type === 'virtual' 
                     ? UI.createVirtualParent(item.task) 
-                    : UI.createTaskCard(item.task, colId, visible);
+                    : UI.createTaskCard(item.task, colId, visible); // Pass 'visible' as context for indentation check
                 listEl.appendChild(el);
             });
 
