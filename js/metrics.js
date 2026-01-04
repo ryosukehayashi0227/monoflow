@@ -24,7 +24,7 @@ function loadData() {
 const labelMenu = document.getElementById('metrics-label-menu');
 function toggleLabelMenu(e) {
     e.stopPropagation();
-    labelMenu.classList.toggle('hidden');
+    if(labelMenu) labelMenu.classList.toggle('hidden');
 }
 function clearLabels() {
     selectedLabels.clear();
@@ -70,25 +70,40 @@ function renderLabelList(data) {
 function translateUI() {
     // Page Title & Subtitle
     document.querySelector('h1').textContent = Common.t('metrics_title');
-    document.querySelector('h1 + p').textContent = Common.t('metrics_subtitle');
+    const subtitle = document.querySelector('h1 + p');
+    if (subtitle) subtitle.textContent = Common.t('metrics_subtitle');
     
-    // Labels in Filter
-    document.querySelector('.text-slate-300').previousElementSibling.previousElementSibling.textContent = Common.t('metrics_period');
-    document.querySelector('#metrics-label-menu span').textContent = Common.t('metrics_label_select');
-    document.querySelector('#metrics-label-menu button').textContent = Common.t('metrics_clear');
-    document.querySelector('a[href="index.html"] span').textContent = Common.t('back_to_app');
+    // Labels in Filter using IDs
+    const periodLabel = document.getElementById('metrics-period-label');
+    if (periodLabel) periodLabel.textContent = Common.t('metrics_period');
+    
+    const labelLabel = document.getElementById('metrics-label-label');
+    if (labelLabel) labelLabel.textContent = Common.t('filter_label');
+
+    const menuTitle = document.querySelector('#metrics-label-menu span');
+    if (menuTitle) menuTitle.textContent = Common.t('metrics_label_select');
+
+    const menuClear = document.querySelector('#metrics-label-menu button');
+    if (menuClear) menuClear.textContent = Common.t('metrics_clear');
+
+    const backLink = document.querySelector('a[href="index.html"] span');
+    if (backLink) backLink.textContent = Common.t('back_to_app');
     
     // Stat Cards
     const cards = document.querySelectorAll('.stat-card');
-    cards[0].querySelector('.stat-label').textContent = Common.t('metrics_total');
-    cards[1].querySelector('.stat-label').textContent = Common.t('metrics_rate');
-    cards[2].querySelector('.stat-label').textContent = Common.t('metrics_avg');
-    cards[3].querySelector('.stat-label').textContent = Common.t('metrics_done');
+    if (cards.length >= 4) {
+        cards[0].querySelector('.stat-label').textContent = Common.t('metrics_total');
+        cards[1].querySelector('.stat-label').textContent = Common.t('metrics_rate');
+        cards[2].querySelector('.stat-label').textContent = Common.t('metrics_avg');
+        cards[3].querySelector('.stat-label').textContent = Common.t('metrics_done');
+    }
     
     // Chart Titles
     const h2s = document.querySelectorAll('h2');
-    h2s[0].innerHTML = `<i data-lucide="pie-chart" class="w-4 h-4"></i> ${Common.t('metrics_dist')}`;
-    h2s[1].innerHTML = `<i data-lucide="bar-chart-3" class="w-4 h-4"></i> ${Common.t('metrics_prio_dist')}`;
+    if (h2s.length >= 2) {
+        h2s[0].innerHTML = `<i data-lucide="pie-chart" class="w-4 h-4"></i> ${Common.t('metrics_dist')}`;
+        h2s[1].innerHTML = `<i data-lucide="bar-chart-3" class="w-4 h-4"></i> ${Common.t('metrics_prio_dist')}`;
+    }
 }
 
 function initMetrics() {
@@ -232,6 +247,8 @@ function renderPriorityChart(counts) {
 document.addEventListener('DOMContentLoaded', () => {
     initMetrics();
     lucide.createIcons();
-    document.getElementById('start-date').addEventListener('change', initMetrics);
-    document.getElementById('end-date').addEventListener('change', initMetrics);
+    const sDate = document.getElementById('start-date');
+    const eDate = document.getElementById('end-date');
+    if(sDate) sDate.addEventListener('change', initMetrics);
+    if(eDate) eDate.addEventListener('change', initMetrics);
 });

@@ -162,3 +162,26 @@ body.modal-open { overflow: hidden; }
 
 .dark ::-webkit-scrollbar-thumb { background: #334155; }
 .dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* --- Navigation Tabs --- */
+.tab-item {
+    color: #64748b;
+    transition: all 0.2s ease;
+}
+.tab-item:hover {
+    color: #1e293b;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+.dark .tab-item { color: #94a3b8; }
+.dark .tab-item:hover { color: #f1f5f9; background-color: rgba(255, 255, 255, 0.05); }
+
+.tab-item.active {
+    background-color: white;
+    color: #2563eb;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+.dark .tab-item.active {
+    background-color: #334155;
+    color: #60a5fa;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}

@@ -12,10 +12,17 @@ function loadData() {
 
 function translateUI() {
     document.querySelector('h1').textContent = Common.t('burndown_title');
-    document.querySelector('h1 + p').textContent = Common.t('burndown_subtitle');
-    document.querySelector('.text-slate-300').previousElementSibling.previousElementSibling.textContent = Common.t('burndown_period');
-    document.querySelector('h2').innerHTML = `<i data-lucide="line-chart" class="w-4 h-4"></i> ${Common.t('burndown_trend')}`;
-    document.querySelector('a[href="index.html"] span').textContent = Common.t('back_to_app');
+    const subtitle = document.querySelector('h1 + p');
+    if (subtitle) subtitle.textContent = Common.t('burndown_subtitle');
+    
+    const periodLabel = document.getElementById('burndown-period-label');
+    if (periodLabel) periodLabel.textContent = Common.t('burndown_period');
+    
+    const trendTitle = document.querySelector('h2');
+    if (trendTitle) trendTitle.innerHTML = `<i data-lucide="line-chart" class="w-4 h-4"></i> ${Common.t('burndown_trend')}`;
+    
+    const backLink = document.querySelector('a[href="index.html"] span');
+    if (backLink) backLink.textContent = Common.t('back_to_app');
 }
 
 function initBurndown() {
@@ -24,7 +31,6 @@ function initBurndown() {
 
     translateUI();
 
-    // 1. Get Date Range
     let startDateVal = document.getElementById('start-date').value;
     let endDateVal = document.getElementById('end-date').value;
 
@@ -44,7 +50,6 @@ function initBurndown() {
     const end = new Date(endDateVal);
     end.setHours(23, 59, 59, 999);
 
-    // 2. Generate Daily Labels
     const labels = [];
     const dateArray = [];
     let current = new Date(start);
@@ -55,7 +60,6 @@ function initBurndown() {
         current.setDate(current.getDate() + 1);
     }
 
-    // 3. Calculate Remaining Tasks per Day
     const tasks = Object.values(data.tasks);
     const burndownData = dateArray.map(day => {
         const dayEnd = new Date(day).setHours(23, 59, 59, 999);
@@ -70,8 +74,8 @@ function initBurndown() {
         }).length;
     });
 
-    // Update Current count
-    document.getElementById('active-task-count').textContent = `${Common.t('burndown_current')}: ${burndownData[burndownData.length - 1]}`;
+    const activeCountEl = document.getElementById('active-task-count');
+    if (activeCountEl) activeCountEl.textContent = `${Common.t('burndown_current')}: ${burndownData[burndownData.length - 1]}`;
 
     renderChart(labels, burndownData);
 }
@@ -136,6 +140,8 @@ function renderChart(labels, dataPoints) {
 document.addEventListener('DOMContentLoaded', () => {
     initBurndown();
     lucide.createIcons();
-    document.getElementById('start-date').addEventListener('change', initBurndown);
-    document.getElementById('end-date').addEventListener('change', initBurndown);
+    const sDate = document.getElementById('start-date');
+    const eDate = document.getElementById('end-date');
+    if(sDate) sDate.addEventListener('change', initBurndown);
+    if(eDate) eDate.addEventListener('change', initBurndown);
 });
