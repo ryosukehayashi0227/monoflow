@@ -44,23 +44,65 @@
                     <button onclick="Common.toggleTheme()" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center"><i data-lucide="sun" id="theme-icon-light" class="w-4 h-4 hidden"></i><i data-lucide="moon" id="theme-icon-dark" class="w-4 h-4"></i></button>
                 </div>
             </div>
-            <div class="flex items-center gap-3 bg-white dark:bg-slate-900 p-2 pl-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm w-fit">
-                <div class="relative group ml-auto">
-                    <button onclick="Common.toggleMenu(event)" class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 hover:border-slate-300 shadow-sm transition-all flex items-center justify-center active:scale-90 md:hidden mr-2"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
-                    <div id="settings-menu" class="absolute left-0 top-full mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 hidden z-20 overflow-hidden text-left">
-                        <a href="index.html" class="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 transition-colors border-b border-slate-100 dark:border-slate-800"><i data-lucide="layout" class="w-4 h-4 text-slate-400"></i> <span id="menu-board-text">Board</span></a>
-                        <a href="metrics.html" class="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 transition-colors border-b border-slate-100 dark:border-slate-800"><i data-lucide="bar-chart-2" class="w-4 h-4 text-slate-400"></i> <span id="menu-metrics-text">Metrics</span></a>
-                        <a href="burndown.html" class="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 transition-colors border-b border-slate-100 dark:border-slate-800"><i data-lucide="trending-down" class="w-4 h-4 text-slate-400"></i> <span id="menu-burndown-text">Burndown</span></a>
-                        <a href="about.html" class="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold text-blue-600 flex items-center gap-2 transition-colors border-b border-slate-100 dark:border-slate-800"><i data-lucide="info" class="w-4 h-4 text-blue-400"></i> <span id="menu-about-text">About</span></a>
+
+            <!-- Burndown Toolbar -->
+            <div class="flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
+                <div class="flex items-center gap-3 bg-white dark:bg-slate-900 p-2 pl-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex-grow">
+                    <div id="burndown-period-label" class="text-[10px] font-black text-slate-400 uppercase tracking-wider">表示期間</div>
+                    <div class="flex items-center gap-2">
+                        <input type="date" id="start-date" class="text-sm font-bold text-slate-600 dark:text-slate-300 focus:outline-none bg-transparent">
+                        <span class="text-slate-300">→</span>
+                        <input type="date" id="end-date" class="text-sm font-bold text-slate-600 dark:text-slate-300 focus:outline-none bg-transparent">
                     </div>
                 </div>
-                <div id="burndown-period-label" class="text-[10px] font-black text-slate-400 uppercase tracking-wider">表示期間</div>
-                <div class="flex items-center gap-2"><input type="date" id="start-date" class="text-sm font-bold text-slate-600 dark:text-slate-300 focus:outline-none bg-transparent"><span class="text-slate-300">→</span><input type="date" id="end-date" class="text-sm font-bold text-slate-600 dark:text-slate-300 focus:outline-none bg-transparent"></div>
-                <button onclick="initBurndown()" class="bg-slate-900 dark:bg-blue-600 text-white p-2 rounded-xl hover:opacity-90 transition-all ml-2"><i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
+
+                <!-- Target Deadline -->
+                <div class="flex items-center gap-3 bg-white dark:bg-slate-900 p-2 pl-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div id="burndown-deadline-label" class="text-[10px] font-black text-orange-400 uppercase tracking-wider shrink-0">目標期日</div>
+                    <input type="date" id="target-deadline" class="text-sm font-bold text-slate-600 dark:text-slate-300 focus:outline-none bg-transparent">
+                </div>
+
+                <!-- Label Popover Filter -->
+                <div class="relative group">
+                    <button onclick="Common.toggleMenu(event)" class="flex items-center gap-3 bg-white dark:bg-slate-900 p-2 pl-5 pr-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-blue-300 transition-all min-w-[180px]">
+                        <div id="burndown-label-label" class="text-[10px] font-black text-slate-400 uppercase tracking-wider shrink-0">ラベル</div>
+                        <div id="selected-label-count" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg ml-auto">すべて</div>
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+                    </button>
+                    
+                    <div id="settings-menu" class="absolute left-0 top-full mt-2 w-64 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-[1.5rem] shadow-2xl border border-slate-100 dark:border-slate-800 hidden z-30 p-4 max-h-80 overflow-y-auto text-left">
+                        <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-50 dark:border-slate-800">
+                            <span id="burndown-label-select-title" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">ラベルを選択</span>
+                            <button onclick="clearLabels()" class="text-[10px] font-bold text-blue-500 hover:text-blue-700">クリア</button>
+                        </div>
+                        <div id="burndown-label-chips" class="flex flex-col gap-1"></div>
+                    </div>
+                </div>
+
+                <button onclick="initBurndown()" class="bg-slate-900 dark:bg-blue-600 text-white p-3 rounded-2xl hover:opacity-90 transition-all active:scale-90 shadow-lg">
+                    <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                </button>
             </div>
         </header>
-        <div class="bg-white dark:bg-slate-900 p-10 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden"><div class="flex justify-between items-center mb-10"><h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2"><i data-lucide="line-chart" class="w-4 h-4"></i> 残タスク数の推移</h2><div id="active-task-count" class="text-xs font-black text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-4 py-1.5 rounded-full">現在: -- タスク</div></div><div class="h-[500px] w-full"><canvas id="burndownChart"></canvas></div></div>
-        <footer class="mt-32 pt-16 border-t border-slate-200 dark:border-slate-800 text-center text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">&copy; 2026 MonoFlow Productivity</footer>
+
+        <div class="bg-white dark:bg-slate-900 p-8 md:p-10 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+            <div class="flex justify-between items-center mb-10">
+                <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                    <i data-lucide="line-chart" class="w-4 h-4"></i> <span id="burndown-trend-label">残タスク数の推移</span>
+                </h2>
+                <div id="active-task-count" class="text-xs font-black text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-4 py-1.5 rounded-full">
+                    現在: -- タスク
+                </div>
+            </div>
+            
+            <div class="h-[550px] w-full">
+                <canvas id="burndownChart"></canvas>
+            </div>
+        </div>
+
+        <footer class="mt-32 pt-16 border-t border-slate-200 dark:border-slate-800 text-center text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">
+            &copy; 2026 MonoFlow Productivity
+        </footer>
     </div>
     <script src="js/common.js"></script>
     <script src="js/burndown.js"></script>
