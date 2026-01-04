@@ -64,8 +64,8 @@ const CONSTANTS = {
             import_fail: 'インポートに失敗しました。',
             welcome_title: 'Welcome to MonoFlow',
             welcome_desc: 'これはサンプルタスクです。',
-            // Metrics Page
-            metrics_title: 'Metrics',
+            // Page Titles
+            metrics_title: 'MonoFlow',
             metrics_subtitle: '分析と進捗',
             metrics_period: '期間',
             metrics_total: '全タスク数',
@@ -76,16 +76,14 @@ const CONSTANTS = {
             metrics_prio_dist: '優先度別の分布',
             metrics_label_select: 'ラベルを選択',
             metrics_clear: 'クリア',
-            // Burndown Page
-            burndown_title: 'Burndown Chart',
+            burndown_title: 'MonoFlow',
             burndown_subtitle: '時間経過による残仕事量',
             burndown_period: '表示期間',
             burndown_trend: '残タスク数の推移',
             burndown_current: '現在',
             burndown_actual: '実際の残りタスク',
             burndown_ideal: '理想的な進捗',
-            // Help Page
-            help_title: 'User Guide',
+            help_title: 'MonoFlow',
             help_subtitle: '操作マニュアル',
             help_quick: 'クイックスタート',
             help_manual: '詳細マニュアル',
@@ -129,6 +127,8 @@ const CONSTANTS = {
             help_m4_l2: '完了したタスクをアーカイブへ移動させることで、ボードを常にクリーンに保てます。',
             help_m4_h3: 'バックアップ',
             help_m4_l3: 'JSON形式でのエクスポート・インポートに対応。データ移行も簡単です。',
+            help_m4_privacy_t: 'データプライバシー',
+            help_m4_privacy_d: 'すべてのデータはあなたのブラウザ（LocalStorage）にのみ保存されます。外部サーバーへの送信は一切行われないため、機密情報も安全に管理できます。',
             help_m5_t: '5. カスタマイズと設定',
             help_m5_h1: 'ダークモード',
             help_m5_l1: '月アイコンをクリックして切り替え。深夜の作業でも目に優しく集中できます。',
@@ -179,8 +179,8 @@ const CONSTANTS = {
             import_fail: 'Import failed.',
             welcome_title: 'Welcome to MonoFlow',
             welcome_desc: 'This is a sample task.',
-            // Metrics Page
-            metrics_title: 'Metrics',
+            // Page Titles
+            metrics_title: 'MonoFlow',
             metrics_subtitle: 'Analytics & Progress',
             metrics_period: 'Period',
             metrics_total: 'Total Tasks',
@@ -191,16 +191,14 @@ const CONSTANTS = {
             metrics_prio_dist: 'Priority Distribution',
             metrics_label_select: 'Select Labels',
             metrics_clear: 'Clear',
-            // Burndown Page
-            burndown_title: 'Burndown Chart',
+            burndown_title: 'MonoFlow',
             burndown_subtitle: 'Work Remaining Over Time',
             burndown_period: 'Date Range',
             burndown_trend: 'Work Remaining Trend',
             burndown_current: 'Now',
             burndown_actual: 'Actual Remaining',
             burndown_ideal: 'Ideal Progress',
-            // Help Page
-            help_title: 'User Guide',
+            help_title: 'MonoFlow',
             help_subtitle: 'Operating Manual',
             help_quick: 'Quick Start',
             help_manual: 'Detailed Manual',
@@ -244,11 +242,13 @@ const CONSTANTS = {
             help_m4_l2: 'Move completed tasks to the archive to keep your board clean.',
             help_m4_h3: 'Backup',
             help_m4_l3: 'Support for JSON export/import. Easy to migrate data between PCs.',
+            help_m4_privacy_t: 'Data Privacy',
+            help_m4_privacy_d: 'All your data is stored locally in your browser (LocalStorage). No data is sent to any external server, ensuring your sensitive information stays private.',
             help_m5_t: '5. Customization',
             help_m5_h1: 'Dark Mode',
             help_m5_l1: 'Switch via the moon icon. Easy on the eyes during late-night sessions.',
             help_m5_h2: 'Multilingual',
-            help_m5_l2: 'Switch between Japanese and English via the menu.',
+            help_m5_l2: 'Switch between Japanese and English via the top toolbar.',
             help_footer: 'MonoFlow Productivity System - Built for High-Performance Personal Kanban'
         }
     }

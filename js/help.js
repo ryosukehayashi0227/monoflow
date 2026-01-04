@@ -1,109 +1,95 @@
 /**
- * MonoFlow Help Page Localization Logic - Exhaustive Edition
+ * MonoFlow Help Page Localization Logic - ID Based Edition
  */
 
 function translateUI() {
-    // 1. Header
-    document.querySelector('h1').textContent = Common.t('help_title');
-    const subtitle = document.querySelector('h1 + p');
-    if (subtitle) subtitle.textContent = Common.t('help_subtitle');
-    const backBtn = document.querySelector('a[href="index.html"] span');
-    if (backBtn) backBtn.textContent = Common.t('back_to_app');
+    // Helper to set text by ID
+    const setT = (id, key) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = Common.t(key);
+    };
 
-    // 2. Section Headers (h2)
-    const h2s = document.querySelectorAll('h2');
-    if (h2s.length >= 2) {
-        h2s[0].innerHTML = `<i data-lucide="zap" class="w-8 h-8 text-blue-600 fill-blue-600/20"></i> ${Common.t('help_quick')}`;
-        h2s[1].innerHTML = `<i data-lucide="book-open" class="w-8 h-8 text-blue-600 fill-blue-600/20"></i> ${Common.t('help_manual')}`;
-    }
-
-    // 3. Quick Start Cards
-    const quickCards = document.querySelectorAll('.grid > div.bg-white');
-    const qKeys = [
-        { t: 'help_q1_t', d: 'help_q1_d' },
-        { t: 'help_q2_t', d: 'help_q2_d' },
-        { t: 'help_q3_t', d: 'help_q3_d' }
-    ];
-    quickCards.forEach((card, i) => {
-        if (qKeys[i]) {
-            card.querySelector('h3').textContent = Common.t(qKeys[i].t);
-            card.querySelector('p').textContent = Common.t(qKeys[i].d);
-        }
-    });
-
-    // 4. Detailed Manual Cards
-    const manualCards = document.querySelectorAll('.feature-card');
+    // 1. Header & Basics
+    setT('help-page-title', 'help_title');
+    setT('help-page-subtitle', 'help_subtitle');
+    setT('back-to-app-text', 'back_to_app');
     
-    // Card 1: Task Card Structure
-    if (manualCards[0]) {
-        manualCards[0].querySelector('h3').textContent = Common.t('help_m1_t');
-        manualCards[0].querySelector('p').textContent = Common.t('help_m1_d');
-        const h4s = manualCards[0].querySelectorAll('h4');
-        h4s[0].textContent = Common.t('help_m1_h1');
-        h4s[1].textContent = Common.t('help_m1_h2');
-        const lis = manualCards[0].querySelectorAll('li');
-        const lKeys = ['help_m1_l1', 'help_m1_l2', 'help_m1_l3', 'help_m1_l4', 'help_m1_l5', 'help_m1_l6', 'help_m1_l7'];
-        lis.forEach((li, i) => { if(lKeys[i]) li.innerHTML = Common.t(lKeys[i]); });
-    }
+    const h2s = document.querySelectorAll('h2');
+    if(h2s[0]) h2s[0].innerHTML = `<i data-lucide="zap" class="w-8 h-8 text-blue-600 fill-blue-600/20"></i> ${Common.t('help_quick')}`;
+    if(h2s[1]) h2s[1].innerHTML = `<i data-lucide="book-open" class="w-8 h-8 text-blue-600 fill-blue-600/20"></i> ${Common.t('help_manual')}`;
 
-    // Card 2: Hierarchy
-    if (manualCards[1]) {
-        manualCards[1].querySelector('h3').textContent = Common.t('help_m2_t');
-        manualCards[1].querySelector('p').textContent = Common.t('help_m2_d');
-        const h4s = manualCards[1].querySelectorAll('h4');
-        h4s[0].textContent = Common.t('help_m2_h1');
-        h4s[1].textContent = Common.t('help_m2_h2');
-        h4s[2].textContent = Common.t('help_m2_h3');
-        h4s[3].textContent = Common.t('metrics_rate'); // Reusing existing key
-        const ps = manualCards[1].querySelectorAll('.flex-grow p, div p');
-        // Select specific descriptions
-        ps[1].textContent = Common.t('help_m2_l1');
-        ps[2].textContent = Common.t('help_m2_l2');
-        ps[3].textContent = Common.t('help_m2_l3');
-        ps[4].textContent = Common.t('help_m2_extra');
-    }
+    // 2. Quick Start
+    setT('help-q1-title', 'help_q1_t');
+    setT('help-q1-desc', 'help_q1_d');
+    setT('help-q2-title', 'help_q2_t');
+    setT('help-q2-desc', 'help_q2_d');
+    setT('help-q3-title', 'help_q3_t');
+    setT('help-q3-desc', 'help_q3_d');
 
-    // Card 3: Search
-    if (manualCards[2]) {
-        manualCards[2].querySelector('h3').textContent = Common.t('help_m3_t');
-        manualCards[2].querySelector('p').textContent = Common.t('help_m3_d');
-        const h4s = manualCards[2].querySelectorAll('h4');
-        h4s[0].innerHTML = `<i data-lucide="search" class="w-5 h-5"></i> ${Common.t('help_m3_h1')}`;
-        h4s[1].innerHTML = `<i data-lucide="filter" class="w-5 h-5"></i> ${Common.t('help_m3_h2')}`;
-        const ps = manualCards[2].querySelectorAll('p');
-        ps[1].textContent = Common.t('help_m3_l1');
-        ps[2].textContent = Common.t('help_m3_l2');
-    }
+    // 3. Detailed Manual - Structure
+    setT('help-m1-title', 'help_m1_t');
+    setT('help-m1-desc', 'help_m1_d');
+    setT('help-m1-h1', 'help_m1_h1');
+    setT('help-m1-h2', 'help_m1_h2');
+    setT('help-m1-l1', 'help_m1_l1');
+    setT('help-m1-l2', 'help_m1_l2');
+    setT('help-m1-l3', 'help_m1_l3');
+    setT('help-m1-l4', 'help_m1_l4');
+    setT('help-m1-l5', 'help_m1_l5');
+    setT('help-m1-l6', 'help_m1_l6');
+    setT('help-m1-l7', 'help_m1_l7');
 
-    // Card 4: Analytics
-    if (manualCards[3]) {
-        manualCards[3].querySelector('h3').textContent = Common.t('help_m4_t');
-        manualCards[3].querySelector('p').textContent = Common.t('help_m4_d');
-        const h4s = manualCards[3].querySelectorAll('h4');
-        h4s[0].textContent = Common.t('help_m4_h1');
-        h4s[1].textContent = 'Data Privacy'; // Special styled one
-        h4s[2].textContent = Common.t('help_m4_h2');
-        h4s[3].textContent = Common.t('help_m4_h3');
-        const ps = manualCards[3].querySelectorAll('p');
-        ps[1].textContent = Common.t('help_m4_l1');
-        ps[3].textContent = Common.t('help_m4_l2');
-        ps[4].textContent = Common.t('help_m4_l3');
-    }
+    // 4. Detailed Manual - Hierarchy
+    setT('help-m2-title', 'help_m2_t');
+    setT('help-m2-desc', 'help_m2_d');
+    setT('help-m2-h1', 'help_m2_h1');
+    setT('help-m2-l1', 'help_m2_l1');
+    setT('help-m2-h2', 'help_m2_h2');
+    setT('help-m2-l2', 'help_m2_l2');
+    setT('help-m2-h3', 'help_m2_h3');
+    setT('help-m2-l3', 'help_m2_l3');
+    setT('help-m2-extra-title', 'metrics_rate'); 
+    setT('help-m2-extra-desc', 'help_m2_extra');
 
-    // Card 5: Settings
-    if (manualCards[4]) {
-        manualCards[4].querySelector('h3').textContent = Common.t('help_m5_t');
-        const h4s = manualCards[4].querySelectorAll('h4');
-        h4s[0].textContent = Common.t('help_m5_h1');
-        h4s[1].textContent = Common.t('help_m5_h2');
-        const ps = manualCards[4].querySelectorAll('p');
-        ps[0].textContent = Common.t('help_m5_l1');
-        ps[1].textContent = Common.t('help_m5_l2');
-    }
+    // 5. Detailed Manual - Search
+    setT('help-m3-title', 'help_m3_t');
+    setT('help-m3-desc', 'help_m3_d');
+    const m3h1 = document.getElementById('help-m3-h1');
+    if(m3h1) m3h1.innerHTML = `<i data-lucide="search" class="w-5 h-5"></i> ${Common.t('help_m3_h1')}`;
+    const m3h2 = document.getElementById('help-m3-h2');
+    if(m3h2) m3h2.innerHTML = `<i data-lucide="filter" class="w-5 h-5"></i> ${Common.t('help_m3_h2')}`;
+    setT('help-m3-l1', 'help_m3_l1');
+    setT('help-m3-l2', 'help_m3_l2');
 
-    // 5. Footer
-    const footerP = document.querySelector('footer p');
-    if (footerP) footerP.textContent = Common.t('help_footer');
+    // 6. Detailed Manual - Analytics
+    setT('help-m4-title', 'help_m4_t');
+    setT('help-m4-desc', 'help_m4_d');
+    setT('help-m4-h1', 'help_m4_h1');
+    setT('help-m4-l1', 'help_m4_l1');
+    setT('help-m4-h2', 'help_m4_h2');
+    setT('help-m4-l2', 'help_m4_l2');
+    setT('help-m4-h3', 'help_m4_h3');
+    setT('help-m4-l3', 'help_m4_l3');
+    setT('help-m4-privacy-title', 'help_m4_privacy_t');
+    setT('help-m4-privacy-desc', 'help_m4_privacy_d');
+
+    // 7. Detailed Manual - Settings
+    setT('help-m5-title', 'help_m5_t');
+    setT('help-m5-h1', 'help_m5_h1');
+    setT('help-m5-l1', 'help_m5_l1');
+    setT('help-m5-h2', 'help_m5_h2');
+    setT('help-m5-l2', 'help_m5_l2');
+
+    // Footer
+    setT('help-footer-text', 'help_footer');
+
+    // 8. Image Switcher
+    const suffix = State.language === 'en' ? '-en' : '';
+    document.querySelectorAll('img.screenshot').forEach(img => {
+        const src = img.getAttribute('src');
+        const base = src.replace('-en.svg', '').replace('.svg', '');
+        img.setAttribute('src', `${base}${suffix}.svg`);
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
