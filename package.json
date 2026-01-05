@@ -1,0 +1,19 @@
+{
+  "name": "monoflow-tests",
+  "version": "1.0.0",
+  "description": "Test suite for MonoFlow",
+  "scripts": {
+    "test": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "http-server": "^14.1.1",
+    "jsdom": "^23.0.0",
+    "vitest": "^1.0.0"
+  }
+}

@@ -41,7 +41,7 @@ const Common = {
             filter_label: 'ラベル',
             filter_all: 'すべてのラベル',
             filter_priority_all: 'すべての優先度',
-            add_placeholder: '新しいタスクを入力...', 
+            add_placeholder: '新しいタスクを入力...',
             add_btn: '追加',
             search_placeholder: '検索...',
             menu_board: 'ボード',
@@ -204,9 +204,9 @@ const Common = {
             filter_label: 'Label',
             filter_all: 'All Labels',
             filter_priority_all: 'All Priorities',
-            add_placeholder: 'Add a new task...', 
+            add_placeholder: 'Add a new task...',
             add_btn: 'Add',
-            search_placeholder: 'Search...', 
+            search_placeholder: 'Search...',
             menu_board: 'Board',
             menu_export: 'Export (JSON)',
             menu_import: 'Import',
@@ -364,7 +364,7 @@ const Common = {
     },
 
     t: (key) => (Common.I18N[State.language] && Common.I18N[State.language][key]) || key,
-    
+
     parseDate: (dateStr) => {
         if (!dateStr) return null;
         const normalized = dateStr.includes('T') ? dateStr : dateStr.replace(/-/g, '/');
@@ -383,7 +383,7 @@ const Common = {
         State.language = localStorage.getItem(CONSTANTS.LANG_KEY) || (navigator.language.startsWith('ja') ? 'ja' : 'en');
         State.theme = localStorage.getItem(CONSTANTS.THEME_KEY) || 'light';
         Common.applyTheme();
-        
+
         document.addEventListener('click', (e) => {
             const settingsMenu = document.getElementById('settings-menu');
             const notifyMenu = document.getElementById('notify-menu');
@@ -409,7 +409,7 @@ const Common = {
     toggleTheme: () => { State.theme = State.theme === 'light' ? 'dark' : 'light'; localStorage.setItem(CONSTANTS.THEME_KEY, State.theme); Common.applyTheme(); },
     toggleMenu: (e) => { if (e) { e.preventDefault(); e.stopPropagation(); } const menu = document.getElementById('settings-menu'); if (menu) menu.classList.toggle('hidden'); },
     setLanguage: (lang) => { State.language = lang; localStorage.setItem(CONSTANTS.LANG_KEY, lang); location.reload(); },
-    
+
     // Shared Trans Helper
     setT: (id, key) => { const el = document.getElementById(id); if (el) el.innerHTML = Common.t(key); },
     setAttr: (id, attr, key) => { const el = document.getElementById(id); if (el) el.setAttribute(attr, Common.t(key)); }
@@ -421,7 +421,7 @@ const DataService = {
         return saved ? JSON.parse(saved) : null;
     },
     save: (data) => localStorage.setItem(CONSTANTS.STORAGE_KEY, JSON.stringify(data)),
-    
+
     export: () => {
         const fullState = {
             data: DataService.load(),
@@ -447,7 +447,7 @@ const DataService = {
                     if (imported.theme) localStorage.setItem(CONSTANTS.THEME_KEY, imported.theme);
                     location.reload();
                 } else { throw new Error(); }
-            } catch(err) { alert(Common.t('import_fail')); }
+            } catch (err) { alert(Common.t('import_fail')); }
             input.value = '';
         };
         reader.readAsText(file);
@@ -495,7 +495,7 @@ const NotificationService = {
     },
     jumpTo: (taskId) => {
         const isBoard = window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/');
-        if (isBoard && typeof App !== 'undefined' && App.jumpToTask) { App.jumpToTask(taskId); const m = document.getElementById('notify-menu'); if(m) m.classList.add('hidden'); }
+        if (isBoard && typeof App !== 'undefined' && App.jumpToTask) { App.jumpToTask(taskId); const m = document.getElementById('notify-menu'); if (m) m.classList.add('hidden'); }
         else { window.location.href = `index.html?jumpTaskId=${taskId}`; }
     }
 };
@@ -512,4 +512,8 @@ document.addEventListener('keydown', (e) => {
     if (e.key === '?') { window.location.href = 'help.html'; }
 });
 
-Common.init();
+if (typeof module !== 'undefined') {
+    module.exports = { DataService, Common, CONSTANTS, State, NotificationService };
+} else {
+    Common.init();
+}

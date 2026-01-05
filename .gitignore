@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 gemini-pr.sh
 GEMINI.md
+
+# Testing artifacts
+playwright-report/
+test-results/
