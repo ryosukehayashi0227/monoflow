@@ -39,7 +39,7 @@ function translateUI() {
 let statusChart, priorityChart, throughputChart;
 let selectedLabels = new Set();
 
-function toggleLabelMenu(e) { e.stopPropagation(); const m = document.getElementById('settings-menu'); if(m) m.classList.toggle('hidden'); }
+function toggleLabelMenu(e) { e.stopPropagation(); const m = document.getElementById('settings-menu'); if (m) m.classList.toggle('hidden'); }
 function clearLabels() { selectedLabels.clear(); initMetrics(); }
 
 function renderLabelList(data) {
@@ -64,12 +64,12 @@ function initMetrics() {
     translateUI(); renderLabelList(data);
     let sVal = document.getElementById('start-date').value;
     let eVal = document.getElementById('end-date').value;
-    if (!sVal) { const d = new Date(); d.setDate(d.getDate()-14); sVal = Common.toDateKey(d); document.getElementById('start-date').value = sVal; }
+    if (!sVal) { const d = new Date(); d.setDate(d.getDate() - 14); sVal = Common.toDateKey(d); document.getElementById('start-date').value = sVal; }
     if (!eVal) { eVal = Common.toDateKey(new Date()); document.getElementById('end-date').value = eVal; }
-    const startTs = Common.parseDate(sVal).setHours(0,0,0,0);
-    const endTs = Common.parseDate(eVal).setHours(23,59,59,999);
+    const startTs = Common.parseDate(sVal).setHours(0, 0, 0, 0);
+    const endTs = Common.parseDate(eVal).setHours(23, 59, 59, 999);
     const dailyThroughput = {}; let temp = new Date(startTs);
-    while (temp.getTime() <= endTs) { dailyThroughput[Common.toDateKey(temp)] = 0; temp.setDate(temp.getDate()+1); }
+    while (temp.getTime() <= endTs) { dailyThroughput[Common.toDateKey(temp)] = 0; temp.setDate(temp.getDate() + 1); }
     const statusCounts = { todo: 0, progress: 0, done: 0 };
     const priorityCounts = { high: 0, medium: 0, low: 0, none: 0 };
     let doneInPeriod = 0, leadTimeTotal = 0, cycleTimeTotal = 0, cycleCount = 0;
@@ -91,37 +91,41 @@ function initMetrics() {
     });
     const total = tasks.length;
     document.getElementById('total-tasks').textContent = total;
-    document.getElementById('completion-rate').textContent = `${total ? Math.round((statusCounts.done/total)*100) : 0}%`;
-    const leadVal = doneInPeriod ? (leadTimeTotal/doneInPeriod/(86400000)).toFixed(1) : "0.0";
+    document.getElementById('completion-rate').textContent = `${total ? Math.round((statusCounts.done / total) * 100) : 0}%`;
+    const leadVal = doneInPeriod ? (leadTimeTotal / doneInPeriod / (86400000)).toFixed(1) : "0.0";
     document.getElementById('avg-days').textContent = `${leadVal} ${Common.t('unit_days')}`;
-    
-    let avgCycleStr = `0.0 ${Common.t('unit_days')}`; 
-    if (cycleCount) { 
-        const d = cycleTimeTotal/cycleCount/86400000; 
-        avgCycleStr = d < 0.1 ? `${(d*24).toFixed(1)} ${Common.t('unit_hours')}` : `${d.toFixed(1)} ${Common.t('unit_days')}`; 
+
+    let avgCycleStr = `0.0 ${Common.t('unit_days')}`;
+    if (cycleCount) {
+        const d = cycleTimeTotal / cycleCount / 86400000;
+        avgCycleStr = d < 0.1 ? `${(d * 24).toFixed(1)} ${Common.t('unit_hours')}` : `${d.toFixed(1)} ${Common.t('unit_days')}`;
     }
     document.getElementById('cycle-time').textContent = avgCycleStr;
-    const pace = doneInPeriod / Math.max(1, Math.round((endTs-startTs)/86400000));
+    const pace = doneInPeriod / Math.max(1, Math.round((endTs - startTs) / 86400000));
     const remaining = statusCounts.todo + statusCounts.progress;
-    let est = "--"; if (pace > 0 && remaining > 0) { const f = new Date(); f.setDate(f.getDate() + (remaining/pace)); est = f.toLocaleDateString(State.language === 'ja' ? 'ja-JP' : 'en-US', { month: 'short', day: 'numeric' }); } else if (remaining === 0 && total > 0) est = "Done";
+    let est = "--"; if (pace > 0 && remaining > 0) { const f = new Date(); f.setDate(f.getDate() + (remaining / pace)); est = f.toLocaleDateString(State.language === 'ja' ? 'ja-JP' : 'en-US', { month: 'short', day: 'numeric' }); } else if (remaining === 0 && total > 0) est = "Done";
     document.getElementById('est-finish').textContent = est;
     document.getElementById('done-tasks').textContent = doneInPeriod;
     renderStatusChart(statusCounts); renderPriorityChart(priorityCounts); renderThroughputChart(dailyThroughput);
 }
 
 function renderThroughputChart(dataMap) {
-    const ctx = document.getElementById('throughputChart').getContext('2d'); if (throughputChart) throughputChart.destroy();
+    const ctx = document.getElementById('throughputChart').getContext('2d'); if (throughputChart && typeof throughputChart.destroy === 'function') throughputChart.destroy();
     throughputChart = new Chart(ctx, { type: 'line', data: { labels: Object.keys(dataMap).map(d => Common.parseDate(d).toLocaleDateString(State.language === 'ja' ? 'ja-JP' : 'en-US', { month: 'short', day: 'numeric' })), datasets: [{ data: Object.values(dataMap), borderColor: '#3B82F6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#fff' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: State.theme === 'dark' ? '#1e293b' : '#f1f5f9' }, ticks: { stepSize: 1, color: State.theme === 'dark' ? '#94a3b8' : '#64748b' } }, x: { grid: { display: false }, ticks: { color: State.theme === 'dark' ? '#94a3b8' : '#64748b' } } } } });
 }
 
 function renderStatusChart(counts) {
-    const ctx = document.getElementById('statusChart').getContext('2d'); if (statusChart) statusChart.destroy();
+    const ctx = document.getElementById('statusChart').getContext('2d'); if (statusChart && typeof statusChart.destroy === 'function') statusChart.destroy();
     statusChart = new Chart(ctx, { type: 'doughnut', data: { labels: [Common.t('col_todo'), Common.t('col_progress'), Common.t('col_done')], datasets: [{ data: [counts.todo, counts.progress, counts.done], backgroundColor: ['#E2E8F0', '#3B82F6', '#22C55E'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { weight: 'bold', family: 'Inter' }, color: State.theme === 'dark' ? '#cbd5e1' : '#64748b' } } } } });
 }
 
 function renderPriorityChart(counts) {
-    const ctx = document.getElementById('priorityChart').getContext('2d'); if (priorityChart) priorityChart.destroy();
+    const ctx = document.getElementById('priorityChart').getContext('2d'); if (priorityChart && typeof priorityChart.destroy === 'function') priorityChart.destroy();
     priorityChart = new Chart(ctx, { type: 'bar', data: { labels: CONSTANTS.PRIORITIES.map(p => p.label[State.language]), datasets: [{ data: CONSTANTS.PRIORITIES.map(p => counts[p.value] || 0), backgroundColor: ['#FEE2E2', '#FFEDD5', '#DBEAFE', '#F1F5F9'], borderColor: ['#EF4444', '#F97316', '#3B82F6', '#94A3B8'], borderWidth: 2, borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { display: false }, ticks: { stepSize: 1, color: State.theme === 'dark' ? '#94a3b8' : '#64748b' } }, x: { grid: { display: false }, ticks: { color: State.theme === 'dark' ? '#94a3b8' : '#64748b' } } }, plugins: { legend: { display: false } } } });
 }
 
-document.addEventListener('DOMContentLoaded', () => { initMetrics(); lucide.createIcons(); document.getElementById('start-date').addEventListener('change', initMetrics); document.getElementById('end-date').addEventListener('change', initMetrics); });
+if (typeof module !== 'undefined') {
+    module.exports = { initMetrics, loadData };
+} else {
+    document.addEventListener('DOMContentLoaded', () => { initMetrics(); lucide.createIcons(); document.getElementById('start-date').addEventListener('change', initMetrics); document.getElementById('end-date').addEventListener('change', initMetrics); });
+}
