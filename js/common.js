@@ -348,7 +348,7 @@ const Common = {
             notify_overdue: 'Overdue',
             notify_due_today: 'Due Today',
             notify_none: 'No urgent tasks found',
-            about_title: 'About MonoFlow',
+            about_title: 'MonoFlow',
             about_link: 'What is MonoFlow?',
             about_subtitle: 'Minimal yet Powerful Personal Kanban',
             about_concept_t: 'Concept',
