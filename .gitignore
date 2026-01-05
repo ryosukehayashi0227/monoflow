@@ -28,3 +28,13 @@ GEMINI.md
 # Testing artifacts
 playwright-report/
 test-results/
+
+# Python
+venv/
+.venv/
+
+# Environment variables
+.env
+
+# Debug artifacts
+debug-*.png
