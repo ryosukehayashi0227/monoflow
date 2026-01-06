@@ -85,7 +85,9 @@ const Common = {
             confirm_reset_2: '本当に削除しますか？\n削除前に「エクスポート」してバックアップを取っておくことをお勧めします。',
             reset_done: 'Boardをリセットしました。',
             import_done: 'インポートが完了しました。',
+            import_done: 'インポートが完了しました。',
             import_fail: 'インポートに失敗しました。',
+            confirm_import: '現在のデータは失われますがよろしいですか？',
             welcome_title: 'Welcome to MonoFlow',
             welcome_desc: 'これはサンプルタスクです。',
             metrics_title: 'MonoFlow',
@@ -248,7 +250,9 @@ const Common = {
             confirm_reset_2: 'Are you absolutely sure?\nWe strongly recommend exporting a backup first.',
             reset_done: 'Board has been reset.',
             import_done: 'Import successful.',
+            import_done: 'Import completed.',
             import_fail: 'Import failed.',
+            confirm_import: 'Current data will be lost. Are you sure?',
             welcome_title: 'Welcome to MonoFlow',
             welcome_desc: 'This is a sample task.',
             metrics_title: 'MonoFlow',
@@ -436,6 +440,7 @@ const DataService = {
 
     import: (input) => {
         const file = input.files[0]; if (!file) return;
+        if (!confirm(Common.t('confirm_import'))) { input.value = ''; return; }
         const reader = new FileReader();
         reader.onload = (e) => {
             try {
