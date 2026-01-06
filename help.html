@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MonoFlow - User Guide</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232563eb'/%3E%3Cpath d='M30 30 L 30 70 L 50 50 L 70 70 L 70 30' fill='none' stroke='white' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" type="image/svg+xml">
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232563eb'/%3E%3Cpath d='M30 30 L 30 70 L 50 50 L 70 70 L 70 30' fill='none' stroke='white' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"
+        type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -15,44 +19,114 @@
     </script>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .screenshot { width: 100%; border-radius: 2rem; border-width: 4px; border-color: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); background-color: white; transition: all 0.3s; }
-        .screenshot:hover { transform: scale(1.03) rotate(1deg); }
-        .dark .screenshot { border-color: #334155; background-color: #1e293b; }
-        
-        .kbd { display: inline-block; padding: 0.25rem 0.5rem; background-color: #f1f5f9; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 900; color: #334155; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-family: monospace; }
-        .dark .kbd { background-color: #1e293b; border-color: #334155; color: #cbd5e1; }
-        
-        li { display: flex; gap: 0.75rem; align-items: start; font-size: 0.875rem; color: #475569; }
-        .dark li { color: #94a3b8; }
-        li::before { content: "→"; color: #3b82f6; font-weight: 900; }
+        .screenshot {
+            width: 100%;
+            border-radius: 2rem;
+            border-width: 4px;
+            border-color: white;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            background-color: white;
+            transition: all 0.3s;
+        }
+
+        .screenshot:hover {
+            transform: scale(1.03) rotate(1deg);
+        }
+
+        .dark .screenshot {
+            border-color: #334155;
+            background-color: #1e293b;
+        }
+
+        .kbd {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background-color: #f1f5f9;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 900;
+            color: #334155;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            font-family: monospace;
+        }
+
+        .dark .kbd {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+
+        li {
+            display: flex;
+            gap: 0.75rem;
+            align-items: start;
+            font-size: 0.875rem;
+            color: #475569;
+        }
+
+        .dark li {
+            color: #94a3b8;
+        }
+
+        li::before {
+            content: "→";
+            color: #3b82f6;
+            font-weight: 900;
+        }
     </style>
 </head>
+
 <body class="antialiased bg-[#f8fafc] dark:bg-[#0f172a]">
     <div class="w-full">
         <!-- Header Section -->
         <header class="flex flex-col gap-4 mb-6 max-w-[1600px] mx-auto px-4 md:px-8 py-4">
             <div class="flex items-center gap-4 pb-4 border-b border-slate-200 dark:border-slate-800 relative">
                 <a href="index.html" class="flex items-center gap-4 group">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-xl flex items-center justify-center shadow-lg shrink-0 transform transition-all group-hover:rotate-3 group-hover:scale-110 duration-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white transform group-hover:scale-110 transition-transform duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="6" y2="18"></line><line x1="12" y1="6" x2="12" y2="14"></line><line x1="18" y1="6" x2="18" y2="10"></line></svg>
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-xl flex items-center justify-center shadow-lg shrink-0 transform transition-all group-hover:rotate-3 group-hover:scale-110 duration-500">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-6 h-6 text-white transform group-hover:scale-110 transition-transform duration-500"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="6" y1="6" x2="6" y2="18"></line>
+                            <line x1="12" y1="6" x2="12" y2="14"></line>
+                            <line x1="18" y1="6" x2="18" y2="10"></line>
+                        </svg>
                     </div>
                     <div>
-                        <h1 id="brand-title" class="text-2xl font-black tracking-tighter text-slate-900 dark:text-white leading-tight">MonoFlow</h1>
-                        <p id="brand-subtitle" class="text-slate-400 font-bold uppercase tracking-widest text-[8px] mt-0 opacity-80">Simple Personal Kanban</p>
+                        <h1 id="brand-title"
+                            class="text-2xl font-black tracking-tighter text-slate-900 dark:text-white leading-tight">
+                            MonoFlow</h1>
+                        <p id="brand-subtitle"
+                            class="text-slate-400 font-bold uppercase tracking-widest text-[8px] mt-0 opacity-80">Simple
+                            Personal Kanban</p>
                     </div>
                 </a>
                 <nav class="flex items-center gap-3 ml-8 hidden md:flex">
                     <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-                        <a href="index.html" id="nav-board" class="tab-item px-4 py-1.5 rounded-lg text-xs font-bold transition-all">Board</a>
-                        <a href="metrics.html" id="nav-metrics" class="tab-item px-4 py-1.5 rounded-lg text-xs font-bold transition-all">Metrics</a>
-                        <a href="burndown.html" id="nav-burndown" class="tab-item px-4 py-1.5 rounded-lg text-xs font-bold transition-all">Burndown</a>
+                        <a href="index.html" id="nav-board"
+                            class="tab-item px-4 py-1.5 rounded-lg text-xs font-bold transition-all">Board</a>
+                        <a href="metrics.html" id="nav-metrics"
+                            class="tab-item px-4 py-1.5 rounded-lg text-xs font-bold transition-all">Metrics</a>
+                        <a href="burndown.html" id="nav-burndown"
+                            class="tab-item px-4 py-1.5 rounded-lg text-xs font-bold transition-all">Burndown</a>
                     </div>
-                    <a href="about.html" id="about-link" class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all border border-blue-100 dark:border-blue-800/50 shadow-sm">What is MonoFlow?</a>
+                    <a href="about.html" id="about-link"
+                        class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all border border-blue-100 dark:border-blue-800/50 shadow-sm">What
+                        is MonoFlow?</a>
                 </nav>
                 <div class="flex items-center gap-2 ml-auto">
-                    <a href="help.html" id="help-btn" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center" title="User Guide"><i data-lucide="help-circle" class="w-4 h-4"></i></a>
-                    <button id="lang-btn" onclick="Common.setLanguage(State.language === 'ja' ? 'en' : 'ja')" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center" title="Switch Language"><i data-lucide="languages" class="w-4 h-4"></i></button>
-                    <button id="theme-btn" onclick="Common.toggleTheme()" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center"><i data-lucide="sun" id="theme-icon-light" class="w-4 h-4 hidden"></i><i data-lucide="moon" id="theme-icon-dark" class="w-4 h-4"></i></button>
+                    <a href="help.html" id="help-btn"
+                        class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center"
+                        title="User Guide"><i data-lucide="help-circle" class="w-4 h-4"></i></a>
+                    <button id="lang-btn" onclick="Common.setLanguage(State.language === 'ja' ? 'en' : 'ja')"
+                        class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center"
+                        title="Switch Language"><i data-lucide="languages" class="w-4 h-4"></i></button>
+                    <button id="theme-btn" onclick="Common.toggleTheme()"
+                        class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm flex items-center justify-center"><i
+                            data-lucide="sun" id="theme-icon-light" class="w-4 h-4 hidden"></i><i data-lucide="moon"
+                            id="theme-icon-dark" class="w-4 h-4"></i></button>
                 </div>
             </div>
         </header>
@@ -60,20 +134,31 @@
         <main class="mt-12 w-full">
             <!-- Quick Start -->
             <section class="max-w-[1000px] mx-auto px-4 mb-32">
-                <h2 id="help-quick-header" class="text-4xl font-black text-slate-900 dark:text-white mb-16 flex items-center gap-4 tracking-tighter">Quick Start</h2>
+                <h2 id="help-quick-header"
+                    class="text-4xl font-black text-slate-900 dark:text-white mb-16 flex items-center gap-4 tracking-tighter">
+                    Quick Start</h2>
                 <div class="grid md:grid-cols-3 gap-6">
-                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
-                        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black mb-4">1</div>
+                    <div
+                        class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black mb-4">
+                            1</div>
                         <h3 id="help-q1-title" class="text-lg font-bold text-slate-800 dark:text-white mb-2">Create</h3>
                         <p id="help-q1-desc" class="text-xs text-slate-500 dark:text-slate-400">Type and Enter.</p>
                     </div>
-                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
-                        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black mb-4">2</div>
+                    <div
+                        class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black mb-4">
+                            2</div>
                         <h3 id="help-q2-title" class="text-lg font-bold text-slate-800 dark:text-white mb-2">Move</h3>
                         <p id="help-q2-desc" class="text-xs text-slate-500 dark:text-slate-400">Drag to Done.</p>
                     </div>
-                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
-                        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black mb-4">3</div>
+                    <div
+                        class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black mb-4">
+                            3</div>
                         <h3 id="help-q3-title" class="text-lg font-bold text-slate-800 dark:text-white mb-2">Detail</h3>
                         <p id="help-q3-desc" class="text-xs text-slate-500 dark:text-slate-400">Click to Edit.</p>
                     </div>
@@ -82,37 +167,56 @@
 
             <!-- New Features -->
             <section class="max-w-[1000px] mx-auto px-4 mb-32">
-                <h2 id="help-new-features-header" class="text-4xl font-black text-slate-900 dark:text-white mb-16 flex items-center gap-4 tracking-tighter">Dependencies & Optimization</h2>
+                <h2 id="help-new-features-header"
+                    class="text-4xl font-black text-slate-900 dark:text-white mb-16 flex items-center gap-4 tracking-tighter">
+                    Dependencies & Optimization</h2>
                 <div class="grid md:grid-cols-2 gap-8">
-                    <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border-l-8 border-l-orange-400 border border-slate-100 dark:border-slate-800 shadow-sm">
-                        <h3 id="help-nf-blocker-title" class="text-xl font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2"><i data-lucide="link-2" class="w-5 h-5 text-orange-500"></i> Blockers</h3>
-                        <p id="help-nf-blocker-desc" class="text-slate-500 dark:text-slate-400">Dependency management.</p>
+                    <div
+                        class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border-l-8 border-l-orange-400 border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <h3 id="help-nf-blocker-title"
+                            class="text-xl font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2"><i
+                                data-lucide="link-2" class="w-5 h-5 text-orange-500"></i> Blockers</h3>
+                        <p id="help-nf-blocker-desc" class="text-slate-500 dark:text-slate-400">Dependency management.
+                        </p>
                     </div>
-                    <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border-l-8 border-l-slate-400 border border-slate-100 dark:border-slate-800 shadow-sm">
-                        <h3 id="help-nf-stale-title" class="text-xl font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2"><i data-lucide="wind" class="w-5 h-5 text-slate-500"></i> Stale Tasks</h3>
-                        <p id="help-nf-stale-desc" class="text-slate-500 dark:text-slate-400">Auto-detection of inactive tasks.</p>
+                    <div
+                        class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border-l-8 border-l-slate-400 border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <h3 id="help-nf-stale-title"
+                            class="text-xl font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2"><i
+                                data-lucide="wind" class="w-5 h-5 text-slate-500"></i> Stale Tasks</h3>
+                        <p id="help-nf-stale-desc" class="text-slate-500 dark:text-slate-400">Auto-detection of inactive
+                            tasks.</p>
                     </div>
                 </div>
             </section>
 
             <!-- Data Privacy Highlight (NEW POSITION) -->
-            <section class="w-full bg-slate-900 dark:bg-blue-900/20 py-24 mb-32 -mx-4 md:-mx-8 px-4 md:px-8 border-y border-white/5">
+            <section
+                class="w-full bg-slate-900 dark:bg-blue-900/20 py-24 mb-32 -mx-4 md:-mx-8 px-4 md:px-8 border-y border-white/5">
                 <div class="max-w-[1000px] mx-auto text-center">
-                    <div class="w-20 h-20 bg-blue-600 text-white rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-blue-500/40">
+                    <div
+                        class="w-20 h-20 bg-blue-600 text-white rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-blue-500/40">
                         <i data-lucide="shield-check" class="w-10 h-10"></i>
                     </div>
-                    <h2 id="help-m4-privacy-title" class="text-white text-4xl font-black mb-6 justify-center">Data Privacy</h2>
-                    <p id="help-m4-privacy-desc" class="text-blue-100 text-xl font-medium max-w-2xl mx-auto opacity-90 leading-relaxed">Your data is 100% private. It lives exclusively in your browser's local storage and never touches a server.</p>
+                    <h2 id="help-m4-privacy-title" class="text-white text-4xl font-black mb-6 justify-center">Data
+                        Privacy</h2>
+                    <p id="help-m4-privacy-desc"
+                        class="text-blue-100 text-xl font-medium max-w-2xl mx-auto opacity-90 leading-relaxed">Your data
+                        is 100% private. It lives exclusively in your browser's local storage and never touches a
+                        server.</p>
                     <div class="mt-10 flex flex-wrap justify-center gap-4">
-                        <div class="bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10 flex items-center gap-3">
+                        <div
+                            class="bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10 flex items-center gap-3">
                             <i data-lucide="server-off" class="w-5 h-5 text-blue-400"></i>
                             <span class="text-white text-sm font-bold uppercase tracking-wider">No Servers</span>
                         </div>
-                        <div class="bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10 flex items-center gap-3">
+                        <div
+                            class="bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10 flex items-center gap-3">
                             <i data-lucide="user-minus" class="w-5 h-5 text-blue-400"></i>
                             <span class="text-white text-sm font-bold uppercase tracking-wider">No Accounts</span>
                         </div>
-                        <div class="bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10 flex items-center gap-3">
+                        <div
+                            class="bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10 flex items-center gap-3">
                             <i data-lucide="wifi-off" class="w-5 h-5 text-blue-400"></i>
                             <span class="text-white text-sm font-bold uppercase tracking-wider">Offline First</span>
                         </div>
@@ -120,23 +224,34 @@
                 </div>
             </section>
 
-            <div class="max-w-[1000px] mx-auto px-4"><h2 id="help-manual-header" class="text-4xl font-black text-slate-900 dark:text-white mb-8 pb-4 border-b border-slate-200 dark:border-slate-800 tracking-tighter">Detailed Manual</h2></div>
+            <div class="max-w-[1000px] mx-auto px-4">
+                <h2 id="help-manual-header"
+                    class="text-4xl font-black text-slate-900 dark:text-white mb-8 pb-4 border-b border-slate-200 dark:border-slate-800 tracking-tighter">
+                    Detailed Manual</h2>
+            </div>
 
             <!-- Manual Section 1: Structure (White) -->
             <div class="w-full bg-white dark:bg-slate-900 py-24 border-y border-slate-100 dark:border-slate-800">
                 <div class="max-w-[1000px] mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
                     <div>
-                        <span class="inline-flex items-center justify-center px-6 py-2 rounded-2xl bg-blue-600 text-white text-sm font-black uppercase tracking-[0.2em] mb-6 shadow-lg shadow-blue-500/40 transform -rotate-2">Step 01</span>
-                        <h3 id="help-m1-title" class="text-3xl font-black text-slate-800 dark:text-white mb-6 leading-tight">Task Card Structure</h3>
-                        <p id="help-m1-desc" class="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">Understanding the visual hierarchy.</p>
-                        <h4 id="help-m1-h1" class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2 mt-8">Visual Indicators</h4>
+                        <span
+                            class="inline-flex items-center justify-center px-6 py-2 rounded-2xl bg-blue-600 text-white text-sm font-black uppercase tracking-[0.2em] mb-6 shadow-lg shadow-blue-500/40 transform -rotate-2">Step
+                            01</span>
+                        <h3 id="help-m1-title"
+                            class="text-3xl font-black text-slate-800 dark:text-white mb-6 leading-tight">Task Card
+                            Structure</h3>
+                        <p id="help-m1-desc" class="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
+                            Understanding the visual hierarchy.</p>
+                        <h4 id="help-m1-h1" class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2 mt-8">
+                            Visual Indicators</h4>
                         <ul class="mb-6 space-y-3">
                             <li><span id="help-m1-l1">Priority Accents</span></li>
                             <li><span id="help-m1-l2">Dynamic Timestamps</span></li>
                             <li><span id="help-m1-l3">Note Preview</span></li>
                             <li><span id="help-m1-l4">Status Badges</span></li>
                         </ul>
-                        <h4 id="help-m1-h2" class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2 mt-8">Status Management</h4>
+                        <h4 id="help-m1-h2" class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2 mt-8">
+                            Status Management</h4>
                         <ul class="space-y-3">
                             <li><span id="help-m1-l5">Dimmed Done Tasks</span></li>
                             <li><span id="help-m1-l6">Strike-through Titles</span></li>
@@ -149,24 +264,37 @@
             <!-- Manual Section 2: Hierarchy (Gray) -->
             <div class="w-full bg-slate-100/50 dark:bg-black/20 py-24 border-b border-slate-100 dark:border-slate-800">
                 <div class="max-w-[1000px] mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
-                    <div class="order-last lg:order-first"><img src="img/screenshot-nest.svg" alt="Hierarchy" class="screenshot"></div>
+                    <div class="order-last lg:order-first"><img src="img/screenshot-nest.svg" alt="Hierarchy"
+                            class="screenshot"></div>
                     <div>
-                        <span class="inline-flex items-center justify-center px-6 py-2 rounded-2xl bg-blue-600 text-white text-sm font-black uppercase tracking-[0.2em] mb-6 shadow-lg shadow-blue-500/40 transform -rotate-2">Step 02</span>
-                        <h3 id="help-m2-title" class="text-3xl font-black text-slate-800 dark:text-white mb-6 leading-tight">Advanced Hierarchy</h3>
-                        <p id="help-m2-desc" class="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">Smart Parent-Child relationships.</p>
-                        
+                        <span
+                            class="inline-flex items-center justify-center px-6 py-2 rounded-2xl bg-blue-600 text-white text-sm font-black uppercase tracking-[0.2em] mb-6 shadow-lg shadow-blue-500/40 transform -rotate-2">Step
+                            02</span>
+                        <h3 id="help-m2-title"
+                            class="text-3xl font-black text-slate-800 dark:text-white mb-6 leading-tight">Advanced
+                            Hierarchy</h3>
+                        <p id="help-m2-desc" class="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">Smart
+                            Parent-Child relationships.</p>
+
                         <div class="space-y-4">
-                            <div class="p-6 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                                <h4 id="help-m2-h1" class="mt-0 text-base font-bold text-slate-800 dark:text-white">Virtual Parent</h4>
-                                <p id="help-m2-l1" class="mb-0 text-sm text-slate-500 dark:text-slate-400">Context across lanes.</p>
+                            <div
+                                class="p-6 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <h4 id="help-m2-h1" class="mt-0 text-base font-bold text-slate-800 dark:text-white">
+                                    Virtual Parent</h4>
+                                <p id="help-m2-l1" class="mb-0 text-sm text-slate-500 dark:text-slate-400">Context
+                                    across lanes.</p>
                             </div>
-                            <div class="p-6 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                                <h4 id="help-m2-h2" class="mt-0 text-base font-bold text-slate-800 dark:text-white">Virtual Child</h4>
-                                <p id="help-m2-l2" class="mb-0 text-sm text-slate-500 dark:text-slate-400">Aggregated subtasks.</p>
+                            <div
+                                class="p-6 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <h4 id="help-m2-h2" class="mt-0 text-base font-bold text-slate-800 dark:text-white">
+                                    Virtual Child</h4>
+                                <p id="help-m2-l2" class="mb-0 text-sm text-slate-500 dark:text-slate-400">Aggregated
+                                    subtasks.</p>
                             </div>
                         </div>
-                        
-                        <h4 id="help-m2-h3" class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2 mt-8">Jump & Flash</h4>
+
+                        <h4 id="help-m2-h3" class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2 mt-8">Jump
+                            & Flash</h4>
                         <p id="help-m2-l3" class="text-slate-500 dark:text-slate-400">Instant navigation.</p>
                     </div>
                 </div>
@@ -176,28 +304,46 @@
             <div class="w-full bg-white dark:bg-slate-900 py-24 border-b border-slate-100 dark:border-slate-800">
                 <div class="max-w-[1000px] mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
                     <div>
-                        <span class="inline-flex items-center justify-center px-6 py-2 rounded-2xl bg-blue-600 text-white text-sm font-black uppercase tracking-[0.2em] mb-6 shadow-lg shadow-blue-500/40 transform -rotate-2">Step 03</span>
-                        <h3 id="help-m3-title" class="text-3xl font-black text-slate-800 dark:text-white mb-6 leading-tight">Search & Filter</h3>
-                        <p id="help-m3-desc" class="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">Find what you need instantly.</p>
-                        
-                        <h4 id="help-m3-h1" class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2 mt-8">Real-time Search</h4>
+                        <span
+                            class="inline-flex items-center justify-center px-6 py-2 rounded-2xl bg-blue-600 text-white text-sm font-black uppercase tracking-[0.2em] mb-6 shadow-lg shadow-blue-500/40 transform -rotate-2">Step
+                            03</span>
+                        <h3 id="help-m3-title"
+                            class="text-3xl font-black text-slate-800 dark:text-white mb-6 leading-tight">Search &
+                            Filter</h3>
+                        <p id="help-m3-desc" class="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">Find what
+                            you need instantly.</p>
+
+                        <h4 id="help-m3-h1" class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2 mt-8">
+                            Real-time Search</h4>
                         <p id="help-m3-l1" class="text-slate-500 dark:text-slate-400">Titles and Notes.</p>
-                        
-                        <h4 id="help-m3-h2" class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2 mt-8">Multi-layer Filter</h4>
+
+                        <h4 id="help-m3-h2" class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2 mt-8">
+                            Multi-layer Filter</h4>
                         <p id="help-m3-l2" class="text-slate-500 dark:text-slate-400">Combine labels and priority.</p>
-                        
-                        <p id="help-m3-extra" class="text-sm text-slate-400 mt-6 bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 inline-block shadow-sm">Drag & Drop limitation note.</p>
+
+                        <p id="help-m3-extra"
+                            class="text-sm text-slate-400 mt-6 bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 inline-block shadow-sm">
+                            Drag & Drop limitation note.</p>
                     </div>
                     <div>
                         <!-- Placeholder -->
-                        <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl rotate-1">
+                        <div
+                            class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl rotate-1">
                             <div class="flex gap-2 mb-6">
-                                <div class="h-10 flex-grow bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700"></div>
-                                <div class="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center text-white"><i data-lucide="search" class="w-5 h-5"></i></div>
+                                <div
+                                    class="h-10 flex-grow bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+                                </div>
+                                <div
+                                    class="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center text-white">
+                                    <i data-lucide="search" class="w-5 h-5"></i></div>
                             </div>
                             <div class="space-y-3">
-                                <div class="h-20 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border-l-8 border-red-500 shadow-sm"></div>
-                                <div class="h-20 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border-l-8 border-blue-500 opacity-20"></div>
+                                <div
+                                    class="h-20 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border-l-8 border-red-500 shadow-sm">
+                                </div>
+                                <div
+                                    class="h-20 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border-l-8 border-blue-500 opacity-20">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -208,26 +354,80 @@
             <div class="w-full bg-slate-100/50 dark:bg-black/20 py-24 border-b border-slate-100 dark:border-slate-800">
                 <div class="max-w-[1000px] mx-auto px-4">
                     <div class="text-center max-w-3xl mx-auto mb-16">
-                        <span class="inline-flex items-center justify-center px-6 py-2 rounded-2xl bg-blue-600 text-white text-sm font-black uppercase tracking-[0.2em] mb-6 shadow-lg shadow-blue-500/40 transform -rotate-2">Step 04</span>
-                        <h3 id="help-m4-title" class="text-3xl font-black text-slate-800 dark:text-white mb-6 leading-tight">Analytics & Science</h3>
-                        <p id="help-m4-desc" class="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">Visualize your performance with precision.</p>
+                        <span
+                            class="inline-flex items-center justify-center px-6 py-2 rounded-2xl bg-blue-600 text-white text-sm font-black uppercase tracking-[0.2em] mb-6 shadow-lg shadow-blue-500/40 transform -rotate-2">Step
+                            04</span>
+                        <h3 id="help-m4-title"
+                            class="text-3xl font-black text-slate-800 dark:text-white mb-6 leading-tight">Analytics &
+                            Science</h3>
+                        <p id="help-m4-desc" class="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">Visualize
+                            your performance with precision.</p>
                     </div>
-                    
+
                     <div class="grid md:grid-cols-3 gap-8 mb-16">
-                        <div class="bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 shadow-lg text-center hover:-translate-y-2 transition-transform">
-                            <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6"><i data-lucide="bar-chart-2" class="w-8 h-8"></i></div>
-                            <h4 id="help-m4-h1" class="mt-0 justify-center text-xl font-bold text-slate-800 dark:text-white">Metrics</h4>
+                        <div
+                            class="bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 shadow-lg text-center hover:-translate-y-2 transition-transform">
+                            <div
+                                class="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                                <i data-lucide="bar-chart-2" class="w-8 h-8"></i></div>
+                            <h4 id="help-m4-h1"
+                                class="mt-0 justify-center text-xl font-bold text-slate-800 dark:text-white">Metrics
+                            </h4>
                             <p id="help-m4-l1" class="text-sm mb-0 text-slate-500">Lead time & Cycle time.</p>
                         </div>
-                        <div class="bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 shadow-lg text-center hover:-translate-y-2 transition-transform">
-                            <div class="w-16 h-16 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6"><i data-lucide="trending-down" class="w-8 h-8"></i></div>
-                            <h4 id="help-m4-h2" class="mt-0 justify-center text-xl font-bold text-slate-800 dark:text-white">Burndown</h4>
+                        <div
+                            class="bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 shadow-lg text-center hover:-translate-y-2 transition-transform">
+                            <div
+                                class="w-16 h-16 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                                <i data-lucide="trending-down" class="w-8 h-8"></i></div>
+                            <h4 id="help-m4-h2"
+                                class="mt-0 justify-center text-xl font-bold text-slate-800 dark:text-white">Burndown
+                            </h4>
                             <p id="help-m4-l2" class="text-sm mb-0 text-slate-500">Ideal vs Actual.</p>
                         </div>
-                        <div class="bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 shadow-lg text-center hover:-translate-y-2 transition-transform">
-                            <div class="w-16 h-16 bg-purple-50 dark:bg-purple-900/30 text-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6"><i data-lucide="archive" class="w-8 h-8"></i></div>
-                            <h4 id="help-m4-h3" class="mt-0 justify-center text-xl font-bold text-slate-800 dark:text-white">Archive</h4>
+                        <div
+                            class="bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 shadow-lg text-center hover:-translate-y-2 transition-transform">
+                            <div
+                                class="w-16 h-16 bg-purple-50 dark:bg-purple-900/30 text-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                                <i data-lucide="archive" class="w-8 h-8"></i></div>
+                            <h4 id="help-m4-h3"
+                                class="mt-0 justify-center text-xl font-bold text-slate-800 dark:text-white">Archive
+                            </h4>
                             <p id="help-m4-l3" class="text-sm mb-0 text-slate-500">Storage shelf concept.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manual Section 5: Data Management (White) -->
+            <div class="w-full bg-white dark:bg-slate-900 py-24 border-b border-slate-100 dark:border-slate-800">
+                <div class="max-w-[1000px] mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <span
+                            class="inline-flex items-center justify-center px-6 py-2 rounded-2xl bg-blue-600 text-white text-sm font-black uppercase tracking-[0.2em] mb-6 shadow-lg shadow-blue-500/40 transform -rotate-2">Step
+                            05</span>
+                        <h3 id="help-m5-title"
+                            class="text-3xl font-black text-slate-800 dark:text-white mb-6 leading-tight">Data
+                            Management</h3>
+                        <p id="help-m5-desc" class="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">Backup and
+                            Restore your data.</p>
+
+                        <h4 id="help-m5-h1" class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2 mt-8">
+                            Export</h4>
+                        <p id="help-m5-l1" class="text-slate-500 dark:text-slate-400">Download JSON backup.</p>
+
+                        <h4 id="help-m5-h2" class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2 mt-8">
+                            Import</h4>
+                        <p id="help-m5-l2" class="text-slate-500 dark:text-slate-400">Restore from JSON.</p>
+
+                        <h4 id="help-m5-h3" class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2 mt-8">Dark
+                            Mode</h4>
+                        <p id="help-m5-l4" class="text-slate-500 dark:text-slate-400">Toggle theme.</p>
+                    </div>
+                    <div>
+                        <div
+                            class="bg-slate-50 dark:bg-slate-800 p-12 rounded-3xl border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-300 dark:text-slate-600">
+                            <i data-lucide="database" class="w-32 h-32"></i>
                         </div>
                     </div>
                 </div>
@@ -235,36 +435,57 @@
 
             <!-- Shortcuts -->
             <section class="max-w-[1000px] mx-auto px-4 py-32">
-                <h3 id="help-shortcuts-title" class="text-center mb-10 text-3xl font-black text-slate-800 dark:text-white">Keyboard Shortcuts</h3>
-                <div class="max-w-2xl mx-auto bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
-                    <div class="grid grid-cols-[1fr_auto] gap-4 p-4 border-b border-slate-100 dark:border-slate-800 items-center">
-                        <span id="help-shortcuts-n" class="text-sm font-medium text-slate-700 dark:text-slate-300">New Task</span><kbd class="kbd">N</kbd>
+                <h3 id="help-shortcuts-title"
+                    class="text-center mb-10 text-3xl font-black text-slate-800 dark:text-white">Keyboard Shortcuts</h3>
+                <div
+                    class="max-w-2xl mx-auto bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+                    <div
+                        class="grid grid-cols-[1fr_auto] gap-4 p-4 border-b border-slate-100 dark:border-slate-800 items-center">
+                        <span id="help-shortcuts-n" class="text-sm font-medium text-slate-700 dark:text-slate-300">New
+                            Task</span><kbd class="kbd">N</kbd>
                     </div>
-                    <div class="grid grid-cols-[1fr_auto] gap-4 p-4 border-b border-slate-100 dark:border-slate-800 items-center">
-                        <span id="help-shortcuts-search" class="text-sm font-medium text-slate-700 dark:text-slate-300">Search</span><kbd class="kbd">/</kbd>
+                    <div
+                        class="grid grid-cols-[1fr_auto] gap-4 p-4 border-b border-slate-100 dark:border-slate-800 items-center">
+                        <span id="help-shortcuts-search"
+                            class="text-sm font-medium text-slate-700 dark:text-slate-300">Search</span><kbd
+                            class="kbd">/</kbd>
                     </div>
-                    <div class="grid grid-cols-[1fr_auto] gap-4 p-4 border-b border-slate-100 dark:border-slate-800 items-center">
-                        <span id="help-shortcuts-esc" class="text-sm font-medium text-slate-700 dark:text-slate-300">Close</span><kbd class="kbd">Esc</kbd>
+                    <div
+                        class="grid grid-cols-[1fr_auto] gap-4 p-4 border-b border-slate-100 dark:border-slate-800 items-center">
+                        <span id="help-shortcuts-esc"
+                            class="text-sm font-medium text-slate-700 dark:text-slate-300">Close</span><kbd
+                            class="kbd">Esc</kbd>
                     </div>
-                    <div class="grid grid-cols-[1fr_auto] gap-4 p-4 border-b border-slate-100 dark:border-slate-800 items-center">
-                        <span id="help-shortcuts-board" class="text-sm font-medium text-slate-700 dark:text-slate-300">Go to Board</span><div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">L</kbd></div>
+                    <div
+                        class="grid grid-cols-[1fr_auto] gap-4 p-4 border-b border-slate-100 dark:border-slate-800 items-center">
+                        <span id="help-shortcuts-board"
+                            class="text-sm font-medium text-slate-700 dark:text-slate-300">Go to Board</span>
+                        <div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">L</kbd></div>
                     </div>
-                    <div class="grid grid-cols-[1fr_auto] gap-4 p-4 border-b border-slate-100 dark:border-slate-800 items-center">
-                        <span id="help-shortcuts-metrics" class="text-sm font-medium text-slate-700 dark:text-slate-300">Go to Metrics</span><div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">M</kbd></div>
+                    <div
+                        class="grid grid-cols-[1fr_auto] gap-4 p-4 border-b border-slate-100 dark:border-slate-800 items-center">
+                        <span id="help-shortcuts-metrics"
+                            class="text-sm font-medium text-slate-700 dark:text-slate-300">Go to Metrics</span>
+                        <div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">M</kbd></div>
                     </div>
                     <div class="grid grid-cols-[1fr_auto] gap-4 p-4 items-center">
-                        <span id="help-shortcuts-burndown" class="text-sm font-medium text-slate-700 dark:text-slate-300">Go to Burndown</span><div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">B</kbd></div>
+                        <span id="help-shortcuts-burndown"
+                            class="text-sm font-medium text-slate-700 dark:text-slate-300">Go to Burndown</span>
+                        <div class="flex gap-1"><kbd class="kbd">Alt</kbd> + <kbd class="kbd">B</kbd></div>
                     </div>
                 </div>
             </section>
         </main>
 
         <footer class="mt-10 pt-16 border-t border-slate-200 dark:border-slate-800 text-center max-w-[1600px] mx-auto">
-            <p id="footer-text" class="text-slate-400 text-[10px] font-black uppercase tracking-[0.4em] mb-2">MonoFlow Productivity System</p>
-            <p class="text-slate-300 dark:text-slate-600 text-[10px] font-medium tracking-widest uppercase">Built for High-Performance Personal Kanban &copy; 2026</p>
+            <p id="footer-text" class="text-slate-400 text-[10px] font-black uppercase tracking-[0.4em] mb-2">MonoFlow
+                Productivity System</p>
+            <p class="text-slate-300 dark:text-slate-600 text-[10px] font-medium tracking-widest uppercase">Built for
+                High-Performance Personal Kanban &copy; 2026</p>
         </footer>
     </div>
     <script src="js/common.js"></script>
     <script src="js/help.js"></script>
 </body>
+
 </html>

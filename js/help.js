@@ -12,17 +12,17 @@ function translateUI() {
     a('help-btn', 'title', 'menu_help');
     a('lang-btn', 'title', 'switch_lang');
     a('theme-btn', 'title', 'toggle_theme');
-    
+
     const h2Quick = document.getElementById('help-quick-header');
     if (h2Quick) h2Quick.innerHTML = `<i data-lucide="zap" class="w-8 h-8 text-blue-600 fill-blue-600/20"></i> ${Common.t('help_quick')}`;
-    
+
     const h2Manual = document.getElementById('help-manual-header');
     if (h2Manual) h2Manual.innerHTML = `<i data-lucide="book-open" class="w-8 h-8 text-blue-600 fill-blue-600/20"></i> ${Common.t('help_manual')}`;
 
     t('help-q1-title', 'help_q1_t'); t('help-q1-desc', 'help_q1_d');
     t('help-q2-title', 'help_q2_t'); t('help-q2-desc', 'help_q2_d');
     t('help-q3-title', 'help_q3_t'); t('help-q3-desc', 'help_q3_d');
-    
+
     // New Features
     const nfHeader = document.getElementById('help-new-features-header');
     if (nfHeader) nfHeader.innerHTML = `<i data-lucide="sparkles" class="w-8 h-8 text-yellow-500 fill-yellow-500/20"></i> ${Common.t('help_new_features_t')}`;
@@ -40,14 +40,19 @@ function translateUI() {
     t('help-m2-extra-title', 'metrics_rate'); t('help-m2-extra-desc', 'help_m2_extra');
     t('help-m2-l4', 'help_m2_l4');
     t('help-m3-title', 'help_m3_t'); t('help-m3-desc', 'help_m3_d');
-    const m3h1 = document.getElementById('help-m3-h1'); if(m3h1) m3h1.innerHTML = `<i data-lucide="search" class="w-5 h-5"></i> ${Common.t('help_m3_h1')}`;
-    const m3h2 = document.getElementById('help-m3-h2'); if(m3h2) m3h2.innerHTML = `<i data-lucide="filter" class="w-5 h-5"></i> ${Common.t('help_m3_h2')}`;
+    const m3h1 = document.getElementById('help-m3-h1'); if (m3h1) m3h1.innerHTML = `<i data-lucide="search" class="w-5 h-5"></i> ${Common.t('help_m3_h1')}`;
+    const m3h2 = document.getElementById('help-m3-h2'); if (m3h2) m3h2.innerHTML = `<i data-lucide="filter" class="w-5 h-5"></i> ${Common.t('help_m3_h2')}`;
     t('help-m3-l1', 'help_m3_l1'); t('help-m3-l2', 'help_m3_l2'); t('help-m3-extra', 'help_m3_extra');
     t('help-m4-title', 'help_m4_t'); t('help-m4-desc', 'help_m4_d');
     t('help-m4-h1', 'help_m4_h1'); t('help-m4-l1', 'help_m4_l1');
     t('help-m4-h2', 'help_m4_h2'); t('help-m4-l2', 'help_m4_l2');
     t('help-m4-h3', 'help_m4_h3'); t('help-m4-l3', 'help_m4_l3');
     t('help-m4-privacy-title', 'help_m4_privacy_t'); t('help-m4-privacy-desc', 'help_m4_privacy_d');
+
+    t('help-m5-title', 'help_m5_t');
+    t('help-m5-h1', 'help_m5_h1'); t('help-m5-l1', 'help_m5_l1');
+    t('help-m5-h2', 'help_m5_h2'); t('help-m5-l2', 'help_m5_l2');
+    t('help-m5-h3', 'help_m5_h3'); t('help-m5-l4', 'help_m5_l4');
     t('help-shortcuts-title', 'help_shortcuts_t');
     t('help-shortcuts-n', 'help_shortcuts_n'); t('help-shortcuts-search', 'help_shortcuts_search');
     t('help-shortcuts-esc', 'help_shortcuts_esc'); t('help-shortcuts-help', 'help_shortcuts_help');
