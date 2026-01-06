@@ -44,7 +44,7 @@ const Common = {
             add_placeholder: '新しいタスクを入力...',
             add_btn: '追加',
             search_placeholder: '検索...',
-            menu_board: 'ボード',
+            menu_board: 'Board',
             menu_export: 'エクスポート (JSON)',
             menu_import: 'インポート',
             menu_metrics: 'Metrics',
