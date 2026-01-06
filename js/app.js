@@ -390,14 +390,55 @@ const App = {
             const tasks = col.taskIds.map(id => State.data.tasks[id]).filter(Boolean);
             const visible = tasks.filter(t => { const lMatch = State.filter === 'all' || (t.labels && t.labels.includes(State.filter)); const pMatch = State.priorityFilter === 'all' || (t.priority === State.priorityFilter); const sMatch = !State.searchQuery || t.content.toLowerCase().includes(State.searchQuery) || (t.description && t.description.toLowerCase().includes(State.searchQuery)); return lMatch && pMatch && sMatch; });
             const renderItems = []; const processedIds = new Set();
+
+            // 1. First Pass: Handle roots (Parent tasks present in this column)
             const roots = visible.filter(t => !t.parentId || !visible.some(pt => pt.id === t.parentId));
             roots.forEach(root => {
                 if (processedIds.has(root.id)) return;
-                if (root.parentId) { const pTask = State.data.tasks[root.parentId]; const last = renderItems[renderItems.length - 1]; if (pTask && (!last || last.type !== 'virtual' || last.task.id !== pTask.id)) renderItems.push({ type: 'virtual', task: pTask }); }
-                renderItems.push({ type: 'real', task: root }); processedIds.add(root.id); visible.filter(c => c.parentId === root.id).forEach(child => { renderItems.push({ type: 'real', task: child }); processedIds.add(child.id); });
-                Object.values(State.data.tasks).filter(t => t.parentId === root.id && !t.archived).forEach(child => { if (!processedIds.has(child.id)) renderItems.push({ type: 'virtual_child', task: child }); });
+
+                // If this root is actually a child whose parent is elsewhere (orphan child)
+                if (root.parentId) {
+                    // Logic handled in pass 2 (Grouping)
+                    return;
+                }
+
+                // Normal Root (Parent)
+                renderItems.push({ type: 'real', task: root }); processedIds.add(root.id);
+
+                // Render its children if they are also in this column
+                visible.filter(c => c.parentId === root.id).forEach(child => {
+                    renderItems.push({ type: 'real', task: child }); processedIds.add(child.id);
+                });
+
+                // Render Virtual Children for kids in OTHER columns
+                Object.values(State.data.tasks).filter(t => t.parentId === root.id && !t.archived).forEach(child => {
+                    if (!processedIds.has(child.id)) renderItems.push({ type: 'virtual_child', task: child });
+                });
             });
+
+            // 2. Second Pass: Handle Orphan Children (Group them by Parent)
+            const orphanChildren = visible.filter(t => t.parentId && !processedIds.has(t.id));
+            const groups = {}; // parentId -> [children]
+            orphanChildren.forEach(child => {
+                if (!groups[child.parentId]) groups[child.parentId] = [];
+                groups[child.parentId].push(child);
+            });
+
+            Object.keys(groups).forEach(pid => {
+                const pTask = State.data.tasks[pid];
+                // Render Virtual Parent ONCE
+                if (pTask) renderItems.push({ type: 'virtual', task: pTask });
+
+                // Render all children belonging to this parent
+                groups[pid].forEach(child => {
+                    renderItems.push({ type: 'real', task: child });
+                    processedIds.add(child.id);
+                });
+            });
+
+            // 3. Fallback: Any remaining items (should be none, but for safety)
             visible.forEach(t => { if (!processedIds.has(t.id)) renderItems.push({ type: 'real', task: t }); });
+
             renderItems.forEach(item => listEl.appendChild(item.type === 'virtual' ? UI.createVirtualParent(item.task) : (item.type === 'virtual_child' ? UI.createVirtualChild(item.task) : UI.createTaskCard(item.task, colId, visible))));
             colEl.appendChild(listEl); board.appendChild(colEl);
         }); lucide.createIcons(); App.initDragAndDrop();
