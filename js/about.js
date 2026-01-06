@@ -1,23 +1,37 @@
 /**
- * MonoFlow About Page Localization Logic
+ * MonoFlow - About Page Logic
+ * Handles localization and static content rendering for the About page.
  */
 
-function translateUI() {
-    const t = (id, key) => Common.setT(id, key);
-    const a = (id, attr, key) => Common.setAttr(id, attr, key);
-    t('brand-title', 'about_title'); t('brand-subtitle', 'about_subtitle');
-    t('nav-board', 'menu_board'); t('nav-metrics', 'menu_metrics'); t('nav-burndown', 'menu_burndown');
-    t('about-link', 'about_link');
-    t('footer-text', 'help_footer');
-    a('help-btn', 'title', 'menu_help');
-    a('lang-btn', 'title', 'switch_lang');
-    a('theme-btn', 'title', 'toggle_theme');
-    
-    t('about-concept-title', 'about_concept_t'); t('about-concept-desc', 'about_concept_d');
-    t('about-features-title', 'about_features_t');
-    t('about-f1-title', 'about_f1_t'); t('about-f1-desc', 'about_f1_d');
-    t('about-f2-title', 'about_f2_t'); t('about-f2-desc', 'about_f2_d');
-    t('about-f3-title', 'about_f3_t'); t('about-f3-desc', 'about_f3_d');
-}
+const About = {
+    // Initialize About Page: Set up translations
+    init: () => {
+        // Ensure data is loaded to respect language settings
+        const data = DataService.load();
+        if (data) State.data = data;
 
-document.addEventListener('DOMContentLoaded', () => { translateUI(); lucide.createIcons(); });
+        // Set up "Back" link with icon if it exists
+        const backLink = document.getElementById('back-link');
+        if (backLink) backLink.innerHTML = `<i data-lucide="arrow-left" class="w-4 h-4"></i> ${Common.t('back_to_board')}`;
+
+        // Translate page title and sections
+        Common.setT('about-title', 'menu_about');
+        Common.setT('about-desc', 'app_desc');
+        Common.setT('about-author-title', 'about_author');
+        Common.setT('about-stack-title', 'about_stack');
+        Common.setT('about-license-title', 'about_license');
+
+        // Translate privacy section
+        Common.setT('about-privacy-title', 'about_privacy_title');
+        Common.setT('about-privacy-content', 'about_privacy_content');
+
+        // Translate external links
+        Common.setT('about-repo-link', 'about_repo');
+
+        // Initialize icons
+        lucide.createIcons();
+    }
+};
+
+// Auto-initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', About.init);

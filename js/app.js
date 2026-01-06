@@ -2,7 +2,9 @@
  * MonoFlow - Core Application Logic
  */
 
+// Manages all board-related data operations
 const BoardData = {
+    // Initialize board with saved data or default template if empty
     init: () => {
         const saved = DataService.load();
         if (saved) { State.data = saved; } else {
@@ -16,6 +18,8 @@ const BoardData = {
         BoardData.ensureIntegrity();
     },
     save: () => DataService.save(State.data),
+
+    // Ensure all tasks exist in a column to prevent data loss (orphaned tasks)
     ensureIntegrity: () => {
         const allInCols = new Set(Object.values(State.data.columns).flatMap(c => c.taskIds));
         Object.keys(State.data.tasks).forEach(id => { if (!State.data.tasks[id].archived && !allInCols.has(id)) State.data.columns['c1'].taskIds.push(id); });
@@ -25,12 +29,14 @@ const BoardData = {
         if (!confirm(Common.t('confirm_delete'))) return;
         if (colId) State.data.columns[colId].taskIds = State.data.columns[colId].taskIds.filter(id => id !== taskId);
         delete State.data.tasks[taskId];
+        // Remove parent reference from any children
         Object.values(State.data.tasks).forEach(t => { if (t.parentId === taskId) t.parentId = null; });
         BoardData.save(); App.render();
     },
     archiveTask: (taskId) => {
         const t = State.data.tasks[taskId];
         let currentCid = 'c1';
+        // Remove from current column but remember where it came from
         for (const cid in State.data.columns) { if (State.data.columns[cid].taskIds.includes(taskId)) { currentCid = cid; State.data.columns[cid].taskIds = State.data.columns[cid].taskIds.filter(id => id !== taskId); break; } }
         t.archived = true; t.lastColumnId = currentCid;
         BoardData.save(); App.render(); Modal.close();
@@ -38,6 +44,7 @@ const BoardData = {
     restoreTask: (taskId) => {
         const t = State.data.tasks[taskId];
         t.archived = false;
+        // Try to restore to previous column, fallback to 'To Do'
         const targetCid = t.lastColumnId && State.data.columns[t.lastColumnId] ? t.lastColumnId : 'c1';
         State.data.columns[targetCid].taskIds.unshift(taskId);
         BoardData.save(); App.render(); Archive.render();
@@ -61,7 +68,9 @@ const LabelManager = {
     }
 };
 
+// Manages the task modal's UI and interactions
 const Modal = {
+    // Cache DOM elements for frequent access
     elements: {
         overlay: document.getElementById('task-modal'),
         content: document.querySelector('#task-modal .modal-content'),
@@ -76,6 +85,7 @@ const Modal = {
         addBlockerBtn: document.getElementById('modal-add-blocker-btn')
     },
     init: () => {
+        // Initialize Color Picker for labels
         const cContainer = document.getElementById('label-color-picker');
         const colors = {
             red: 'bg-red-500', blue: 'bg-blue-500', green: 'bg-green-500', yellow: 'bg-yellow-500', purple: 'bg-purple-500'
@@ -88,6 +98,7 @@ const Modal = {
         ).join('');
     },
     renderStaticUI: () => {
+        // Apply translations to static modal elements
         document.querySelector('#task-modal h3').textContent = Common.t('modal_title');
         Common.setT('display-created-at', 'task_created');
         const addTagBtn = document.getElementById('modal-add-tag-btn'); if (addTagBtn) addTagBtn.textContent = Common.t('modal_btn_add_tag');
@@ -117,6 +128,8 @@ const Modal = {
         document.getElementById('display-created-at').textContent = `${Common.t('task_created')}: ${task.createdAt ? UI.formatTime(task.createdAt) : '---'}`;
         document.getElementById('display-updated-at').textContent = `${Common.t('task_updated')}: ${task.updatedAt ? UI.formatTime(task.updatedAt) : '---'}`;
         const pRadio = Modal.elements.overlay.querySelector(`input[name="priority"][value="${task.priority || 'none'}"]`); if (pRadio) pRadio.checked = true;
+
+        // Prevent recursive parenting (max 2 levels)
         const hasChildren = Object.values(State.data.tasks).some(t => t.parentId === taskId);
         if (hasChildren) { Modal.elements.parent.disabled = true; Modal.elements.parent.classList.add('bg-slate-50', 'text-slate-400', 'cursor-not-allowed'); Modal.elements.parent.innerHTML = `<option value="" selected>${Common.t('modal_parent_restricted')}</option>`; }
         else { Modal.elements.parent.disabled = false; Modal.elements.parent.classList.remove('bg-slate-50', 'text-slate-400', 'cursor-not-allowed'); Modal.elements.parent.innerHTML = `<option value="">${Common.t('modal_label_none')}</option>`; Object.values(State.data.tasks).forEach(t => { if (t.id !== taskId && !t.parentId && !t.archived) { const opt = document.createElement('option'); opt.value = t.id; opt.textContent = t.content.substring(0, 30); Modal.elements.parent.appendChild(opt); } }); Modal.elements.parent.value = task.parentId || ''; }
@@ -129,6 +142,7 @@ const Modal = {
             if (val && !State.tempBlockers.includes(val)) { State.tempBlockers.push(val); Modal.renderBlockers(taskId); }
         };
 
+        // Animate modal entry
         Modal.elements.overlay.classList.remove('hidden'); void Modal.elements.overlay.offsetWidth; Modal.elements.overlay.classList.remove('opacity-0'); Modal.elements.content.classList.remove('scale-95', 'opacity-0'); Modal.elements.content.classList.add('scale-100', 'opacity-100'); document.body.classList.add('modal-open');
     },
     close: () => { Modal.elements.overlay.classList.add('opacity-0'); Modal.elements.content.classList.remove('scale-100', 'opacity-100'); Modal.elements.content.classList.add('scale-95', 'opacity-0'); setTimeout(() => { Modal.elements.overlay.classList.add('hidden'); document.body.classList.remove('modal-open'); }, 250); },
@@ -138,6 +152,7 @@ const Modal = {
             const t = State.data.tasks[id]; t.content = content; t.description = Modal.elements.desc.value; t.dueDate = Modal.elements.date.value;
             t.parentId = Modal.elements.parent.value || null; t.priority = document.querySelector('input[name="priority"]:checked')?.value || 'none';
             t.labels = [...State.tempLabels]; t.blockers = [...State.tempBlockers]; t.updatedAt = new Date().toISOString();
+            // If parent logic changed, ensure no circular deps (though hidden by UI) or cleanup
             if (t.parentId) Object.values(State.data.tasks).forEach(child => { if (child.parentId === id) child.parentId = null; });
             BoardData.save(); App.render(); Modal.close();
         }
@@ -170,7 +185,10 @@ const Modal = {
 };
 
 const UI = {
+    // Format date string to local locale
     formatTime: (iso) => { if (!iso) return ''; const d = Common.parseDate(iso); return d.toLocaleString(State.language === 'ja' ? 'ja-JP' : 'en-US', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }); },
+
+    // Draw Bezier curves connecting a task to its dependencies
     drawConnectors: (taskId) => {
         const canvas = document.getElementById('connector-canvas');
         if (!canvas) return;
@@ -212,8 +230,6 @@ const UI = {
             // Smoother Curve
             const dist = Math.abs(tx - sx);
             const cpOffset = Math.min(dist / 2, 100);
-            // Control points logic needs to be swapped because we are drawing FROM Target (Blocker) TO Source (Self)
-            // But wait, let's just swap M and coords in d attribute.
 
             // Draw from Blocker (tx, ty) to Self (sx, sy) to make the "flow" come from dependency.
             const cp1x_rev = tx + (sx > tx ? cpOffset : -cpOffset);
@@ -392,6 +408,7 @@ const App = {
             const renderItems = []; const processedIds = new Set();
 
             // 1. First Pass: Handle roots (Parent tasks present in this column)
+            // Identify tasks that do not have a parent IN THIS LIST (could be true root or orphan in this context)
             const roots = visible.filter(t => !t.parentId || !visible.some(pt => pt.id === t.parentId));
             roots.forEach(root => {
                 if (processedIds.has(root.id)) return;
@@ -410,13 +427,14 @@ const App = {
                     renderItems.push({ type: 'real', task: child }); processedIds.add(child.id);
                 });
 
-                // Render Virtual Children for kids in OTHER columns
+                // Render Virtual Children for kids in OTHER columns (Subtask Preview)
                 Object.values(State.data.tasks).filter(t => t.parentId === root.id && !t.archived).forEach(child => {
                     if (!processedIds.has(child.id)) renderItems.push({ type: 'virtual_child', task: child });
                 });
             });
 
             // 2. Second Pass: Handle Orphan Children (Group them by Parent)
+            // Files that are technically children but their parent is not in this column
             const orphanChildren = visible.filter(t => t.parentId && !processedIds.has(t.id));
             const groups = {}; // parentId -> [children]
             orphanChildren.forEach(child => {
@@ -426,7 +444,7 @@ const App = {
 
             Object.keys(groups).forEach(pid => {
                 const pTask = State.data.tasks[pid];
-                // Render Virtual Parent ONCE
+                // Render Virtual Parent ONCE to provide context (Context Ghost)
                 if (pTask) renderItems.push({ type: 'virtual', task: pTask });
 
                 // Render all children belonging to this parent

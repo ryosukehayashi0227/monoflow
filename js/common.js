@@ -3,10 +3,15 @@
  */
 
 const CONSTANTS = {
+    // LocalStorage keys for data, language, and theme persistence
     STORAGE_KEY: 'monoflow-v10-refactored',
     LANG_KEY: 'monoflow-lang',
     THEME_KEY: 'monoflow-theme',
+
+    // Fixed Column IDs
     DONE_COLUMN_ID: 'c3',
+
+    // Tailwind classes for UI consistency
     COLORS: {
         red: 'bg-red-100 text-red-700 border-red-200',
         blue: 'bg-blue-100 text-blue-700 border-blue-200',
@@ -14,6 +19,8 @@ const CONSTANTS = {
         yellow: 'bg-yellow-100 text-yellow-700 border-yellow-200',
         purple: 'bg-purple-100 text-purple-700 border-purple-200'
     },
+
+    // Priority configurations including icons and styles
     PRIORITIES: [
         { value: 'high', label: { ja: '高', en: 'High' }, icon: 'chevrons-up', style: 'text-red-600 bg-red-50 border-red-200' },
         { value: 'medium', label: { ja: '中', en: 'Med' }, icon: 'minus', style: 'text-orange-600 bg-orange-50 border-orange-200' },
@@ -23,17 +30,18 @@ const CONSTANTS = {
 };
 
 const State = {
-    data: null,
-    filter: 'all',
-    priorityFilter: 'all',
-    searchQuery: '',
-    language: 'ja',
-    theme: 'light',
-    tempLabels: [],
-    lastAddedId: null
+    data: null,            // The main data object loaded from storage
+    filter: 'all',         // Current label filter
+    priorityFilter: 'all', // Current priority filter
+    searchQuery: '',       // Current search text
+    language: 'ja',        // Current UI language
+    theme: 'light',        // Current UI theme (light/dark)
+    tempLabels: [],        // Temporary storage for labels during editing
+    lastAddedId: null      // ID of the most recently added task (for animation)
 };
 
 const Common = {
+    // Translation dictionary
     I18N: {
         ja: {
             app_desc: 'Simple Personal Kanban',
@@ -380,8 +388,11 @@ const Common = {
         }
     },
 
+
+    // Simple translation helper: checks I18N object for cached language
     t: (key) => (Common.I18N[State.language] && Common.I18N[State.language][key]) || key,
 
+    // Safely parses dates including ISO strings and legacy formats
     parseDate: (dateStr) => {
         if (!dateStr) return null;
         const normalized = dateStr.includes('T') ? dateStr : dateStr.replace(/-/g, '/');
@@ -427,18 +438,20 @@ const Common = {
     toggleMenu: (e) => { if (e) { e.preventDefault(); e.stopPropagation(); } const menu = document.getElementById('settings-menu'); if (menu) menu.classList.toggle('hidden'); },
     setLanguage: (lang) => { State.language = lang; localStorage.setItem(CONSTANTS.LANG_KEY, lang); location.reload(); },
 
-    // Shared Trans Helper
+    // Shared Translation Helper: targets innerHTML or attributes
     setT: (id, key) => { const el = document.getElementById(id); if (el) el.innerHTML = Common.t(key); },
     setAttr: (id, attr, key) => { const el = document.getElementById(id); if (el) el.setAttribute(attr, Common.t(key)); }
 };
 
 const DataService = {
+    // Load from LocalStorage
     load: () => {
         const saved = localStorage.getItem(CONSTANTS.STORAGE_KEY);
         return saved ? JSON.parse(saved) : null;
     },
     save: (data) => localStorage.setItem(CONSTANTS.STORAGE_KEY, JSON.stringify(data)),
 
+    // Export full application state as JSON file
     export: () => {
         const fullState = {
             data: DataService.load(),
@@ -451,6 +464,7 @@ const DataService = {
         a.download = `monoflow-backup-${new Date().toISOString().split('T')[0]}.json`; a.click();
     },
 
+    // Handle file import: reads JSON, validates, and restores state
     import: (input) => {
         const file = input.files[0]; if (!file) return;
         if (!confirm(Common.t('confirm_import'))) { input.value = ''; return; }
@@ -479,6 +493,7 @@ const DataService = {
 };
 
 const NotificationService = {
+    // Identify overdue and due-today tasks
     getUrgentTasks: () => {
         const data = DataService.load();
         if (!data) return { overdue: [], dueToday: [] };
