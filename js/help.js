@@ -49,6 +49,12 @@ function translateUI() {
     t('help-m4-h3', 'help_m4_h3'); t('help-m4-l3', 'help_m4_l3');
     t('help-m4-privacy-title', 'help_m4_privacy_t'); t('help-m4-privacy-desc', 'help_m4_privacy_d');
 
+    t('help-step-1', 'help_step_1');
+    t('help-step-2', 'help_step_2');
+    t('help-step-3', 'help_step_3');
+    t('help-step-4', 'help_step_4');
+    t('help-step-5', 'help_step_5');
+
     t('help-m5-title', 'help_m5_t');
     t('help-m5-h1', 'help_m5_h1'); t('help-m5-l1', 'help_m5_l1');
     t('help-m5-h2', 'help_m5_h2'); t('help-m5-l2', 'help_m5_l2');
