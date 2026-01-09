@@ -19,9 +19,18 @@ const Metrics = {
         Common.setT('label-throughput', 'throughput_history');
 
         // Filter Setup
-        const filterEl = document.getElementById('metrics-filter');
-        filterEl.innerHTML = `<option value="all">${Common.t('filter_all')}</option>` + State.data.labels.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
-        filterEl.onchange = (e) => Metrics.render(e.target.value);
+        const chipsContainer = document.getElementById('metrics-label-chips');
+        if (chipsContainer) {
+            chipsContainer.innerHTML = State.data.labels.map(l =>
+                `<button onclick="Metrics.render('${l.id}')" class="w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2 transition-colors rounded-lg">
+                    <span class="w-2 h-2 rounded-full" style="background-color: ${l.color}"></span> ${l.name}
+                </button>`
+            ).join('');
+        }
+
+        // Expose global functions for HTML buttons
+        window.initMetrics = () => location.reload();
+        window.clearLabels = () => Metrics.render('all');
 
         Metrics.render('all');
         lucide.createIcons();
@@ -29,6 +38,19 @@ const Metrics = {
 
     // Calculate and rendering all statistics based on current filter
     render: (filterId) => {
+        // Update Filter UI Text
+        const labelTextEl = document.getElementById('selected-label-count');
+        if (labelTextEl) {
+            if (filterId === 'all') {
+                labelTextEl.textContent = 'すべて';
+            } else {
+                const label = State.data.labels.find(l => l.id === filterId);
+                if (label) labelTextEl.textContent = label.name;
+            }
+        }
+        const settingsMenu = document.getElementById('settings-menu');
+        if (settingsMenu) settingsMenu.classList.add('hidden');
+
         const tasks = Object.values(State.data.tasks).filter(t => !t.archived);
         const filtered = filterId === 'all' ? tasks : tasks.filter(t => t.labels && t.labels.includes(filterId));
 
@@ -48,14 +70,16 @@ const Metrics = {
             const totalLead = doneTasks.reduce((acc, t) => acc + (new Date(t.completedDate) - new Date(t.createdAt)), 0);
             avgLeadTime = Math.round(totalLead / doneTasks.length / (1000 * 60 * 60 * 24));
         }
-        document.getElementById('avg-lead-time').textContent = avgLeadTime + ' ' + Common.t('days_suffix');
+        const avgDaysEl = document.getElementById('avg-days');
+        if (avgDaysEl) avgDaysEl.textContent = avgLeadTime + ' ' + Common.t('unit_days');
 
         // Estimate completion based on simple velocity (avg tasks done per day)
         const velocity = Metrics.calculateVelocity(doneTasks);
         const remaining = total - done;
         const daysLeft = velocity > 0 ? Math.ceil(remaining / velocity) : 0;
         const estDate = daysLeft > 0 ? new Date(Date.now() + daysLeft * 24 * 60 * 60 * 1000).toLocaleDateString() : '---';
-        document.getElementById('est-completion').textContent = estDate;
+        const estFinishEl = document.getElementById('est-finish');
+        if (estFinishEl) estFinishEl.textContent = estDate;
 
         Metrics.renderCharts(todo, inProgress, done, filtered);
     },

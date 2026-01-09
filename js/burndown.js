@@ -17,8 +17,13 @@ const Burndown = {
 
         // Populate label filter
         const filterEl = document.getElementById('burndown-filter');
-        filterEl.innerHTML = `<option value="all">${Common.t('filter_all')}</option>` + State.data.labels.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
-        filterEl.onchange = (e) => Burndown.render(e.target.value);
+        if (filterEl) {
+            filterEl.innerHTML = `<option value="all">${Common.t('filter_all')}</option>` + State.data.labels.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
+            filterEl.onchange = (e) => Burndown.render(e.target.value);
+        }
+
+        // Expose global function for header refresh button
+        window.initBurndown = () => location.reload();
 
         Burndown.render('all');
         lucide.createIcons();
@@ -29,25 +34,43 @@ const Burndown = {
         const tasks = Object.values(State.data.tasks).filter(t => !t.archived);
         const filtered = filterId === 'all' ? tasks : tasks.filter(t => t.labels && t.labels.includes(filterId));
 
+        if (filtered.length === 0) return;
+
         // 1. Determine Timeline (Start Date to End Date/Today)
-        const startDates = filtered.map(t => new Date(t.createdAt).getTime());
+        // Robustly parse dates, ignoring invalid ones
+        const startDates = filtered
+            .map(t => t.createdAt ? new Date(t.createdAt).getTime() : NaN)
+            .filter(d => !isNaN(d));
+
         if (startDates.length === 0) return;
+
         const minDate = new Date(Math.min(...startDates));
         minDate.setHours(0, 0, 0, 0);
 
         // Determine End Date (Latest due date or completion date, or today + buffer)
-        const dueDates = filtered.filter(t => t.dueDate).map(t => new Date(t.dueDate).getTime());
-        const compDates = filtered.filter(t => t.completedDate).map(t => new Date(t.completedDate).getTime());
+        const dueDates = filtered.map(t => t.dueDate ? new Date(t.dueDate).getTime() : NaN).filter(d => !isNaN(d));
+        const compDates = filtered.map(t => t.completedDate ? new Date(t.completedDate).getTime() : NaN).filter(d => !isNaN(d));
+
         const maxDateVal = Math.max(...dueDates, ...compDates, Date.now());
         const maxDate = new Date(maxDateVal);
         maxDate.setHours(0, 0, 0, 0);
 
+        // Limit range to prevent massive loop if data is weird (e.g. 1970)
+        // If start date is too old (more than 1 year ago), clamp it for visualization unless user wants otherwise
+        const oneYearAgo = new Date(); oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+        if (minDate < oneYearAgo) {
+            minDate.setTime(oneYearAgo.getTime());
+        }
+
         // Generate array of date strings for the chart labels
         const labels = [];
         let curr = new Date(minDate);
-        while (curr <= maxDate) {
+        // Safety break to prevent infinite loops
+        let iterations = 0;
+        while (curr <= maxDate && iterations < 1000) {
             labels.push(curr.toISOString().split('T')[0]);
             curr.setDate(curr.getDate() + 1);
+            iterations++;
         }
 
         // 2. Calculate Remaining Tasks per Day
@@ -56,16 +79,24 @@ const Burndown = {
         const totalTasks = filtered.length;
 
         // Initialize Ideal Line (Linear drop from Total to 0)
-        const idealSlope = totalTasks / (labels.length - 1);
+        const idealSlope = labels.length > 1 ? totalTasks / (labels.length - 1) : 0;
 
         labels.forEach((dateStr, idx) => {
             const dateObj = new Date(dateStr);
             const nextDate = new Date(dateObj); nextDate.setDate(nextDate.getDate() + 1);
 
             // Only plot "Real" line up to today
-            if (dateObj <= new Date()) {
+            // Use current time comparison for "today", but allow end-of-day inclusion
+            const isFuture = dateObj > new Date();
+
+            // For the chart, we want to show the state at the END of that day.
+            // If the day is in the past or today, we calculate.
+            if (!isFuture || dateStr === new Date().toISOString().split('T')[0]) {
                 // Count tasks created ON or BEFORE this date
-                const createdCount = filtered.filter(t => new Date(t.createdAt) < nextDate).length;
+                const createdCount = filtered.filter(t => {
+                    if (!t.createdAt) return false;
+                    return new Date(t.createdAt) < nextDate;
+                }).length;
 
                 // Count tasks completed ON or BEFORE this date
                 const completedCount = filtered.filter(t => {
@@ -82,7 +113,10 @@ const Burndown = {
         });
 
         // 3. Render Chart using Chart.js
-        const ctx = document.getElementById('burndownChart').getContext('2d');
+        const ctxEl = document.getElementById('burndownChart');
+        if (!ctxEl) return;
+        const ctx = ctxEl.getContext('2d');
+
         if (State.burndownChart) State.burndownChart.destroy();
 
         State.burndownChart = new Chart(ctx, {
@@ -119,28 +153,7 @@ const Burndown = {
                     },
                     y: { beginAtZero: true }
                 }
-            },
-            // Custom plugin to shade weekends (optional, Simplified for stability)
-            plugins: [{
-                id: 'weekendShading',
-                beforeDraw: (chart) => {
-                    const ctx = chart.ctx;
-                    const xAxis = chart.scales.x;
-                    const yAxis = chart.scales.y;
-                    ctx.save();
-                    chart.data.labels.forEach((label, index) => {
-                        const date = new Date(label);
-                        const day = date.getDay(); // 0=Sun, 6=Sat
-                        if (day === 0 || day === 6) {
-                            const xStart = xAxis.getPixelForTick(index);
-                            // Width approximation (distance to next tick or previous)
-                            // Ideally calculate width correctly, but for now just shade a thin strip or skip
-                            // to avoid complex geometry logic in this tool call.
-                        }
-                    });
-                    ctx.restore();
-                }
-            }]
+            }
         });
     }
 };
