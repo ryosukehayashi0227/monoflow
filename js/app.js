@@ -2,6 +2,13 @@
  * MonoFlow - Core Application Logic
  */
 
+// Render cache for incremental DOM updates (Performance Optimization)
+const RenderCache = {
+    initialized: false,  // Whether initial full render has been done
+    columnElements: {},  // Cached column container elements
+    taskListElements: {} // Cached task list elements per column
+};
+
 // Manages all board-related data operations
 const BoardData = {
     // Initialize board with saved data or default template if empty
@@ -388,55 +395,84 @@ const App = {
         }
     },
     render: () => {
-        const board = document.getElementById('board'); board.innerHTML = '';
-        const appDesc = document.querySelector('header p.text-slate-400'); if (appDesc) appDesc.textContent = Common.t('app_desc');
-        const taskInput = document.getElementById('new-task-input'); if (taskInput) taskInput.placeholder = Common.t('add_placeholder');
-        const searchInput = document.getElementById('search-input'); if (searchInput) searchInput.placeholder = Common.t('search_placeholder');
-        const addBtnSpan = document.getElementById('add-btn-text'); if (addBtnSpan) addBtnSpan.textContent = Common.t('add_btn');
-        const aboutLink = document.getElementById('about-link'); if (aboutLink) aboutLink.textContent = Common.t('about_link');
-        const helpLink = document.querySelector('a[href="help.html"]'); if (helpLink) helpLink.title = Common.t('menu_help');
-        App.updateFilterDropdown(); App.updatePriorityFilterDropdown();
-        const mItems = { 'menu-board-text': Common.t('menu_board'), 'menu-metrics-text': Common.t('menu_metrics'), 'menu-burndown-text': Common.t('menu_burndown'), 'menu-about-text': Common.t('menu_about'), 'menu-export': Common.t('menu_export'), 'menu-import': Common.t('menu_import'), 'menu-archive': Common.t('menu_archive'), 'menu-reset': Common.t('menu_reset') };
-        for (const id in mItems) { const el = document.getElementById(id); if (el) { if (el.tagName === 'SPAN') el.textContent = mItems[id]; else { const icon = el.querySelector('i'); el.innerHTML = `${icon ? icon.outerHTML : ''} ${mItems[id]}`; } } }
+        const board = document.getElementById('board');
+
+        // Initial render: Create column structure once and cache it
+        if (!RenderCache.initialized) {
+            board.innerHTML = '';
+            State.data.columnOrder.forEach(colId => {
+                const col = State.data.columns[colId];
+                const colTitle = colId === 'c1' ? Common.t('col_todo') : (colId === 'c2' ? Common.t('col_progress') : Common.t('col_done'));
+                const colEl = document.createElement('div');
+                colEl.className = 'bg-slate-200/40 dark:bg-slate-800/40 backdrop-blur-sm rounded-2xl p-2.5 flex flex-col border border-white/20 dark:border-slate-700 shadow-inner h-full min-h-[500px]';
+                colEl.dataset.columnId = colId;
+                colEl.innerHTML = `<div class="flex justify-between items-center mb-3 px-1"><h2 class="column-title text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">${colTitle}</h2><span class="column-count bg-white/60 dark:bg-slate-700/60 text-slate-500 dark:text-slate-300 text-[9px] font-black px-2 py-0.5 rounded-full border border-slate-100 dark:border-slate-600">${col.taskIds.length}</span></div>`;
+                const listEl = document.createElement('div');
+                listEl.className = 'task-list space-y-2 pb-20 flex-grow min-h-[200px]';
+                listEl.dataset.columnId = colId;
+                colEl.appendChild(listEl);
+                board.appendChild(colEl);
+                // Cache elements for future updates
+                RenderCache.columnElements[colId] = colEl;
+                RenderCache.taskListElements[colId] = listEl;
+            });
+            RenderCache.initialized = true;
+        }
+
+        // Incremental update: Only update task lists and column counts
+        App.updateFilterDropdown();
+        App.updatePriorityFilterDropdown();
+
         State.data.columnOrder.forEach(colId => {
-            const col = State.data.columns[colId]; const colTitle = colId === 'c1' ? Common.t('col_todo') : (colId === 'c2' ? Common.t('col_progress') : Common.t('col_done'));
-            const colEl = document.createElement('div'); colEl.className = 'bg-slate-200/40 dark:bg-slate-800/40 backdrop-blur-sm rounded-2xl p-2.5 flex flex-col border border-white/20 dark:border-slate-700 shadow-inner h-full min-h-[500px]';
-            colEl.innerHTML = `<div class="flex justify-between items-center mb-3 px-1"><h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">${colTitle}</h2><span class="bg-white/60 dark:bg-slate-700/60 text-slate-500 dark:text-slate-300 text-[9px] font-black px-2 py-0.5 rounded-full border border-slate-100 dark:border-slate-600">${col.taskIds.length}</span></div>`;
-            const listEl = document.createElement('div'); listEl.className = 'task-list space-y-2 pb-20 flex-grow min-h-[200px]'; listEl.dataset.columnId = colId;
+            const col = State.data.columns[colId];
+            const listEl = RenderCache.taskListElements[colId];
+            const colEl = RenderCache.columnElements[colId];
+
+            if (!listEl || !colEl) return;
+
+            // Update column task count
+            const countEl = colEl.querySelector('.column-count');
+            if (countEl) countEl.textContent = col.taskIds.length;
+
+            // Clear only the task list (not entire column)
+            listEl.innerHTML = '';
+
+            // Build visible tasks based on filters
             const tasks = col.taskIds.map(id => State.data.tasks[id]).filter(Boolean);
-            const visible = tasks.filter(t => { const lMatch = State.filter === 'all' || (t.labels && t.labels.includes(State.filter)); const pMatch = State.priorityFilter === 'all' || (t.priority === State.priorityFilter); const sMatch = !State.searchQuery || t.content.toLowerCase().includes(State.searchQuery) || (t.description && t.description.toLowerCase().includes(State.searchQuery)); return lMatch && pMatch && sMatch; });
-            const renderItems = []; const processedIds = new Set();
+            const visible = tasks.filter(t => {
+                const lMatch = State.filter === 'all' || (t.labels && t.labels.includes(State.filter));
+                const pMatch = State.priorityFilter === 'all' || (t.priority === State.priorityFilter);
+                const sMatch = !State.searchQuery || t.content.toLowerCase().includes(State.searchQuery) || (t.description && t.description.toLowerCase().includes(State.searchQuery));
+                return lMatch && pMatch && sMatch;
+            });
+
+            const renderItems = [];
+            const processedIds = new Set();
 
             // 1. First Pass: Handle roots (Parent tasks present in this column)
-            // Identify tasks that do not have a parent IN THIS LIST (could be true root or orphan in this context)
             const roots = visible.filter(t => !t.parentId || !visible.some(pt => pt.id === t.parentId));
             roots.forEach(root => {
                 if (processedIds.has(root.id)) return;
+                if (root.parentId) return; // Orphan child handled in pass 2
 
-                // If this root is actually a child whose parent is elsewhere (orphan child)
-                if (root.parentId) {
-                    // Logic handled in pass 2 (Grouping)
-                    return;
-                }
-
-                // Normal Root (Parent)
-                renderItems.push({ type: 'real', task: root }); processedIds.add(root.id);
+                renderItems.push({ type: 'real', task: root });
+                processedIds.add(root.id);
 
                 // Render its children if they are also in this column
                 visible.filter(c => c.parentId === root.id).forEach(child => {
-                    renderItems.push({ type: 'real', task: child }); processedIds.add(child.id);
+                    renderItems.push({ type: 'real', task: child });
+                    processedIds.add(child.id);
                 });
 
-                // Render Virtual Children for kids in OTHER columns (Subtask Preview)
+                // Render Virtual Children for kids in OTHER columns
                 Object.values(State.data.tasks).filter(t => t.parentId === root.id && !t.archived).forEach(child => {
                     if (!processedIds.has(child.id)) renderItems.push({ type: 'virtual_child', task: child });
                 });
             });
 
             // 2. Second Pass: Handle Orphan Children (Group them by Parent)
-            // Files that are technically children but their parent is not in this column
             const orphanChildren = visible.filter(t => t.parentId && !processedIds.has(t.id));
-            const groups = {}; // parentId -> [children]
+            const groups = {};
             orphanChildren.forEach(child => {
                 if (!groups[child.parentId]) groups[child.parentId] = [];
                 groups[child.parentId].push(child);
@@ -444,22 +480,30 @@ const App = {
 
             Object.keys(groups).forEach(pid => {
                 const pTask = State.data.tasks[pid];
-                // Render Virtual Parent ONCE to provide context (Context Ghost)
                 if (pTask) renderItems.push({ type: 'virtual', task: pTask });
-
-                // Render all children belonging to this parent
                 groups[pid].forEach(child => {
                     renderItems.push({ type: 'real', task: child });
                     processedIds.add(child.id);
                 });
             });
 
-            // 3. Fallback: Any remaining items (should be none, but for safety)
-            visible.forEach(t => { if (!processedIds.has(t.id)) renderItems.push({ type: 'real', task: t }); });
+            // 3. Fallback: Any remaining items
+            visible.forEach(t => {
+                if (!processedIds.has(t.id)) renderItems.push({ type: 'real', task: t });
+            });
 
-            renderItems.forEach(item => listEl.appendChild(item.type === 'virtual' ? UI.createVirtualParent(item.task) : (item.type === 'virtual_child' ? UI.createVirtualChild(item.task) : UI.createTaskCard(item.task, colId, visible))));
-            colEl.appendChild(listEl); board.appendChild(colEl);
-        }); lucide.createIcons(); App.initDragAndDrop();
+            // Append task cards to list
+            renderItems.forEach(item => {
+                listEl.appendChild(
+                    item.type === 'virtual' ? UI.createVirtualParent(item.task) :
+                        (item.type === 'virtual_child' ? UI.createVirtualChild(item.task) :
+                            UI.createTaskCard(item.task, colId, visible))
+                );
+            });
+        });
+
+        lucide.createIcons();
+        App.initDragAndDrop();
     },
     updateFilterDropdown: () => { const s = document.getElementById('label-filter'); if (!s) return; s.innerHTML = `<option value="all">${Common.t('filter_all')}</option>`; State.data.labels.forEach(l => { const opt = document.createElement('option'); opt.value = l.id; opt.textContent = l.name; if (l.id === State.filter) opt.selected = true; s.appendChild(opt); }); },
     updatePriorityFilterDropdown: () => { const s = document.getElementById('priority-filter'); if (!s) return; s.innerHTML = `<option value="all">${Common.t('filter_priority_all')}</option>`; CONSTANTS.PRIORITIES.forEach(p => { const opt = document.createElement('option'); opt.value = p.value; opt.textContent = p.label[State.language]; if (p.value === State.priorityFilter) opt.selected = true; s.appendChild(opt); }); },

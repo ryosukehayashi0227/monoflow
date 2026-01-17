@@ -44,24 +44,26 @@ test.describe('Import/Export', () => {
         const importFilePath = path.join(__dirname, 'temp_import.json');
         fs.writeFileSync(importFilePath, JSON.stringify(importData));
 
-        // Trigger import
-        // We need to find the file input. Usually hidden.
-        // JS: DataService.import(input)
-        // HTML probably has <input type="file" onchange="DataService.import(this)">
-        // We will locate it. If it's hidden, we need to make sure Playwright can set it.
+        // Handle the confirm dialog that appears before import
+        page.on('dialog', async dialog => {
+            await dialog.accept();
+        });
 
-        // Let's assume there is an input[type=file]
-        const fileInput = page.locator('input[type="file"]');
-
-        // Upload the file
+        // Get file input and upload the file
+        const fileInput = page.locator('#import-file');
         await fileInput.setInputFiles(importFilePath);
 
+        // Import triggers page reload, wait for it
+        await page.waitForLoadState('load');
+
+        // Wait for board to render
+        await page.waitForSelector('#board');
+
         // Verify task appears
-        // Import usually reloads the page.
-        // Wait for reload or task visibility
-        await expect(page.locator('.task-card', { hasText: taskName })).toBeVisible();
+        await expect(page.locator('.task-card', { hasText: taskName })).toBeVisible({ timeout: 10000 });
 
         // Cleanup
         fs.unlinkSync(importFilePath);
     });
 });
+
