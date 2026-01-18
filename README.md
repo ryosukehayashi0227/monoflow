@@ -51,5 +51,18 @@ MonoFlow is built with a focus on simplicity, speed, and standard web technologi
 - **Icons:** Lucide Icons (Clean, consistent vector iconography).
 - **Drag & Drop:** SortableJS (Reliable, touch-compatible reordering).
 
+## 📚 Documentation
+
+For detailed technical information, please refer to the following documents:
+
+- **[SPEC.md](SPEC.md)** - Complete system specification including data models, features, and technical requirements
+- **[AGENTS.md](AGENTS.md)** - Architecture overview and development guidelines for AI assistants
+- **[TESTS.md](TESTS.md)** - Testing strategy, test suites, and how to run tests
+- **[GEMINI.md](GEMINI.md)** - Project context and development guidelines
+
+### Additional Resources
+- **[docs/system_spec.md](docs/system_spec.md)** - Legacy system specification (日本語)
+- **[docs/test_spec.md](docs/test_spec.md)** - Legacy test specification (日本語)
+
 ---
 **MonoFlow** - Built for High-Performance Personal Productivity.
