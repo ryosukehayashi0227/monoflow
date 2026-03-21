@@ -10,6 +10,7 @@ Unlike cloud-based tools, MonoFlow lives entirely in your browser. It requires n
 - **Offline Operation:** Fully functional without an internet connection. Ideal for secure environments or focus-heavy offline sessions.
 - **Zero Tracking:** No telemetry, no cookies, no analytics scripts. Pure productivity without the prying eyes.
 - **Instant Portability:** The entire system is a collection of static files. Move it to a USB drive, a private server, or just keep it on your desktop.
+- **PWA Ready:** Installable as a Progressive Web App (PWA) on supported devices for a native-like full-screen experience.
 
 ## ✨ Core Features
 
