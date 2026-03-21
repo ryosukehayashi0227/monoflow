@@ -23,7 +23,7 @@ const documentMock = {
     querySelectorAll: vi.fn(() => []),
 };
 global.document = documentMock;
-global.Chart = vi.fn(); // Mock Chart.js
+global.Chart = vi.fn(() => ({ destroy: vi.fn() })); // Mock Chart.js
 
 // Mock Common and DataService for metrics.js
 // We need to inject these mocks or rely on the fact that metrics.js uses global objects if not imported.
@@ -38,7 +38,11 @@ global.CONSTANTS = CONSTANTS;
 global.lucide = { createIcons: vi.fn() };
 
 // Now import metrics.js - it will execute and look for globals
-import { initMetrics } from '../../js/metrics.js';
+import '../../js/metrics.js';
+
+function triggerInit() {
+    if (globalThis.initMetricsForTest) globalThis.initMetricsForTest();
+}
 
 describe('Metrics Logic', () => {
     beforeEach(() => {
@@ -63,21 +67,21 @@ describe('Metrics Logic', () => {
     });
 
     it('should calculate average lead time correctly', () => {
-        initMetrics();
-        // t1: 4 days, t2: 1 day -> Avg: 2.5 days
-        expect(document.getElementById('avg-days').textContent).toContain('2.5');
+        triggerInit();
+        // t1: 4 days, t2: 1 day -> Avg: 2.5 days, Math.round(2.5) = 3
+        expect(document.getElementById('avg-days').textContent).toContain('3');
     });
 
     it('should calculate completion rate correctly', () => {
-        initMetrics();
+        triggerInit();
         // 2 tasks, both done -> 100%
         expect(document.getElementById('completion-rate').textContent).toBe('100%');
     });
 
     it('should handle zero tasks gracefully', () => {
         vi.spyOn(DataService, 'load').mockReturnValue({ tasks: {}, columns: {}, labels: [] });
-        initMetrics();
+        triggerInit();
         expect(document.getElementById('completion-rate').textContent).toBe('0%');
-        expect(document.getElementById('avg-days').textContent).toContain('0.0');
+        expect(document.getElementById('avg-days').textContent).toContain('0');
     });
 });

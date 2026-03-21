@@ -149,6 +149,7 @@ const Common = {
             help_m1_h2: 'ステータス管理',
             help_m1_l5: 'Doneレーンにあるタスクは、新しい未完了タスクへの集中を助けるため、自動的に「減光」処理されます。',
             help_m1_l6: 'タイトルには打ち消し線が適用され、心理的な達成感を高めます。',
+            help_m1_l7: '完了日時はISO形式で記録され、Metricsダッシュボードでの正確な集計を可能にします。',
             help_step_1: 'VISUALS',
             help_step_2: 'HIERARCHY',
             help_step_3: 'SEARCH',
@@ -544,6 +545,12 @@ document.addEventListener('keydown', (e) => {
     }
     if (e.key === '?') { window.location.href = 'help.html'; }
 });
+
+if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.error('SW registration failed:', err));
+    });
+}
 
 if (typeof module !== 'undefined') {
     module.exports = { DataService, Common, CONSTANTS, State, NotificationService };

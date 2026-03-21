@@ -13,6 +13,7 @@ This document provides detailed technical specifications for MonoFlow, including
 - **100% Local Data**: All information is stored in the browser's `localStorage`, with no external server transmission
 - **Offline Operation**: Fully functional without internet connection
 - **Zero Configuration**: No installation required, just open `index.html` to start
+- **PWA Support**: Installable as a Progressive Web App on mobile and desktop
 - **Advanced Task Management**: 2-level hierarchy, dependency tracking, stale task detection
 - **Analytics**: Metrics dashboard and burndown charts
 - **Multi-language Support**: Full localization for Japanese and English
@@ -416,8 +417,8 @@ Dedicated view (`metrics.html`) provides statistical insights
 
 ### 10.2 Technical Improvements
 - **IndexedDB migration**: Avoid LocalStorage capacity limitations
-- **Service Worker**: Enhanced offline support
-- **PWA conversion**: Distribute as installable application
+- **Service Worker**: Enhanced offline support (Implemented via PWA)
+- **PWA conversion**: Distribute as installable application (Implemented)
 
 ---
 

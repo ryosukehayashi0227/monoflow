@@ -171,3 +171,4 @@ const Metrics = {
 };
 
 document.addEventListener('DOMContentLoaded', Metrics.init);
+if (typeof globalThis !== 'undefined') globalThis.initMetricsForTest = Metrics.init;
